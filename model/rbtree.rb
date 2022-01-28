@@ -25,9 +25,9 @@ class BinTree
       end
     end
 
-    def flip
+    def flip_color
       if @type != :normal
-        fail "tried to flip non-normal node"
+        fail "tried to flip_color non-normal node"
       end
       @color = @color == :B ? :R : :B
       p "flipped color of #{@key} -> #{@color}"
@@ -177,6 +177,16 @@ class BinTree
         return -1
       end
       n + nr
+    end
+
+    def rotate(child)
+      if @left == child
+        rotate_right
+      elsif @right == child
+        rotate_left
+      else
+        fail "tried to rotate a pair not in parent-child: #{@key} - #{child.key}"
+      end
     end
 
     def rotate_left
@@ -422,17 +432,18 @@ class BinTree
 
   # リバランス
   def rebalance(n)
+    p "rebalancing #{n.key}"
     # 0. Nが通常ノードでないか、黒ノードの場合
     # -> なにもしない
     if !n.is_normal_node || n.color == :B
-      p "do nothing(n is B)s"
+      p "do nothing(n is B)"
       return n
     end
     # 1. Nが根ノードの場合
     # -> 色変して終わり
     if n == root
       p "changed #{n.key} -> B"
-      n.flip
+      n.flip_color
       return n
     end
     # 2. Nの親が黒ノードの場合
@@ -445,14 +456,11 @@ class BinTree
     # 3. Nの親が赤ノードの場合
     if n.is_left_child != n.parent.is_left_child
       # 曲がっている場合(シス)
-      # -> Nの親の親とNの親で回転させる
+      # -> Nの親の親とNの親で回転させる(トランスにする)
+      # https://ja.wikipedia.org/wiki/%E3%82%B7%E3%82%B9_(%E5%8C%96%E5%AD%A6)
       p "detected cis: #{n.key} - #{n.parent.key} - #{n.parent.parent.key}"
       pa = n.parent
-      if n.is_left_child
-        pa.rotate_right
-      else
-        pa.rotate_left
-      end
+      pa.rotate(n)
       n = pa
     end
 
@@ -463,21 +471,17 @@ class BinTree
     if u.color == :B
       # Uが黒ノードの場合
       # P,Qを色変する
-      pa.flip
-      q.flip
+      pa.flip_color
+      q.flip_color
       # さらにQ-Pに対して右回転を行う。
-      if pa.is_left_child
-        q.rotate_right
-      else
-        q.rotate_left
-      end
+      q.rotate(pa)
       return n
     else
       # Uが赤ノードの場合
       # P, Q, Uの色を反転する。
-      pa.flip
-      q.flip
-      u.flip
+      pa.flip_color
+      q.flip_color
+      u.flip_color
       # Q -> N として、再帰的に処理を繰り返すことにする。
       return rebalance(q)
     end
@@ -501,7 +505,7 @@ def all_constraint(tree)
 end
 
 tree = BinTree.new
-items = (1..10000).to_a.shuffle
+items = (1..500).to_a.shuffle
 #items = [5, 2, 3, 1, 4]
 p items
 items.each{ |v| 
@@ -520,7 +524,7 @@ samples.times{
   puts "found #{key} in depth #{n} / #{ln}"
 }
 
-exit
+#exit
 
 puts "-- normal forward --"
 is = items.sort
