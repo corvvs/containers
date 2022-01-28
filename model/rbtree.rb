@@ -3,17 +3,26 @@ class BinTree
     attr_reader   :key, :is_end, :type
     attr_accessor :left, :right, :parent, :color
     def initialize(key, parent, color, type = :normal)
-      @key = key
-      @is_end = !key
-      @parent = parent
-      @color = color
-      @left = nil
-      @right = nil
       # [type]
       # - :normal   通常ノード
       # - :end      endノード
       # - :nil      NILノード
       @type = type
+      @key = key
+      @is_end = type == :end
+      @parent = parent
+      @color = color
+      if @type == :nil
+        @left = nil
+        @right = nil
+      else
+        @left = Node.new(nil, self, :B, :nil)
+        if @type == :end
+          @right = nil
+        else
+          @right = Node.new(nil, self, :B, :nil)
+        end
+      end
     end
 
     def add_left(key)
@@ -30,11 +39,11 @@ class BinTree
 
     # 自身を根とする部分木の最大ノードを返す
     def max
-      if !@right
+      if !has_right_child
         return self
       end
       node = @right
-      while node.right do
+      while node.has_right_child do
         node = node.right
       end
       return node
@@ -42,14 +51,18 @@ class BinTree
 
     # 自身を根とする部分木の最小ノードを返す
     def min
-      if !@left
+      if !has_left_child
         return self
       end
       node = @left
-      while node.left do
+      while node.has_left_child do
         node = node.left
       end
       return node
+    end
+
+    def is_normal_node
+      @type == :normal
     end
 
     # 自身が左子かどうかを返す
@@ -57,8 +70,8 @@ class BinTree
     def is_left_child
       return false if !@parent
       return false if !@parent.left
-      return false if !@parent.key
-      return @parent.left.key == @key
+      return false if @parent.key == :end
+      return @parent.left == self
     end
 
     # 自身が右子かどうかを返す
@@ -66,16 +79,24 @@ class BinTree
     def is_right_child
       return false if !@parent
       return false if !@parent.right
-      return false if !@parent.key
-      return @parent.right.key == @key
+      return false if @parent.key == :end
+      return @parent.right == self
+    end
+
+    def has_left_child
+      @left && @left.type != :nil
+    end
+
+    def has_right_child
+      @right && @right.type != :nil
     end
 
     # 自身に後隣接するノードを返す
     def forward_neighbor
-      if @right
+      if @right.is_normal_node
         return @right.min
       end
-      if !@key
+      if @type == :end
         return @left.min
       end
       node = self
@@ -87,10 +108,10 @@ class BinTree
 
     # 自身に前隣接するノードを返す
     def backward_neighbor
-      if @left
+      if @left.is_normal_node
         return @left.max
       end
-      if !@key
+      if @type == :end
         return @right.max
       end
       node = self
@@ -186,7 +207,7 @@ class BinTree
 
   attr_reader     :end
   def initialize
-    @end = Node.new(nil, nil, :B)
+    @end = Node.new(nil, nil, :B, :end)
   end
 
   def root
@@ -217,28 +238,26 @@ class BinTree
     # 普通の二分木のadd
     node = root
     while node do
+      p [node.key, node.type, node.parent.has_left_child]
+      if node.type == :nil
+        # NILノード
+        # -> ここに追加
+        if node.parent.left == node
+          p "added #{key} to left of #{node.parent.key}:#{node.parent.type}"
+          return node.parent.add_left(key)
+        else
+          p "added #{key} to right of #{node.parent.key}:#{node.parent.type}"
+          return node.parent.add_right(key)
+        end
+      end
       if key < node.key
         # 追加キーがノードよりも小さい
-        if node.left
-          # 左子があれば左に降りる
-          node = node.left
-        else
-          # 左子がなければ左子に追加して終了
-          node.left = node.add_left(key)
-          return node.left
-        end
+        node = node.left
       elsif node.key < key
-        # 追加キーがノードよりも大きい
-        if node.right
-          # 右子があれば右に降りる
-          node = node.right
-        else
-          # 右子がなければ右子に追加
-          node.right = node.add_right(key)
-          return node.right
-        end
+        node = node.right
       else
         # 重複なし二分木ならなにもしない
+        p "not added"
         return node
       end
     end
@@ -327,14 +346,30 @@ class BinTree
 end
 
 tree = BinTree.new
-items = [1, 2, 3]
+items = (1..5).to_a.shuffle
 p items
 items.each{ |v| tree.add(v) }
 
-p tree.constraint_black_or_white
-p tree.constraint_root_is_black
-p tree.constraint_all_leaves_are_black
-p tree.constraint_not_red_red
-p tree.constraint_same_black_height
+p tree.root.min.key
+p tree.root.max.key
 
-
+puts "-- normal forward --"
+it = tree.it_begin
+while true do
+  p [it.node.key, it.node.min.key, it.node.max.key]
+  p tree.constraint_black_or_white
+  p tree.constraint_root_is_black
+  p tree.constraint_all_leaves_are_black
+  p tree.constraint_not_red_red
+  p tree.constraint_same_black_height
+  p tree.root.min.key
+  p tree.root.max.key
+  break if it.node == tree.it_end.node
+  it = it.next
+end
+puts "-- normal backward --"
+while true  do
+  p [it.node.key, it.node.min.key, it.node.max.key]
+  break if it.node == tree.it_begin.node
+  it = it.prev
+end
