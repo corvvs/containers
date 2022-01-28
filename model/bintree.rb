@@ -1,102 +1,102 @@
 class BinTree
   class Node
-    attr_reader     :key, :is_end
+    attr_reader   :key, :is_end
     attr_accessor :left, :right, :parent
-      def initialize(key = nil, parent = nil)
-        @key = key
-        @is_end = !key
-        @parent = parent
-        @left = nil
-        @right = nil
-      end
+    def initialize(key, parent)
+      @key = key
+      @is_end = !key
+      @parent = parent
+      @left = nil
+      @right = nil
+    end
 
-      def add_left(key)
-        added = Node.new(key, self)
-        self.left = added
-        added
-      end
+    def add_left(key)
+      added = Node.new(key, self)
+      self.left = added
+      added
+    end
 
-      def add_right(key)
-        added = Node.new(key, self)
-        self.right = added
-        added
-      end
+    def add_right(key)
+      added = Node.new(key, self)
+      self.right = added
+      added
+    end
 
-      # 自身を根とする部分木の最大ノードを返す
-      def max
-        if !@right
-          return self
-        end
-        node = @right
-        while node.right do
-          node = node.right
-        end
-        return node
+    # 自身を根とする部分木の最大ノードを返す
+    def max
+      if !@right
+        return self
       end
+      node = @right
+      while node.right do
+        node = node.right
+      end
+      return node
+    end
 
-      # 自身を根とする部分木の最小ノードを返す
-      def min
-        if !@left
-          return self
-        end
-        node = @left
-        while node.left do
-          node = node.left
-        end
-        return node
+    # 自身を根とする部分木の最小ノードを返す
+    def min
+      if !@left
+        return self
       end
+      node = @left
+      while node.left do
+        node = node.left
+      end
+      return node
+    end
 
-      # 自身が左子かどうかを返す
-      # ルートは左子ではない(特別扱い)
-      def is_left_child
-        return false if !@parent
-        return false if !@parent.left
-        return false if !@parent.key
-        return @parent.left.key == @key
-      end
+    # 自身が左子かどうかを返す
+    # ルートは左子ではない(特別扱い)
+    def is_left_child
+      return false if !@parent
+      return false if !@parent.left
+      return false if !@parent.key
+      return @parent.left.key == @key
+    end
 
-      # 自身が右子かどうかを返す
-      # ルートは右子ではない(特別扱い)
-      def is_right_child
-        return false if !@parent
-        return false if !@parent.right
-        return false if !@parent.key
-        return @parent.right.key == @key
-      end
+    # 自身が右子かどうかを返す
+    # ルートは右子ではない(特別扱い)
+    def is_right_child
+      return false if !@parent
+      return false if !@parent.right
+      return false if !@parent.key
+      return @parent.right.key == @key
+    end
 
-      # 自身に後隣接するノードを返す
-      def forward_neighbor
-        if @right
-          return @right.min
-        end
-        if !@key
-          return @left.min
-        end
-        node = self
-        while node.is_right_child
-          node = node.parent
-        end
-        return node.parent
+    # 自身に後隣接するノードを返す
+    def forward_neighbor
+      if @right
+        return @right.min
       end
+      if !@key
+        return @left.min
+      end
+      node = self
+      while node.is_right_child
+        node = node.parent
+      end
+      return node.parent
+    end
 
-      # 自身に前隣接するノードを返す
-      def backward_neighbor
-        if @left
-          return @left.max
-        end
-        if !@key
-          return @right.max
-        end
-        node = self
-        while node.is_left_child
-          node = node.parent
-        end
-        return node.parent
+    # 自身に前隣接するノードを返す
+    def backward_neighbor
+      if @left
+        return @left.max
       end
+      if !@key
+        return @right.max
+      end
+      node = self
+      while node.is_left_child
+        node = node.parent
+      end
+      return node.parent
+    end
 
-      def set_key(key)
-        @key = key
-      end
+    def set_key(key)
+      @key = key
+    end
   end
 
 
@@ -134,7 +134,7 @@ class BinTree
 
   attr_reader     :end
   def initialize
-    @end = Node.new
+    @end = Node.new(nil, nil)
   end
 
   def root
@@ -210,12 +210,11 @@ class BinTree
       # 左子を持つ
       # -> TのparentとTの左子を接続して終了
       parent = node.parent
-      # puts "parent #{parent.key}, #{!!parent.left}, #{!!parent.right}"
-      if parent.left && parent.left == node
-        parent.left = node.left
+      if node.is_right_child
+        parent.right = node.left
         node.left.parent = parent
       else
-        parent.right = node.left
+        parent.left = node.left
         node.left.parent = parent
       end
       node.parent = nil
@@ -224,10 +223,10 @@ class BinTree
     end
     # Tが子を持たない場合
     parent = node.parent
-    if parent.left && parent.left == node
-      parent.left = nil
-    else
+    if node.is_right_child
       parent.right = nil
+    else
+      parent.left = nil
     end
     node.parent = nil
     return key
@@ -263,12 +262,8 @@ items.each{ |v| tree.add(v) }
 # p tree.root.max.is_left_child
 # p tree.root.max.is_right_child
 
-tree.delete(5)
-tree.delete(1)
-tree.delete(10)
-tree.delete(4)
-tree.delete(5)
-tree.delete(8)
+# items.shuffle.each{ |key| tree.delete(key) }
+tree.delete(items[0])
 
 puts "-- normal forward --"
 it = tree.it_begin
@@ -283,7 +278,6 @@ while true do
   break if it.node == tree.it_begin.node
   it = it.prev
 end
-
 
 puts "-- reverse forward --"
 it = tree.it_rbegin
