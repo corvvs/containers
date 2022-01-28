@@ -1,14 +1,19 @@
 class BinTree
   class Node
-    attr_reader   :key, :is_end
-    attr_accessor :left, :right, :parent
-    def initialize(key, parent, color)
+    attr_reader   :key, :is_end, :type
+    attr_accessor :left, :right, :parent, :color
+    def initialize(key, parent, color, type = :normal)
       @key = key
       @is_end = !key
       @parent = parent
       @color = color
       @left = nil
       @right = nil
+      # [type]
+      # - :normal   通常ノード
+      # - :end      endノード
+      # - :nil      NILノード
+      @type = type
     end
 
     def add_left(key)
@@ -104,6 +109,45 @@ class BinTree
         return false
       end
       (!@left || @left.is_black_or_white) && (!@right || @right.is_black_or_white)
+    end
+
+    def leave_is_black
+      if @left && !@left.leave_is_black
+        return false
+      end
+      if @right && !@right.leave_is_black
+        return false
+      end
+      # 葉の場合
+      if !@left && !@right
+        if @type != :nil
+          p "leave is not :nil"
+        end
+        return @color == :B
+      end
+      return true
+    end
+
+    def not_red_red
+      if @color == :R
+        if @left && @left.color == :R
+          return false
+        end
+        if @right && @right.color == :R
+          return false
+        end
+      end
+      return (!@left || @left.not_red_red) && (!@right || @right.not_red_red)
+    end
+
+    def black_height
+      n = @color == :B ? 1 : 0
+      nl = @left ? @left.black_height : 0
+      nr = @right ? @right.black_height : 0
+      if nl < 0 || nr < 0 || nl != nr
+        return -1
+      end
+      n + nr
     end
   end
 
@@ -265,49 +309,32 @@ class BinTree
   def constraint_root_is_black
     root.color == :B
   end
+
+  # 3. 葉がすべて黒
+  def constraint_all_leaves_are_black
+    root.leave_is_black
+  end
+
+  # 4. 赤制約
+  def constraint_not_red_red
+    root.not_red_red
+  end
+
+  # 5. 黒制約
+  def constraint_same_black_height
+    root.black_height >= 0
+  end
 end
 
 tree = BinTree.new
-items = (1..10).to_a.shuffle
-# items = [5, 3, 4, 6, 10, 8, 9, 2, 1, 7]
+items = [1, 2, 3]
 p items
 items.each{ |v| tree.add(v) }
 
-# p tree.root.min.key
-# p tree.root.max.key
-# p tree.root.min.is_left_child
-# p tree.root.min.is_right_child
-# p tree.root.max.is_left_child
-# p tree.root.max.is_right_child
+p tree.constraint_black_or_white
+p tree.constraint_root_is_black
+p tree.constraint_all_leaves_are_black
+p tree.constraint_not_red_red
+p tree.constraint_same_black_height
 
-# items.shuffle.each{ |key| tree.delete(key) }
-tree.delete(items[0])
 
-puts "-- normal forward --"
-it = tree.it_begin
-while true do
-  p [it.node.key, it.node.min.key, it.node.max.key]
-  break if it.node == tree.it_end.node
-  it = it.next
-end
-puts "-- normal backward --"
-while true do
-  p [it.node.key, it.node.min.key, it.node.max.key]
-  break if it.node == tree.it_begin.node
-  it = it.prev
-end
-
-puts "-- reverse forward --"
-it = tree.it_rbegin
-while true do
-  p [it.node.key, it.node.min.key, it.node.max.key]
-  break if it.node == tree.it_rend.node
-  it = it.next
-end
-
-puts "-- reverse backward --"
-while true do
-  p [it.node.key, it.node.min.key, it.node.max.key]
-  break if it.node == tree.it_rbegin.node
-  it = it.prev
-end
