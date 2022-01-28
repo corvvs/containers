@@ -1,7 +1,7 @@
 class BinTree
   class Node
-    attr_reader     :key, :is_end, :parent
-    attr_accessor :left, :right
+    attr_reader     :key, :is_end
+    attr_accessor :left, :right, :parent
       def initialize(key = nil, parent = nil)
         @key = key
         @is_end = !key
@@ -47,6 +47,7 @@ class BinTree
       end
 
       # 自身が左子かどうかを返す
+      # ルートは左子ではない(特別扱い)
       def is_left_child
         return false if !@parent
         return false if !@parent.left
@@ -55,6 +56,7 @@ class BinTree
       end
 
       # 自身が右子かどうかを返す
+      # ルートは右子ではない(特別扱い)
       def is_right_child
         return false if !@parent
         return false if !@parent.right
@@ -90,6 +92,10 @@ class BinTree
           node = node.parent
         end
         return node.parent
+      end
+
+      def set_key(key)
+        @key = key
       end
   end
 
@@ -135,6 +141,22 @@ class BinTree
     return @end.left
   end
 
+  # keyを持つノードを返す
+  # なければnilを返す
+  def find(key)
+    node = root
+    while node do
+      if key == node.key
+        break
+      elsif key < node.key
+        node = node.left
+      elsif node.key < key
+        node = node.right
+      end
+    end
+    node
+  end
+
   def add(key)
     if !@end.left
       @end.left = @end.add_left(key)
@@ -170,6 +192,47 @@ class BinTree
     end
   end
 
+  # ノードの削除
+  def delete(key, from = nil)
+    node = from || find(key)
+    if !node
+      return nil
+    end
+    if node.right
+      # 右子(右部分木)をもつ
+      # -> 右部分木の最小値のkeyをもってくる
+      # -> 右部分木の最小値を削除する
+      submin = node.right.min
+      node.set_key(submin.key)
+      return delete(node.key, submin)
+    end
+    if node.left
+      # 左子を持つ
+      # -> TのparentとTの左子を接続して終了
+      parent = node.parent
+      # puts "parent #{parent.key}, #{!!parent.left}, #{!!parent.right}"
+      if parent.left && parent.left == node
+        parent.left = node.left
+        node.left.parent = parent
+      else
+        parent.right = node.left
+        node.left.parent = parent
+      end
+      node.parent = nil
+      node.left = nil
+      return key
+    end
+    # Tが子を持たない場合
+    parent = node.parent
+    if parent.left && parent.left == node
+      parent.left = nil
+    else
+      parent.right = nil
+    end
+    node.parent = nil
+    return key
+  end
+
   def it_begin()
     it = Iterator.new(self, root.min)
   end
@@ -189,6 +252,7 @@ end
 
 tree = BinTree.new
 items = (1..10).to_a.shuffle
+# items = [5, 3, 4, 6, 10, 8, 9, 2, 1, 7]
 p items
 items.each{ |v| tree.add(v) }
 
@@ -199,16 +263,23 @@ items.each{ |v| tree.add(v) }
 # p tree.root.max.is_left_child
 # p tree.root.max.is_right_child
 
+tree.delete(5)
+tree.delete(1)
+tree.delete(10)
+tree.delete(4)
+tree.delete(5)
+tree.delete(8)
+
 puts "-- normal forward --"
 it = tree.it_begin
 while true do
-  p it.node.key
+  p [it.node.key, it.node.min.key, it.node.max.key]
   break if it.node == tree.it_end.node
   it = it.next
 end
 puts "-- normal backward --"
 while true do
-  p it.node.key
+  p [it.node.key, it.node.min.key, it.node.max.key]
   break if it.node == tree.it_begin.node
   it = it.prev
 end
@@ -217,14 +288,14 @@ end
 puts "-- reverse forward --"
 it = tree.it_rbegin
 while true do
-  p it.node.key
+  p [it.node.key, it.node.min.key, it.node.max.key]
   break if it.node == tree.it_rend.node
   it = it.next
 end
 
 puts "-- reverse backward --"
 while true do
-  p it.node.key
+  p [it.node.key, it.node.min.key, it.node.max.key]
   break if it.node == tree.it_rbegin.node
   it = it.prev
 end
