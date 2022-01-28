@@ -25,6 +25,14 @@ class BinTree
       end
     end
 
+    def flip
+      if @type != :normal
+        fail "tried to flip non-normal node"
+      end
+      @color = @color == :B ? :R : :B
+      p "flipped color of #{@key} -> #{@color}"
+    end
+
     def add_left(key)
       added = Node.new(key, self, :R)
       self.left = added
@@ -170,6 +178,58 @@ class BinTree
       end
       n + nr
     end
+
+    def rotate_left
+      if !@right
+        fail "tried to rotate left with no right child #{@key}"
+      end
+      r = @right
+      p "L-rot #{@key} - #{r.key}"
+      rr = r.left
+      pa = @parent
+      lchild = is_left_child
+      @right = rr
+      rr.parent = self
+      r.left = self
+      self.parent = r
+      if lchild
+        pa.left = r
+      else
+        pa.right = r
+      end
+      r.parent = pa
+    end
+
+    def rotate_right
+      if !@left
+        fail "tried to rotate left with no right child #{@key}"
+      end
+      r = @left
+      p "R-rot #{@key} - #{r.key}"
+      rr = r.right
+      pa = @parent
+      lchild = is_left_child
+      @left = rr
+      rr.parent = self
+      r.right = self
+      self.parent = r
+      if lchild
+        pa.left = r
+      else
+        pa.right = r
+      end
+      r.parent = pa
+    end
+
+    def counter_child(child)
+      if @left == child
+        return @right
+      elsif @right == child
+        return @left
+      end
+      fail "#{child.key} is not a child of #{@key}"
+    end
+
   end
 
 
@@ -219,7 +279,7 @@ class BinTree
   def find(key)
     node = root
     while node do
-      if key == node.key
+      if node.type != :normal || key == node.key
         break
       elsif key < node.key
         node = node.left
@@ -230,10 +290,26 @@ class BinTree
     node
   end
 
+  def find_count(key)
+    node = root
+    n = 0
+    while node do
+      if node.type != :normal || key == node.key
+        break
+      elsif key < node.key
+        node = node.left
+      elsif node.key < key
+        node = node.right
+      end
+      n += 1
+    end
+    node.type == :normal ? n : nil
+  end
+
   def add(key)
     if !@end.left
       @end.left = @end.add_left(key)
-      return @end.left
+      return rebalance(@end.left)
     end
     # 普通の二分木のadd
     node = root
@@ -244,10 +320,10 @@ class BinTree
         # -> ここに追加
         if node.parent.left == node
           p "added #{key} to left of #{node.parent.key}:#{node.parent.type}"
-          return node.parent.add_left(key)
+          return rebalance(node.parent.add_left(key))
         else
           p "added #{key} to right of #{node.parent.key}:#{node.parent.type}"
-          return node.parent.add_right(key)
+          return rebalance(node.parent.add_right(key))
         end
       end
       if key < node.key
@@ -343,33 +419,130 @@ class BinTree
   def constraint_same_black_height
     root.black_height >= 0
   end
+
+  # リバランス
+  def rebalance(n)
+    # 0. Nが通常ノードでないか、黒ノードの場合
+    # -> なにもしない
+    if !n.is_normal_node || n.color == :B
+      p "do nothing(n is B)s"
+      return n
+    end
+    # 1. Nが根ノードの場合
+    # -> 色変して終わり
+    if n == root
+      p "changed #{n.key} -> B"
+      n.flip
+      return n
+    end
+    # 2. Nの親が黒ノードの場合
+    # -> なにもしなくてよい
+    if n.parent.color == :B
+      p "do nothing(parent is B)"
+      return n
+    end
+    
+    # 3. Nの親が赤ノードの場合
+    if n.is_left_child != n.parent.is_left_child
+      # 曲がっている場合(シス)
+      # -> Nの親の親とNの親で回転させる
+      p "detected cis: #{n.key} - #{n.parent.key} - #{n.parent.parent.key}"
+      pa = n.parent
+      if n.is_left_child
+        pa.rotate_right
+      else
+        pa.rotate_left
+      end
+      n = pa
+    end
+
+    pa = n.parent
+    q = pa.parent
+    u = q.counter_child(pa)
+    p "n = #{n.key}, p = #{pa.key}, q = #{q.key}, u = #{u.key}"
+    if u.color == :B
+      # Uが黒ノードの場合
+      # P,Qを色変する
+      pa.flip
+      q.flip
+      # さらにQ-Pに対して右回転を行う。
+      if pa.is_left_child
+        q.rotate_right
+      else
+        q.rotate_left
+      end
+      return n
+    else
+      # Uが赤ノードの場合
+      # P, Q, Uの色を反転する。
+      pa.flip
+      q.flip
+      u.flip
+      # Q -> N として、再帰的に処理を繰り返すことにする。
+      return rebalance(q)
+    end
+
+  end
+end
+
+
+def all_constraint(tree)
+  [
+    :constraint_black_or_white,
+    :constraint_root_is_black,
+    :constraint_all_leaves_are_black,
+    :constraint_not_red_red,
+    :constraint_same_black_height,
+  ].each{ |sym|
+    if !tree.send(sym)
+      fail "failed at constraint #{sym}"
+    end
+  }
 end
 
 tree = BinTree.new
-items = (1..5).to_a.shuffle
+items = (1..10000).to_a.shuffle
+#items = [5, 2, 3, 1, 4]
 p items
-items.each{ |v| tree.add(v) }
+items.each{ |v| 
+  p "adding #{v}"
+  tree.add(v)
+  all_constraint(tree)
+}
 
-p tree.root.min.key
-p tree.root.max.key
+
+puts "-- random sampling --"
+samples = items.size / 20
+samples.times{
+  key = items.sample(1)[0]
+  n = tree.find_count(key)
+  ln = Math.log2(items.size.to_f)
+  puts "found #{key} in depth #{n} / #{ln}"
+}
+
+exit
 
 puts "-- normal forward --"
+is = items.sort
 it = tree.it_begin
+qs = []
 while true do
-  p [it.node.key, it.node.min.key, it.node.max.key]
-  p tree.constraint_black_or_white
-  p tree.constraint_root_is_black
-  p tree.constraint_all_leaves_are_black
-  p tree.constraint_not_red_red
-  p tree.constraint_same_black_height
-  p tree.root.min.key
-  p tree.root.max.key
+  # p [it.node.key, it.node.min.key, it.node.max.key]
+  all_constraint(tree)
   break if it.node == tree.it_end.node
+  qs << it.node.key
   it = it.next
 end
+#p qs
+fail "not sorted" if is != qs
 puts "-- normal backward --"
+qs = []
 while true  do
-  p [it.node.key, it.node.min.key, it.node.max.key]
+  # p [it.node.key, it.node.min.key, it.node.max.key]
   break if it.node == tree.it_begin.node
   it = it.prev
+  qs << it.node.key
 end
+qs.reverse!
+#p qs
+fail "not sorted" if is != qs
