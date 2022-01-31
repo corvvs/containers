@@ -19,10 +19,13 @@ all				:	vector_stl
 
 .PHONY			:	vector_clean vector_stl vector
 
-vector_stl		:
+vector_clean	:
+	$(RM) $(HPPS_OBJS)
+
+vector_stl		:	vector_clean
 	$(MAKE) USE_STL=1 $(NAME_VECTOR_STL)
 
-vector			:
+vector			:	vector_clean
 	$(MAKE) $(NAME_VECTOR_FT)
 
 $(NAME_VECTOR_FT) $(NAME_VECTOR_STL)	:	$(HPPS_OBJS)
