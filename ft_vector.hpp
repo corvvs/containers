@@ -1,31 +1,35 @@
-#ifndef FT_VECTOR_H
-# define FT_VECTOR_H
+#ifndef FT_VECTOR_HPP
+# define FT_VECTOR_HPP
 
 # include "ft_common.hpp"
 # include <memory>
+# include <iostream>
 
 namespace ft {
 	template<class T, class Allocator = std::allocator<T> >
 	class vector {
 		public:
 
-			typedef typename T										value_type;
-			typedef typename Allocator								allocator_type;
+			typedef T												value_type;
+			typedef Allocator										allocator_type;
 			typedef typename std::size_t							size_type;
 			typedef typename std::ptrdiff_t							difference_type;
 			typedef typename Allocator::reference					reference;
 			typedef typename Allocator::const_reference				const_reference;
 			typedef typename Allocator::pointer						pointer;
 			typedef typename Allocator::const_pointer				const_pointer;
-			typedef typename LegacyRandomAccessIterator				iterator;
-			typedef typename const LegacyRandomAccessIterator		const_iterator;
+			// typedef typename LegacyRandomAccessIterator				iterator;
+			// typedef typename const LegacyRandomAccessIterator		const_iterator;
 			// ?? これらは実装する必要あり？
-			typedef typename std::reverse_iterator<iterator>		reverse_iterator;
-			typedef typename std::reverse_iterator<const_iterator>	const_reverse_iterator;
+			// typedef typename std::reverse_iterator<iterator>		reverse_iterator;
+			// typedef typename std::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 			// [コンストラクタ]
 			// デフォルト
-			vector();
+			vector(): capacity_(0), size_(0), allocator_(std::allocator<T>()), storage_(NULL) {
+				// capacityは0, sizeも0
+				std::cout << "ft!!" << std::endl;
+			}
 			// アロケータ指定
 			explicit vector(const Allocator& alloc);
 			// 要素数, (初期値(コピーされる), アロケータ)
@@ -41,7 +45,11 @@ namespace ft {
 			vector( const vector& other );
 
 			// [デストラクタ]
-			virtual ~vector();
+			virtual ~vector() {
+				if (storage_) {
+					allocator_.deallocate(storage_, capacity_);
+				}
+			}
 
 			// [代入]
 			// ?? signifierは無効化される？
@@ -90,42 +98,48 @@ namespace ft {
 			// [begin]
 			// コンテナの最初の要素を指すイテレータを返します。
 			// コンテナが空の場合は、返されたイテレータは end() と等しくなります。 
-			iterator begin();
-			const_iterator begin() const;
+			// iterator begin();
+			// const_iterator begin() const;
 
 			// [end]
 			// コンテナの最後の要素の次の要素を指すイテレータを返します。
 			// この要素はプレースホルダとしての役割を持ちます。この要素にアクセスを試みると未定義動作になります。
-			iterator end();
-			const_iterator end() const;
+			// iterator end();
+			// const_iterator end() const;
 
 			// [rbegin]
 			// 逆順の vector の最初の要素を指す逆イテレータを返します。 これは非逆順の vector の最後の要素に対応します。
 			// vector が空の場合、返されるイテレータは rend() と等しくなります。 
-			reverse_iterator rbegin();
-			const_reverse_iterator rbegin() const;
+			// reverse_iterator rbegin();
+			// const_reverse_iterator rbegin() const;
 
 			// [rend]
 			// 逆順の vector の最後の要素の次の要素を指す逆イテレータを返します。
 			// これは非逆順の vector の最初の要素の前の要素に対応します。
 			// この要素はプレースホルダとして振る舞い、アクセスを試みると未定義動作になります。
-			reverse_iterator rend();
-			const_reverse_iterator rend() const;
+			// reverse_iterator rend();
+			// const_reverse_iterator rend() const;
 
 			// [empty]
 			// コンテナの持っている要素が無い、つまり begin() == end() かどうかを調べます。 
-			bool empty() const;
+			bool empty() const {
+				return size_ == 0;
+			}
 			
 			// [size]
 			// コンテナ内の要素の数、すなわち std::distance(begin(), end()) を返します。 
-			size_type size() const;
+			size_type size() const {
+				return size_;
+			}
 
 			// [max_size]
 			// システムまたはライブラリ実装の制限によるコンテナが保持できる最大要素数を返します。 
 			// この値は一般的にはコンテナのサイズの理論上の制限を反映します
 			// (多くとも std::numeric_limits<difference_type>::max())。
 			// 実行時の利用可能な RAM の量により、コンテナのサイズは max_size() より小さな値に制限される場合があります。 
-			size_type max_size() const;
+			size_type max_size() const {
+				return ((std::size_t)(-1)) / sizeof(T);
+			}
 
 			// [reserve]
 			// ベクタの容量を new_cap より大きいまたは等しい値に増加させます。
@@ -140,7 +154,9 @@ namespace ft {
 
 			// [capacity]
 			// コンテナが現在確保している空間に格納できる要素の数を返します。 
-			size_type capacity() const;
+			size_type capacity() const {
+				return capacity_;
+			}
 
 			// [clear]
 			// コンテナからすべての要素を削除します。 この呼び出しの後、 size() はゼロを返します。
@@ -151,18 +167,18 @@ namespace ft {
 			// [insert]
 			// pos の前に value を挿入します。
 			// returns: 挿入された value を指すイテレータ。
-			iterator insert( iterator pos, const T& value );
+			// iterator insert( iterator pos, const T& value );
 			// os の前に value のコピーを count 個挿入します。
-			void insert( iterator pos, size_type count, const T& value );
+			// void insert( iterator pos, size_type count, const T& value );
 			// pos の前に範囲 [first, last) から要素を挿入します。 
-			void insert( iterator pos, InputIt first, InputIt last);
+			// void insert( iterator pos, InputIt first, InputIt last);
 
 			// [erase]
 			// コンテナから指定された要素を削除します。 
 			// 1) pos の指す要素を削除します。
-			iterator erase( iterator pos );
+			// iterator erase( iterator pos );
 			// 2) 範囲 [first, last) 内の要素を削除します。
-			iterator erase( iterator first, iterator last );
+			// iterator erase( iterator first, iterator last );
 			// 削除位置およびその後を指すイテレータおよび参照は無効化されます。 終端イテレータも無効化されます。
 			// イテレータ pos は有効かつ逆参照可能でなければなりません。 そのため end() イテレータは (有効であるが逆参照可能でないため) pos の値として使用することはできません。
 			// first==last の場合、イテレータ first は逆参照可能である必要はありません。 空範囲の削除は何もしません。 
@@ -197,8 +213,11 @@ namespace ft {
 			// すべてのイテレータおよび参照は有効なまま残されます。 終端イテレータは無効化されます。
 			void swap( vector& other );
 
-
 		FT_PRIVATE:
+			size_type		capacity_;
+			size_type		size_;
+			allocator_type	allocator_;
+			T*				storage_;
 	};
 
 	// [比較演算子]

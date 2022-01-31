@@ -1,5 +1,5 @@
-#ifndef FT_COMMON_H
-# define FT_COMMON_H
+#ifndef FT_COMMON_HPP
+# define FT_COMMON_HPP
 
 # define FT_PRIVATE private
 
