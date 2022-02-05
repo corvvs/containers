@@ -1,7 +1,10 @@
 CXX				:=	clang++
-CXXFLAGS		:=	-Wall -Wextra -Werror -std=c++98 --pedantic
+CXXFLAGS		:=	-Wall -Wextra -Werror -std=c++98 --pedantic -g -fsanitize=address
 ifdef USE_STL
 	CXXFLAGS	+=	-D USE_STL=1
+endif
+ifdef FT_DEBUG
+	CXXFLAGS	+=	-D FT_DEBUG=1
 endif
 
 HPPS_VECTOR		:=	ft_vector.hpp

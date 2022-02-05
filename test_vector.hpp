@@ -2,6 +2,7 @@
 # define TEST_VECTOR_HPP
 
 # include <iostream>
+# include <string>
 
 # ifdef USE_STL
 #  include <vector>
