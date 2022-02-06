@@ -146,16 +146,16 @@ namespace ft {
             // アロケータ指定
             explicit vector(const allocator_type& alloc)
                 : capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {
-                DOUT() << this << std::endl;;
+                // DOUT() << this << std::endl;;
             }
 
             // 要素数, (初期値(コピーされる), アロケータ)
             explicit vector(
                     size_type count,
-                    const value_type& value = value_type(),
+                    const_reference value = value_type(),
                     const allocator_type& alloc = allocator_type()
             ): capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {
-                DOUT() << this << std::endl;;
+                // DOUT() << this << "count: " << count << std::endl;;
                 resize(count, value);
             }
 
@@ -165,20 +165,20 @@ namespace ft {
                     const allocator_type& alloc = allocator_type(),
                     typename ft::disable_if< ft::is_integral<InputIt>::value >::type* = NULL
             ): capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {
-                DOUT() << this << std::endl;
+                // DOUT() << this << std::endl;
                 // 第４引数はdisable_ifのためのものなので、ノータッチ
                 insert(end(), first, last);
             }
             // コピーコンストラクタ
             vector(const vector& other) {
-                DOUT() << this << std::endl;;
+                // DOUT() << this << std::endl;;
                 *this = other;
             }
 
             // [デストラクタ]
             virtual ~vector() {
                 obliterate_();
-                DOUT() << "destructed " << this << std::endl;
+                // DOUT() << "destructed " << this << std::endl;
             }
 
             // [代入]
@@ -194,18 +194,15 @@ namespace ft {
             // !! INVALIDATE all signifiers !!
             // ※コンテナの要素へのイテレータ、ポインタ、参照はすべて無効化されます。 終端イテレータも無効化されます。 
             // (1) 内容を「valueのコピーcount個」に置き換える
-            void assign( size_type count, const T& value ) {
-                vector<T, Allocator>    new_one;
-                new_one.reserve(recommended_capacity_(count));
-                new_one.insert(new_one.end(), count, value);
+            void assign( size_type count, const_reference value ) {
+                vector<value_type, allocator_type>  new_one(count, value, allocator_);
                 swap(new_one);
             }
             // (2) 内容をレンジイテレータが指すものに置き換える
             // first and/or lastがthis内を指している場合はundefined
             template< class InputIt >
             void assign( InputIt first, InputIt last ) {
-                vector<T, Allocator>    new_one;
-                new_one.insert(new_one.end(), first, last);
+                vector<value_type, allocator_type>  new_one(first, last, allocator_);
                 swap(new_one);
             }
 
@@ -340,7 +337,8 @@ namespace ft {
             // (多くとも std::numeric_limits<difference_type>::max())。
             // 実行時の利用可能な RAM の量により、コンテナのサイズは max_size() より小さな値に制限される場合があります。 
             size_type max_size() const {
-                return ((std::size_t)(-1)) / sizeof(value_type);
+                return allocator_.max_size();
+                // return ((std::size_t)(-1)) / sizeof(value_type);
             }
 
             // [reserve]
@@ -367,14 +365,14 @@ namespace ft {
                     // size_ == 0 のはず。
                     storage_ = allocator_.allocate(new_cap);
                     capacity_ = new_cap;
-                    DOUT() << "newly allocated " << storage_ << " with cap: " << new_cap << std::endl;
+                    // DOUT() << "newly allocated " << storage_ << " with cap: " << new_cap << std::endl;
                 } else {
                     // 再確保
-                    ft::vector<value_type, allocator_type>  reserved;
+                    vector<value_type, allocator_type>  reserved(allocator_);
                     reserved.reserve(new_cap);
                     reserved.append_within_capacity_(begin(), end());
                     swap(reserved);
-                    DOUT() << "reallocated " << storage_ << " with cap: " << capacity() << std::endl;
+                    // DOUT() << "reallocated " << storage_ << " with cap: " << capacity() << std::endl;
                 }
             }
 
@@ -396,48 +394,79 @@ namespace ft {
             // pos の前に value を挿入します。
             // returns: 挿入された value を指すイテレータ。
             iterator insert(iterator pos, const value_type& value) {
-                DOUT() << std::endl;
                 size_type    n = pos - begin();
                 insert(pos, 1, value);
-                iterator    it = iterator(storage_);
-                return it += n;
+                return begin() + n;
             }
             // os の前に value のコピーを count 個挿入します。
             // returns: 挿入された最初の要素を指すイテレータ、または count==0 の場合は pos。
             void insert(iterator pos, size_type count, const value_type& value) {
-                size_type    ni = size_;
-                size_type    pi = pos - begin();
-                reserve(recommended_capacity_(size_ + count));
-                DOUT() << "ni + count == size_?: " << (ni + count == size_) << std::endl;
-                for (size_type i = ni; pi + 1 <= i; i -= 1) {
-                    storage_[i + count] = storage_[i];
-                }
-                for (size_type i = 0; i < count; i += 1) {
-                    storage_[i + pi] = value_type(value);
+                size_type   recommended_cap = recommended_capacity_(size() + count);
+                bool        needed_realloc = recommended_cap > capacity();
+                bool        do_append = pos == end();
+                if (!needed_realloc) {
+                    if (do_append) {
+                        // 再確保不要 & 末尾に追加
+                        for (size_type i = 0; i < count; ++i) {
+                            push_back_within_capacity_(value);
+                        }
+                    } else {
+                        // 再確保不要 & 末尾でない
+                        mass_move_within_capacity_(pos, count);
+                        fill_within_capacity_(pos, count, value);
+                    }
+                } else {
+                    // 再確保が必要
+                    vector<value_type, allocator_type> new_one(allocator_);
+                    new_one.reserve(recommended_cap);
+                    new_one.append_within_capacity_(begin(), pos);
+                    for (size_type i = 0; i < count; ++i) {
+                        new_one.push_back_within_capacity_(value);
+                    }
+                    new_one.append_within_capacity_(pos, end());
+                    swap(new_one);
                 }
             }
+
             // pos の前に範囲 [first, last) から要素を挿入します。 
             template< class InputIt >
             void insert(
                 iterator pos, InputIt first, InputIt last,
                 typename ft::disable_if< ft::is_integral<InputIt>::value >::type* = NULL
             ) {
-                vector<value_type, allocator_type>  receiver;
+                // 一旦新しいvectorで受ける
+                vector<value_type, allocator_type>  receiver(allocator_);
                 for (; first != last; ++first) {
                     receiver.push_back(*first);
                 }
-                size_type   n_receipt = receiver.size();
-                DOUT() << "n_receipt: " << n_receipt << std::endl;
-                iterator to = extend_and_move_(pos, n_receipt);
-                DOUT() << "begin:  " << &*receiver.begin() << std::endl;
-                DOUT() << "end:    " << &*receiver.end() << std::endl;
-                DOUT() << "rec cap:" << receiver.capacity() << std::endl;
-                DOUT() << "my  cap:" << capacity() << std::endl;
-                for (iterator from = receiver.begin(); from != receiver.end(); ++from) {
-                    *to = *from;
-                    ++to;
+                size_type   count = receiver.size();
+                // サイズがわかるので、再確保の有無を計算
+                size_type   recommended_cap = recommended_capacity_(size() + count);
+                bool        needed_realloc = recommended_cap > capacity();
+                bool        do_append = pos == end();
+                if (!needed_realloc) {
+                    if (do_append) {
+                        // 再確保不要 & 末尾に追加
+                        append_within_capacity_(receiver.begin(), receiver.end());
+                    } else {
+                        // 再確保不要 & 末尾でない
+                        size_type   p = pos - begin();
+                        mass_move_within_capacity_(pos, count);
+                        for (size_type i = 0; i < count; ++i) {
+                            allocator_.construct(&storage_[i + p], receiver[i]);
+                        }
+                    }
+                } else {
+                    // 再確保が必要
+                    vector<value_type, allocator_type> new_one(allocator_);
+                    new_one.reserve(recommended_cap);
+                    new_one.append_within_capacity_(begin(), pos);
+                    for (size_type i = 0; i < count; ++i) {
+                        new_one.push_back_within_capacity_(receiver[i]);
+                    }
+                    new_one.append_within_capacity_(pos, end());
+                    swap(new_one);
                 }
-                DOUT() << "insert done" << std::endl;
             }
 
             // [erase]
@@ -462,14 +491,14 @@ namespace ft {
             // <時間計算量: 償却定数>
             // <例外安全性: STRONG>
             // 例外が投げられた場合 (Allocator::allocate() または要素のコピー/ムーブのコンストラクタ/代入によって発生する可能性があります)、この関数は効果を持ちません (強い例外保証)。 
-            void push_back(const value_type& value) {
+            void push_back(const_reference value) {
                 size_type   rec_cap = recommended_capacity_(size_ + 1);
                 if (rec_cap > capacity()) {
                     // 再確保発生
                     // コピーしてpush_backしてswap
                     // 1回あたりO(size)かかるが、size回pushしてlog2(size)回しか起こらないので、
                     // 全体としては定数くらいになってくれるはず。
-                    vector<value_type, allocator_type> cloned;
+                    vector<value_type, allocator_type> cloned(allocator_);
                     cloned.reserve(rec_cap);
                     cloned.append_within_capacity_(begin(), end());
                     cloned.push_back_within_capacity_(value);
@@ -500,7 +529,7 @@ namespace ft {
             // より小さなサイズに変更しても vector の容量は縮小されません。 これは、 pop_back() を複数回呼び出すことで同等の効果を得た場合に無効化されるイテレータは削除されたもののみであるのに対し、容量の変更はすべてのイテレータを無効化するためです。 
             void resize( size_type count, value_type value = value_type() ) {
                 const size_type   current_size = size();
-                DOUT() << "size_ = " << current_size << ", count = " << count << std::endl;
+                // DOUT() << "size_ = " << current_size << ", count = " << count << std::endl;
                 if (current_size > count) {
                     // 現在のサイズが count より大きい場合、最初の count 個の要素にコンテナが縮小されます。
                     // If n is less than or equal to the size of the container,
@@ -521,7 +550,7 @@ namespace ft {
                     } else {
                         // 再確保が必要
                         // -> Copyableなら強い保証、そうでないなら基本保証
-                        ft::vector<value_type, allocator_type> cloned;
+                        vector<value_type, allocator_type> cloned(allocator_);
                         cloned.reserve(recommended_capacity_(count));
                         cloned.insert(cloned.end(), begin(), end());
                         cloned.insert(cloned.end(), count - cloned.size(), value);
@@ -534,7 +563,7 @@ namespace ft {
             // コンテナの内容を other の内容と交換します。 個々の要素に対するいかなるムーブ、コピー、swap 操作も発生しません。
             // すべてのイテレータおよび参照は有効なまま残されます。 終端イテレータは無効化されます。
             void swap( vector& other ) {
-                DOUT() << storage_ << " <-> " << other.storage_ << std::endl;
+                // DOUT() << storage_ << " <-> " << other.storage_ << std::endl;
                 // preserve
                 pointer         s_storage = storage_;
                 allocator_type  s_allocator = allocator_;
@@ -584,6 +613,11 @@ namespace ft {
                 return c;
             }
 
+            // サイズをnにしたい場合、再確保が必要かどうかを返す。
+            bool    needed_reallocation_(size_type n) const {
+                return recommended_capacity_(n) > capacity();
+            }
+
             // [from, to) の要素を末尾に追加する。
             // capacityは十分にあるものとする。
             void    append_within_capacity_(iterator from, iterator to) {
@@ -598,10 +632,36 @@ namespace ft {
             }
 
             // 再確保不要な前提でpush_backを行う。
-            void    push_back_within_capacity_(const value_type& value) {
+            void    push_back_within_capacity_(const_reference value) {
                 // ASSERTION: capacity() >= size() + 1
                 allocator_.construct(&storage_[size_], value);
                 size_ += 1;
+            }
+
+            // 区間 [pos, end) の部分を to_extend だけ右にずらし、
+            // サイズを to_extend だけ増やす。
+            // 再確保が起きない前提。つまり、c
+            // ASSERTION: size_ + to_extend <= capacity()
+            void    mass_move_within_capacity_(iterator pos, size_type to_extend) {
+                if (pos == end() || to_extend == 0) { return; }
+                size_type i_pos = pos - begin();
+                for (size_type i_from = size_; i_pos < i_from;) {
+                    if (i_pos + 1 > i_from) { break; }
+                    --i_from;
+                    size_type   i_to = i_from + to_extend;
+                    storage_[i_to] = storage_[i_from];
+                }
+                size_ += to_extend;
+            }
+
+            // pos から count 個の要素を value のコピーで塗りつぶす。
+            // 再確保が起きない前提。つまり、c
+            // ASSERTION: size_ + cou t <= capacity()
+            void    fill_within_capacity_(iterator pos, size_type count, const value_type& value) {
+                size_type   i_pos = pos - begin();
+                for (size_type i = 0; i < count; ++i) {
+                    allocator_.construct(&storage_[i_pos + i], value);
+                }
             }
 
             // サイズを size() + to_extend にできるよう reserve した後、
@@ -646,7 +706,7 @@ namespace ft {
             void    obliterate_() {
                 clear();
                 if (storage_) {
-                    DOUT() << "deallocating " << storage_ << " with cap: " << capacity_ << std::endl;
+                    // DOUT() << "deallocating " << storage_ << " with cap: " << capacity_ << std::endl;
                     allocator_.deallocate(storage_, capacity());
                     storage_ = NULL;
                     size_ = 0;

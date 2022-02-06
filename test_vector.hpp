@@ -4,6 +4,7 @@
 # include <iostream>
 # include <string>
 # include <cstdlib>
+# include "ft_common.hpp"
 
 # ifdef USE_STL
 #  include <vector>
