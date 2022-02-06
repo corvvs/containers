@@ -354,9 +354,9 @@ namespace ft {
             // reserve() はコンテナの容量を減らすために使用することはできません。 そのためには shrink_to_fit() が提供されています。 <- C++11
             void reserve( size_type new_cap ) {
                 //  new_cap が現在の capacity() より大きくなければ、この関数は何もしません。
-                DOUT() << "current cap: " << capacity() << ", new cap: " << new_cap << std::endl;
+                // DOUT() << "current cap: " << capacity() << ", new cap: " << new_cap << std::endl;
                 if (new_cap <= capacity_) {
-                    DOUT() << "do nothing" << std::endl;
+                    // DOUT() << "do nothing" << std::endl;
                     return;
                 }
                 if (max_size() < new_cap) {
@@ -367,12 +367,12 @@ namespace ft {
                     // size_ == 0 のはず。
                     storage_ = allocator_.allocate(new_cap);
                     capacity_ = new_cap;
-                    DOUT() << "allocated " << storage_ << " with cap: " << new_cap << std::endl;
+                    DOUT() << "newly allocated " << storage_ << " with cap: " << new_cap << std::endl;
                 } else {
                     // 再確保
                     ft::vector<value_type, allocator_type>  reserved;
                     reserved.reserve(new_cap);
-                    reserved.insert(reserved.end(), begin(), end());
+                    reserved.append_within_capacity(begin(), end());
                     swap(reserved);
                     DOUT() << "reallocated " << storage_ << " with cap: " << capacity() << std::endl;
                 }
@@ -427,13 +427,17 @@ namespace ft {
                     receiver.push_back(*first);
                 }
                 size_type   n_receipt = receiver.size();
-                DOUT() << "begin: " << &*receiver.begin() << std::endl;
-                DOUT() << "end:   " << &*receiver.end() << std::endl;
+                DOUT() << "n_receipt: " << n_receipt << std::endl;
                 iterator to = extend_and_move_(pos, n_receipt);
+                DOUT() << "begin:  " << &*receiver.begin() << std::endl;
+                DOUT() << "end:    " << &*receiver.end() << std::endl;
+                DOUT() << "rec cap:" << receiver.capacity() << std::endl;
+                DOUT() << "my  cap:" << capacity() << std::endl;
                 for (iterator from = receiver.begin(); from != receiver.end(); ++from) {
                     *to = *from;
                     ++to;
                 }
+                DOUT() << "insert done" << std::endl;
             }
 
             // [erase]
@@ -457,11 +461,9 @@ namespace ft {
             // そうでなければ、終端イテレータのみが無効化されます。 
             // 例外が投げられた場合 (Allocator::allocate() または要素のコピー/ムーブのコンストラクタ/代入によって発生する可能性があります)、この関数は効果を持ちません (強い例外保証)。 
             void push_back( const value_type& value ) {
-                std::cerr << "push_back..." << std::endl;
                 reserve(recommended_capacity_(size_ + 1));
                 storage_[size_] = value;
                 size_ += 1;
-                std::cerr << "push_back done: " << size_ << std::endl;
             }
 
             // [pop_back]
@@ -544,19 +546,41 @@ namespace ft {
 
             // サイズを「n以上に増やす」ために推奨されるcapacityの値を返す
             size_type    recommended_capacity_(size_type n) const {
-                if (n <= capacity_) { return capacity_; }
+                size_type    c = capacity();
+                if (n <= c) { return c; }
                 size_type    ms = max_size();
-                size_type    c = capacity_;
-                if (c < 4) { c = 4; }
-                while (c < n) {
-                    if (ms / 2 <= c) {
-                        // もう拡張できない
-                        throw std::length_error("too long");
+                if (c == 0 && n == 1) {
+                    c = 1;
+                } else {
+                    if (c <= n / 2) {
+                        c = n;
+                        if (ms < c) {
+                            // もう拡張できない
+                            throw std::length_error("too long");
+                        }
+                    } else {
+                        if (ms / 2 <= c) {
+                            // もう拡張できない
+                            throw std::length_error("too long");
+                        }
+                        c *= 2;
                     }
-                    c *= 2;
                 }
-                DOUT() << "recommended " << c << " for " << n << std::endl;
+                // DOUT() << c << " for " << n << std::endl;
                 return c;
+            }
+
+            // [from, to) の要素を末尾に追加する。
+            // capacityは十分にあるものとする。
+            void    append_within_capacity(iterator from, iterator to) {
+                // size_type   n = to - from;
+                // ASSERTION: size() + n <= capacity
+                size_type i = size();
+                for (iterator it = from; it != to; ++it) {
+                    storage_[i] = *it;
+                    ++i;
+                }
+                size_ = i;
             }
 
             // サイズを size() + to_extend にできるよう reserve した後、
@@ -567,6 +591,7 @@ namespace ft {
                 size_type   size_before = size();
                 DOUT() << "n_pos       = " << n_pos << std::endl;
                 DOUT() << "size_before = " << size_before << std::endl;
+                DOUT() << "to_extend   = " << to_extend << std::endl;
                 reserve(recommended_capacity_(size_before + to_extend));
                 if (to_extend > 0) {
                     size_ += to_extend;

@@ -1,10 +1,10 @@
 CXX				:=	clang++
-CXXFLAGS		:=	-Wall -Wextra -Werror -std=c++98 --pedantic -g -fsanitize=address
+CXXFLAGS		:=	-Wall -Wextra -Werror -std=c++98 --pedantic -O2 -g -fsanitize=address
 ifdef USE_STL
 	CXXFLAGS	+=	-D USE_STL=1
 endif
 ifdef FT_DEBUG
-	CXXFLAGS	+=	-D FT_DEBUG=1
+	CXXFLAGS	+=	-D FT_DEBUG=1 -g -fsanitize=address
 endif
 
 HPPS_VECTOR		:=	ft_vector.hpp
@@ -25,11 +25,18 @@ all				:	vector_stl
 vector_clean	:
 	$(RM) $(HPPS_OBJS)
 
-vector_stl		:	vector_clean
+vector_stl		:
+	$(MAKE) vector_clean
 	$(MAKE) USE_STL=1 $(NAME_VECTOR_STL)
 
-vector			:	vector_clean
+vector			:
+	$(MAKE) vector_clean
 	$(MAKE) $(NAME_VECTOR_FT)
+
+vector_diff		:	vector vector_stl
+	time ./$(NAME_VECTOR_STL) > out1
+	time ./$(NAME_VECTOR_FT) 2> err2 > out2
+	diff -u out1 out2
 
 $(NAME_VECTOR_FT) $(NAME_VECTOR_STL)	:	$(HPPS_OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(HPPS_OBJS)
