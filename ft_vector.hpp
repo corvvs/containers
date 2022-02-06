@@ -518,8 +518,8 @@ namespace ft {
                     // 空
                     return;
                 }
+                allocator_.destroy(&storage_[size_ - 1]);
                 size_ -= 1;
-                allocator_.destroy(&storage_[size_]);
             }
 
             // [resize]
@@ -563,22 +563,10 @@ namespace ft {
             // コンテナの内容を other の内容と交換します。 個々の要素に対するいかなるムーブ、コピー、swap 操作も発生しません。
             // すべてのイテレータおよび参照は有効なまま残されます。 終端イテレータは無効化されます。
             void swap( vector& other ) {
-                // DOUT() << storage_ << " <-> " << other.storage_ << std::endl;
-                // preserve
-                pointer         s_storage = storage_;
-                allocator_type  s_allocator = allocator_;
-                size_type       s_size = size_;
-                size_type       s_capacity = capacity_;
-                // to this
-                storage_ = other.storage_;
-                allocator_ = other.allocator_;
-                size_ = other.size_;
-                capacity_ = other.capacity_;
-                // to other
-                other.storage_ = s_storage;
-                other.allocator_ = s_allocator;
-                other.size_ = s_size;
-                other.capacity_ = s_capacity;
+                ft::swap(storage_, other.storage_);
+                ft::swap(allocator_, other.allocator_);
+                ft::swap(size_, other.size_);
+                ft::swap(capacity_, other.capacity_);
             }
 
         FT_PRIVATE:

@@ -168,6 +168,7 @@ namespace test_int {
     }
 
     void    mass_insertion_range(Vec::size_type n, Vec::size_type m) {
+        srand(n);
         Vec vi;
         for (Vec::size_type i = 0; i < m; ++i) {
             vi.push_back(i);
@@ -178,8 +179,45 @@ namespace test_int {
             Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * (vj.size() - 1)) + 1;
             vj.insert(vj.begin() + at, vi.begin(), vi.end());
         }
-        print_elements(vj.begin(), vj.end());
+        print_elements(vi.begin(), vi.end());
         print_stats(vj);
+    }
+
+    void    mass_pop_back(Vec::size_type n) {
+        srand(n);
+        Vec vi;
+        for (Vec::size_type i = 0; i < n; ++i) {
+            vi.push_back(rand());
+        }
+        print_elements(vi.begin(), vi.end());
+        print_stats(vi);
+        for (Vec::size_type i = 0; i < n / 2; ++i) {
+            vi.pop_back();
+        }
+        print_elements(vi.begin(), vi.end());
+        print_stats(vi);
+        for (Vec::size_type i = 0; i < n; ++i) {
+            vi.push_back(rand());
+        }
+        print_elements(vi.begin(), vi.end());
+        print_stats(vi);
+        Vec::size_type m = vi.size();
+        for (Vec::size_type i = 0; i < m; ++i) {
+            vi.pop_back();
+        }
+        print_elements(vi.begin(), vi.end());
+        print_stats(vi);
+    }
+
+    void    mass_test() {
+        test_int::mass_assignation(100000);
+        test_int::mass_swap(100000);
+        test_int::mass_range_allocation(50000);
+        test_int::mass_repeated_allocation(10000000, 999);
+        test_int::mass_insertion_1(100000);
+        test_int::mass_insertion_n(1000);
+        test_int::mass_insertion_range(1000, 1000);
+        test_int::mass_pop_back(100000);
     }
 }
 
@@ -244,18 +282,19 @@ int main() {
         // test_int::mass_insertion_n(2);
         // test_int::mass_insertion_n(3);
         // test_int::mass_insertion_n(4);
-        test_int::mass_insertion_range(0, 10);
-        test_int::mass_insertion_range(10, 0);
-        test_int::mass_insertion_range(1, 1);
-        test_int::mass_insertion_range(10, 10);
-        test_int::mass_insertion_range(100, 100);
-        test_int::mass_insertion_range(1000, 1000);
+        // test_int::mass_insertion_range(0, 10);
+        // test_int::mass_insertion_range(10, 0);
+        // test_int::mass_insertion_range(1, 1);
+        // test_int::mass_insertion_range(10, 10);
+        // test_int::mass_insertion_range(100, 100);
+        // test_int::mass_pop_back(0);
+        // test_int::mass_pop_back(1);
+        // test_int::mass_pop_back(2);
 
-        // test_int::mass_assignation(100000);
-        // test_int::mass_swap(100000);
-        // test_int::mass_range_allocation(50000);
-        // test_int::mass_repeated_allocation(10000000, 999);
-        // test_int::mass_insertion_1(100000);
-        // test_int::mass_insertion_n(1000);
+
+
+
+
+        // test_int::mass_test();
     // }
 }

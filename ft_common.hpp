@@ -14,4 +14,13 @@ std::ostream&   debug_out(
     return (std::cerr << "[" << filename << ":" << linenumber << " " << funcname << "] ");
 }
 
+namespace ft {
+    template<class T>
+    void        swap(T& a, T& b) {
+        T temp(a);
+        a = b;
+        b = temp;
+    }
+}
+
 #endif
