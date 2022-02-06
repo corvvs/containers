@@ -128,10 +128,8 @@ namespace ft {
                     pointer    ptr_;
             };
 
-
-
             typedef const iterator                                  const_iterator;
-            // ?? これらは実装する必要あり？
+            // ?? std::reverse_iteratorは実装する必要あり？
             typedef typename std::reverse_iterator<iterator>        reverse_iterator;
             typedef typename std::reverse_iterator<const_iterator>  const_reverse_iterator;
 
@@ -139,14 +137,11 @@ namespace ft {
             // デフォルト
             vector()
                 : capacity_(0), size_(0), allocator_(std::allocator<value_type>()), storage_(NULL) {
-                // capacityは0, sizeも0
-                DOUT() << this << std::endl;;
             }
 
             // アロケータ指定
             explicit vector(const allocator_type& alloc)
                 : capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {
-                // DOUT() << this << std::endl;;
             }
 
             // 要素数, (初期値(コピーされる), アロケータ)
@@ -155,7 +150,6 @@ namespace ft {
                     const_reference value = value_type(),
                     const allocator_type& alloc = allocator_type()
             ): capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {
-                // DOUT() << this << "count: " << count << std::endl;;
                 resize(count, value);
             }
 
@@ -165,20 +159,17 @@ namespace ft {
                     const allocator_type& alloc = allocator_type(),
                     typename ft::disable_if< ft::is_integral<InputIt>::value >::type* = NULL
             ): capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {
-                // DOUT() << this << std::endl;
                 // 第４引数はdisable_ifのためのものなので、ノータッチ
                 insert(end(), first, last);
             }
             // コピーコンストラクタ
             vector(const vector& other) {
-                // DOUT() << this << std::endl;;
                 *this = other;
             }
 
             // [デストラクタ]
             virtual ~vector() {
                 obliterate_();
-                // DOUT() << "destructed " << this << std::endl;
             }
 
             // [代入]
@@ -338,7 +329,6 @@ namespace ft {
             // 実行時の利用可能な RAM の量により、コンテナのサイズは max_size() より小さな値に制限される場合があります。 
             size_type max_size() const {
                 return allocator_.max_size();
-                // return ((std::size_t)(-1)) / sizeof(value_type);
             }
 
             // [reserve]
@@ -352,9 +342,7 @@ namespace ft {
             // reserve() はコンテナの容量を減らすために使用することはできません。 そのためには shrink_to_fit() が提供されています。 <- C++11
             void reserve( size_type new_cap ) {
                 //  new_cap が現在の capacity() より大きくなければ、この関数は何もしません。
-                // DOUT() << "current cap: " << capacity() << ", new cap: " << new_cap << std::endl;
                 if (new_cap <= capacity_) {
-                    // DOUT() << "do nothing" << std::endl;
                     return;
                 }
                 if (max_size() < new_cap) {
@@ -365,14 +353,12 @@ namespace ft {
                     // size_ == 0 のはず。
                     storage_ = allocator_.allocate(new_cap);
                     capacity_ = new_cap;
-                    // DOUT() << "newly allocated " << storage_ << " with cap: " << new_cap << std::endl;
                 } else {
                     // 再確保
                     vector<value_type, allocator_type>  reserved(allocator_);
                     reserved.reserve(new_cap);
                     reserved.append_within_capacity_(begin(), end());
                     swap(reserved);
-                    // DOUT() << "reallocated " << storage_ << " with cap: " << capacity() << std::endl;
                 }
             }
 
@@ -394,7 +380,7 @@ namespace ft {
             // pos の前に value を挿入します。
             // returns: 挿入された value を指すイテレータ。
             iterator insert(iterator pos, const value_type& value) {
-                size_type    n = pos - begin();
+                size_type    n = distance_(begin(), pos);
                 insert(pos, 1, value);
                 return begin() + n;
             }
@@ -450,7 +436,7 @@ namespace ft {
                         append_within_capacity_(receiver.begin(), receiver.end());
                     } else {
                         // 再確保不要 & 末尾でない
-                        size_type   p = pos - begin();
+                        size_type   p = distance_(begin(), pos);
                         mass_move_within_capacity_(pos, count);
                         for (size_type i = 0; i < count; ++i) {
                             allocator_.construct(&storage_[i + p], receiver[i]);
@@ -472,7 +458,20 @@ namespace ft {
             // [erase]
             // コンテナから指定された要素を削除します。 
             // 1) pos の指す要素を削除します。
-            // iterator erase( iterator pos );
+            iterator erase(const_iterator pos) {
+                if (pos == end()) {
+
+                }
+                size_type   i = distance_(begin(), pos);
+                size_type   sz = size();
+                allocator_.destroy(&storage_[i]);
+                for (size_type j = i + 1; j < sz; ++j) {
+                    storage_[j - 1] = storage_[j];
+                }
+                size_ -= 1;
+                return begin() + i;
+            }
+
             // 2) 範囲 [first, last) 内の要素を削除します。
             // iterator erase( iterator first, iterator last );
             // 削除位置およびその後を指すイテレータおよび参照は無効化されます。 終端イテレータも無効化されます。
@@ -575,6 +574,16 @@ namespace ft {
             allocator_type  allocator_;
             pointer         storage_;
 
+            difference_type distance_(iterator from, iterator to) const {
+                if (from == to) {
+                    return 0;
+                }
+                if (to == end()) {
+                    return size();
+                }
+                return to - from;
+            }
+
             // サイズを「n以上に増やす」ために推奨されるcapacityの値を返す
             size_type    recommended_capacity_(size_type n) const {
                 size_type    c = capacity();
@@ -632,7 +641,7 @@ namespace ft {
             // ASSERTION: size_ + to_extend <= capacity()
             void    mass_move_within_capacity_(iterator pos, size_type to_extend) {
                 if (pos == end() || to_extend == 0) { return; }
-                size_type i_pos = pos - begin();
+                size_type i_pos = distance_(begin(), pos);
                 for (size_type i_from = size_; i_pos < i_from;) {
                     if (i_pos + 1 > i_from) { break; }
                     --i_from;
@@ -646,32 +655,10 @@ namespace ft {
             // 再確保が起きない前提。つまり、c
             // ASSERTION: size_ + cou t <= capacity()
             void    fill_within_capacity_(iterator pos, size_type count, const value_type& value) {
-                size_type   i_pos = pos - begin();
+                size_type   i_pos = distance_(begin(), pos);
                 for (size_type i = 0; i < count; ++i) {
                     allocator_.construct(&storage_[i_pos + i], value);
                 }
-            }
-
-            // サイズを size() + to_extend にできるよう reserve した後、
-            // [pos, end) が利用可能部分の末尾に来るように移動する。
-            // 移動元区間の先頭のイテレータを返す。
-            iterator    extend_and_move_(iterator pos, size_type to_extend) {
-                size_type   n_pos = pos - begin();
-                size_type   size_before = size();
-                DOUT() << "n_pos       = " << n_pos << std::endl;
-                DOUT() << "size_before = " << size_before << std::endl;
-                DOUT() << "to_extend   = " << to_extend << std::endl;
-                reserve(recommended_capacity_(size_before + to_extend));
-                if (to_extend > 0) {
-                    size_ += to_extend;
-                    DOUT() << "size: " << size() << ", cap: " << capacity() << std::endl;
-                    for (size_type i = n_pos + size_before; n_pos < i;) {
-                        DOUT() << "copy " << i << " -> " << (i + to_extend) << std::endl;
-                        i -= 1;
-                        storage_[i + to_extend] = storage_[i];
-                    }
-                }
-                return begin() + n_pos;
             }
 
             // [from, end) の要素を後ろからdestroyする

@@ -209,6 +209,23 @@ namespace test_int {
         print_stats(vi);
     }
 
+    void    mass_erase_1(Vec::size_type n) {
+        srand(n);
+        Vec vi;
+        for (Vec::size_type i = 0; i < n; ++i) {
+            vi.push_back(i);
+        }
+        print_elements(vi.begin(), vi.end());
+        print_stats(vi);
+        for (Vec::size_type i = 0; i < n; ++i) {
+            Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * vi.size());
+            Vec::iterator eit = vi.erase(vi.begin() + at);
+            std::cout << (eit - vi.begin()) << std::endl;
+        }
+        print_elements(vi.begin(), vi.end());
+        print_stats(vi);
+    }
+
     void    mass_test() {
         test_int::mass_assignation(100000);
         test_int::mass_swap(100000);
@@ -291,7 +308,8 @@ int main() {
         // test_int::mass_pop_back(1);
         // test_int::mass_pop_back(2);
 
-
+        test_int::mass_erase_1(1);
+        test_int::mass_erase_1(100);
 
 
 
