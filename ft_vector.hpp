@@ -372,7 +372,7 @@ namespace ft {
                     // 再確保
                     ft::vector<value_type, allocator_type>  reserved;
                     reserved.reserve(new_cap);
-                    reserved.append_within_capacity(begin(), end());
+                    reserved.append_within_capacity_(begin(), end());
                     swap(reserved);
                     DOUT() << "reallocated " << storage_ << " with cap: " << capacity() << std::endl;
                 }
@@ -459,11 +459,25 @@ namespace ft {
             // 1) 新しい要素は value のコピーとして初期化されます。
             // 新しい size() が capacity() より大きい場合は、すべてのイテレータおよび参照 (終端イテレータも含む) が無効化されます。 
             // そうでなければ、終端イテレータのみが無効化されます。 
+            // <時間計算量: 償却定数>
+            // <例外安全性: STRONG>
             // 例外が投げられた場合 (Allocator::allocate() または要素のコピー/ムーブのコンストラクタ/代入によって発生する可能性があります)、この関数は効果を持ちません (強い例外保証)。 
-            void push_back( const value_type& value ) {
-                reserve(recommended_capacity_(size_ + 1));
-                storage_[size_] = value;
-                size_ += 1;
+            void push_back(const value_type& value) {
+                size_type   rec_cap = recommended_capacity_(size_ + 1);
+                if (rec_cap > capacity()) {
+                    // 再確保発生
+                    // コピーしてpush_backしてswap
+                    // 1回あたりO(size)かかるが、size回pushしてlog2(size)回しか起こらないので、
+                    // 全体としては定数くらいになってくれるはず。
+                    vector<value_type, allocator_type> cloned;
+                    cloned.reserve(rec_cap);
+                    cloned.append_within_capacity_(begin(), end());
+                    cloned.push_back_within_capacity_(value);
+                    swap(cloned);
+                } else {
+                    // 再確保不要
+                    push_back_within_capacity_(value);
+                }
             }
 
             // [pop_back]
@@ -572,7 +586,7 @@ namespace ft {
 
             // [from, to) の要素を末尾に追加する。
             // capacityは十分にあるものとする。
-            void    append_within_capacity(iterator from, iterator to) {
+            void    append_within_capacity_(iterator from, iterator to) {
                 // size_type   n = to - from;
                 // ASSERTION: size() + n <= capacity
                 size_type i = size();
@@ -581,6 +595,13 @@ namespace ft {
                     ++i;
                 }
                 size_ = i;
+            }
+
+            // 再確保不要な前提でpush_backを行う。
+            void    push_back_within_capacity_(const value_type& value) {
+                // ASSERTION: capacity() >= size() + 1
+                allocator_.construct(&storage_[size_], value);
+                size_ += 1;
             }
 
             // サイズを size() + to_extend にできるよう reserve した後、

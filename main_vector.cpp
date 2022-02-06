@@ -40,9 +40,9 @@ namespace test_int {
         std::cout << "-- reserve(0)" << std::endl;
         vi.reserve(0);
         print_stats(vi);
-        std::cout << "-- reserve(-1)" << std::endl;
-        vi.reserve(-1);
-        print_stats(vi);
+        // std::cout << "-- reserve(-1)" << std::endl;
+        // vi.reserve(-1);
+        // print_stats(vi);
     }
 
     // swap
@@ -64,29 +64,13 @@ namespace test_int {
         std::cout << *ii << " - " << *ij << std::endl;
     }
 
-    void    assignation() {
-        Vec  vj;
-        {
-            Vec  vi;
-            vi.push_back(1);
-            vi.push_back(2);
-            print_elements(vi.begin(), vi.end());
-            vj = vi;
-            print_elements(vj.begin(), vj.end());
-            vi.push_back(3);
-            vi.push_back(4);
-            vj = vi;
-        }
-        print_elements(vj.begin(), vj.end());
-    }
-
     void    mass_assignation(std::size_t n) {
         Vec  vj;
         {
             Vec  vi;
             for (std::size_t i = 0; i < n; i += 1 ) {
                 std::size_t ca = vi.capacity();
-                vi.push_back(i);
+                vi.push_back(rand());
                 std::size_t cb = vi.capacity();
                 if (ca < cb) {
                     std::cout << "capacity updated: " << ca << " -> " << cb << std::endl;
@@ -95,8 +79,18 @@ namespace test_int {
             std::cerr << "( assign )" << std::endl;
             vj = vi;
             std::cerr << "( assign over )" << std::endl;
+            print_stats(vi);
+            for (std::size_t i = 0; i < n; i += 1 ) {
+                std::size_t ca = vj.capacity();
+                vj.push_back(rand());
+                std::size_t cb = vj.capacity();
+                if (ca < cb) {
+                    std::cout << "capacity updated: " << ca << " -> " << cb << std::endl;
+                }
+            }
         }
         print_elements(vj.begin(), vj.end());
+        print_stats(vj);
     }
 }
 
@@ -140,44 +134,14 @@ namespace test_string {
 }
 
 int main() {
-    
-    // VectorClass<int>    vi;
-    // VectorClass<int>    vj;
+    srand(42424242);
 
-    // single_action_int();
     // test_int::construct_and_reserve();
-    // test_int::swap();
-    // test_int::assignation();
-    // test_string::assignation();
-    test_int::mass_assignation(1000000);
-
-    // std::cout << "[default constructor]" << std::endl;
-    // print_stats(vi);
-    // std::cout << (vi == vj) << std::endl;
-    // std::cout << "done" << std::endl;
-    // vi.push_back(1);
-    // vi.push_back(2);
-    // vi.push_back(3);
-    // vi.push_back(4);
-    // vi.push_back(5);
-    // vi.push_back(6);
-    // vi.push_back(7);
-    // vi.push_back(8);
-    // std::cout << (vi == vj) << std::endl;
-    // print_stats(vi);
-    // VectorClass<int>::iterator it = vi.begin();
-    // std::cout << *(it++) << std::endl;
-    // std::cout << *(++it) << std::endl;
-    // // std::cout << (it == vi.end()) << std::endl;
-
-    // VectorClass<int>    vk(10, 123);
-    // std::cout << vk[0] << std::endl;
-    // vk.resize(5, 321);
-    // std::cout << vk[0] << std::endl;
-    // print_stats(vk);
-
-
-    // vk.insert(vk.begin(), 999);
-    // std::cout << vk[0] << std::endl;
-
+    // {
+    //     test_int::mass_assignation(0);
+    //     test_int::mass_assignation(1);
+    //     test_int::mass_assignation(2);
+        // test_int::mass_assignation(3);
+        test_int::mass_assignation(10000000);
+    // }
 }
