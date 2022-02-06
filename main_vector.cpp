@@ -64,7 +64,7 @@ namespace test_int {
         std::cout << *ii << " - " << *ij << std::endl;
     }
 
-    void    mass_assignation(std::size_t n) {
+    void    mass_assignation(Vec::size_type n) {
         Vec  vj;
         {
             Vec  vi;
@@ -91,6 +91,24 @@ namespace test_int {
         }
         print_elements(vj.begin(), vj.end());
         print_stats(vj);
+    }
+
+    void    mass_swap(Vec::size_type n) {
+        Vec  vj;
+        {
+            Vec  vi;
+            for (std::size_t i = 0; i < n; i += 1 ) {
+                std::size_t ca = vi.capacity();
+                vi.push_back(rand());
+                std::size_t cb = vi.capacity();
+                if (ca < cb) {
+                    std::cout << "capacity updated: " << ca << " -> " << cb << std::endl;
+                }
+            }
+            vj.swap(vi);
+            print_elements(vi.begin(), vi.end());
+            print_elements(vj.begin(), vj.end());
+        }
     }
 }
 
@@ -142,6 +160,7 @@ int main() {
     //     test_int::mass_assignation(1);
     //     test_int::mass_assignation(2);
         // test_int::mass_assignation(3);
-        test_int::mass_assignation(10000000);
+        // test_int::mass_assignation(10000000);
+        test_int::mass_swap(10000000);
     // }
 }

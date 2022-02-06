@@ -3,6 +3,7 @@
 
 # include <iostream>
 # include <string>
+# include <cstdlib>
 
 # ifdef USE_STL
 #  include <vector>
