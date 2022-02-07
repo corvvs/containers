@@ -74,7 +74,40 @@ namespace test_int {
         std::cout << *ii << " - " << *ij << std::endl;
     }
 
-    void    mass_assignation(Vec::size_type n) {
+    void    mass_assign(Vec::size_type n) {
+        srand(n);
+        Vec  vi;
+        for (Vec::size_type i = 0; i < 5; ++i) {
+            Vec::size_type cap = vi.capacity();
+            vi.assign((Vec::size_type)((double)(rand()) / RAND_MAX * n) + 1, rand());
+            std::cout << "cap: " << cap << " -> " << vi.capacity() << std::endl;
+            print_elements(vi.begin(), vi.end());
+            print_elements(vi.rbegin(), vi.rend());
+            print_stats(vi);
+        }
+    }
+
+    void    mass_assign_range(Vec::size_type n) {
+        srand(n);
+        Vec vj;
+        for (Vec::size_type i = 0; i < n; ++i) {
+            vj.push_back(rand());
+        }
+        Vec vi;
+        for (Vec::size_type i = 0; i <= n / 100; ++i) {
+            Vec::size_type from = Vec::size_type(double(rand()) / RAND_MAX * (vj.size() - 1));
+            Vec::size_type to = Vec::size_type(double(rand()) / RAND_MAX * (vj.size() - from)) + from;
+            std::cout << "insert [" << from << ", " << to << "), " << (to - from) << std::endl;
+            Vec::size_type cap = vi.capacity();
+            vi.assign(vj.begin() + from, vj.begin() + to);
+            std::cout << "cap: " << cap << " -> " << vi.capacity() << std::endl;
+            print_elements(vi.begin(), vi.end());
+            print_elements(vi.rbegin(), vi.rend());
+            print_stats(vi);
+        }
+    }
+
+    void    mass_assignation_eq(Vec::size_type n) {
         srand(n);
         Vec  vj;
         {
@@ -87,9 +120,7 @@ namespace test_int {
                     std::cout << "capacity updated: " << ca << " -> " << cb << std::endl;
                 }
             }
-            std::cerr << "( assign )" << std::endl;
             vj = vi;
-            std::cerr << "( assign over )" << std::endl;
             print_stats(vi);
             for (std::size_t i = 0; i < n; i += 1 ) {
                 std::size_t ca = vj.capacity();
@@ -258,7 +289,9 @@ namespace test_int {
     }
 
     void    mass_test() {
-        test_int::mass_assignation(100000);
+        test_int::mass_assign(100000);
+        test_int::mass_assign_range(30000);
+        test_int::mass_assignation_eq(100000);
         test_int::mass_swap(100000);
         test_int::mass_range_allocation(50000);
         test_int::mass_repeated_allocation(10000000, 999);
@@ -315,10 +348,10 @@ int main() {
 
     // test_int::construct_and_reserve();
     // {
-        // test_int::mass_assignation(0);
-        // test_int::mass_assignation(1);
-        // test_int::mass_assignation(2);
-        // test_int::mass_assignation(3);
+        // test_int::mass_assignation_eq(0);
+        // test_int::mass_assignation_eq(1);
+        // test_int::mass_assignation_eq(2);
+        // test_int::mass_assignation_eq(3);
         // test_int::mass_range_allocation(0);
         // test_int::mass_range_allocation(1);
         // test_int::mass_range_allocation(2);
@@ -349,6 +382,14 @@ int main() {
 
         // test_int::mass_erase_range(100000);
 
-        test_int::mass_test();
+        // test_int::mass_assign(0);
+        // test_int::mass_assign(1);
+        // test_int::mass_assign(2);
+
+
+        test_int::mass_assign(100000);
+        // test_int::mass_assign_range(30000);
+
+        // test_int::mass_test();
     // }
 }

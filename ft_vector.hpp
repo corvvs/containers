@@ -185,16 +185,29 @@ namespace ft {
             // !! INVALIDATE all signifiers !!
             // ※コンテナの要素へのイテレータ、ポインタ、参照はすべて無効化されます。 終端イテレータも無効化されます。 
             // (1) 内容を「valueのコピーcount個」に置き換える
-            void assign( size_type count, const_reference value ) {
-                vector<value_type, allocator_type>  new_one(count, value, allocator_);
-                swap(new_one);
+            void assign(size_type count, const_reference value) {
+                if (is_reallocation_needed_(count)) {
+                    vector<value_type, allocator_type>  new_one(count, value, allocator_);
+                    swap(new_one);
+                } else {
+                    clear();
+                    insert(begin(), count, value);
+                }
             }
             // (2) 内容をレンジイテレータが指すものに置き換える
             // first and/or lastがthis内を指している場合はundefined
             template< class InputIt >
-            void assign( InputIt first, InputIt last ) {
+            void assign(
+                InputIt first, InputIt last,
+                typename ft::disable_if< ft::is_integral<InputIt>::value >::type* = NULL
+            ) {
                 vector<value_type, allocator_type>  new_one(first, last, allocator_);
-                swap(new_one);
+                if (is_reallocation_needed_(new_one.size())) {
+                    swap(new_one);
+                } else {
+                    clear();
+                    insert(begin(), new_one.begin(), new_one.end());
+                }
             }
 
             // [get_allocator]
@@ -574,8 +587,10 @@ namespace ft {
             // コンテナの内容を other の内容と交換します。 個々の要素に対するいかなるムーブ、コピー、swap 操作も発生しません。
             // すべてのイテレータおよび参照は有効なまま残されます。 終端イテレータは無効化されます。
             void swap( vector& other ) {
-                ft::swap(storage_, other.storage_);
+                // allocator_ 以外はプリミティブ型なので、最初にallocator_をスワップする。
+                // -> 少なくともSTRONG, 多分no-throw
                 ft::swap(allocator_, other.allocator_);
+                ft::swap(storage_, other.storage_);
                 ft::swap(size_, other.size_);
                 ft::swap(capacity_, other.capacity_);
             }
