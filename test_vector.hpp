@@ -14,4 +14,6 @@
 #  define VectorClass ft::vector
 # endif
 
+# include "ft_sprint.hpp"
+
 #endif

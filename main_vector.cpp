@@ -1,11 +1,13 @@
 #include "test_vector.hpp"
 
 template<class T>
-void    print_stats(VectorClass<T> &v) {
+void    print_stats(VectorClass<T> &v, bool with_stats = true) {
     std::cout << "capacity:     " << v.capacity() << std::endl;
     std::cout << "size:         " << v.size() << std::endl;
-    std::cout << "max_size:     " << v.max_size() << std::endl;
     std::cout << "empty:        " << v.empty() << std::endl;
+    if (with_stats) {
+        std::cout << "max_size:     " << v.max_size() << std::endl;
+    }
 }
 
 namespace test_int {
@@ -33,6 +35,7 @@ namespace test_int {
 
     // 構築とreserve
     void    construct_and_reserve() {
+        SPRINT();
         Vec  vi;
         print_stats(vi);
         std::cout << "-- reserve(0)" << std::endl;
@@ -57,6 +60,7 @@ namespace test_int {
 
     // swap
     void    swap() {
+        SPRINT();
         Vec  vi;
         vi.push_back(1);
         vi.push_back(2);
@@ -75,6 +79,7 @@ namespace test_int {
     }
 
     void    mass_assign(Vec::size_type n) {
+        SPRINT();
         srand(n);
         Vec  vi;
         for (Vec::size_type i = 0; i < 5; ++i) {
@@ -88,6 +93,7 @@ namespace test_int {
     }
 
     void    mass_assign_range(Vec::size_type n) {
+        SPRINT();
         srand(n);
         Vec vj;
         for (Vec::size_type i = 0; i < n; ++i) {
@@ -108,6 +114,7 @@ namespace test_int {
     }
 
     void    mass_assignation_eq(Vec::size_type n) {
+        SPRINT();
         srand(n);
         Vec  vj;
         {
@@ -137,6 +144,7 @@ namespace test_int {
     }
 
     void    mass_swap(Vec::size_type n) {
+        SPRINT();
         srand(n);
         Vec  vj;
         {
@@ -156,6 +164,7 @@ namespace test_int {
     }
 
     void    mass_repeated_allocation(Vec::size_type n, const Vec::value_type& i) {
+        SPRINT();
         Vec vi(n, i);
         print_elements(vi.begin(), vi.end());
         print_elements(vi.rbegin(), vi.rend());
@@ -163,6 +172,7 @@ namespace test_int {
     }
 
     void    mass_range_allocation(Vec::size_type n) {
+        SPRINT();
         srand(n);
         int *arr = new int[n];
         for (std::size_t i = 0; i < n; i += 1 ) {
@@ -175,6 +185,7 @@ namespace test_int {
     }
 
     void    mass_insertion_1(Vec::size_type n) {
+        SPRINT();
         srand(n);
         Vec vi;
         vi.push_back(0);
@@ -188,6 +199,7 @@ namespace test_int {
     }
 
     void    mass_insertion_n(Vec::size_type n) {
+        SPRINT();
         srand(n);
         Vec vi;
         vi.push_back(rand());
@@ -199,6 +211,7 @@ namespace test_int {
     }
 
     void    mass_insertion_range(Vec::size_type n, Vec::size_type m) {
+        SPRINT();
         srand(n);
         Vec vi;
         for (Vec::size_type i = 0; i < m; ++i) {
@@ -215,6 +228,7 @@ namespace test_int {
     }
 
     void    mass_pop_back(Vec::size_type n) {
+        SPRINT();
         srand(n);
         Vec vi;
         for (Vec::size_type i = 0; i < n; ++i) {
@@ -241,20 +255,21 @@ namespace test_int {
     }
 
     void    mass_resize(Vec::size_type n) {
+        SPRINT();
         srand(n);
-        Vec vi;
-        for (Vec::size_type i = 0; i < n; ++i) {
-            vi.push_back(rand());
-        }
-        for (Vec::size_type i = 0; i < n / 100 + 10; ++i) {
-            Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * n);
-            vi.resize(at, rand());
+        Vec  vi;
+        for (Vec::size_type i = 0; i < 5; ++i) {
+            Vec::size_type cap = vi.capacity();
+            vi.resize((Vec::size_type)((double)(rand()) / RAND_MAX * n) + 1, rand());
+            std::cout << "cap: " << cap << " -> " << vi.capacity() << std::endl;
             print_elements(vi.begin(), vi.end());
+            print_elements(vi.rbegin(), vi.rend());
             print_stats(vi);
         }
     }
 
     void    mass_erase_1(Vec::size_type n) {
+        SPRINT();
         srand(n);
         Vec vi;
         for (Vec::size_type i = 0; i < n; ++i) {
@@ -272,6 +287,7 @@ namespace test_int {
     }
 
     void    mass_erase_range(Vec::size_type n) {
+        SPRINT();
         srand(n);
         Vec vi;
         for (Vec::size_type t = 0; t < n / 100; ++t) {
@@ -288,6 +304,40 @@ namespace test_int {
         }
     }
 
+    void    mass_compare(Vec::size_type n) {
+        SPRINT();
+        srand(n);
+        VectorClass<Vec> vs;
+        // DOUT() << "vs is " << &vs << std::endl;
+        int N = 10;
+        for (int i = 0; i < N; ++i) {
+            Vec vi;
+            // DOUT() << " ======== subvector go ================================================" << std::endl;
+            // DOUT() << "vi is " << &vi << std::endl;
+            for (Vec::size_type j = 0; j < n; ++j) {
+                vi.push_back(rand());
+            }
+            print_elements(vi.begin(), vi.end());
+            // DOUT() << " ======= subvector done ===============================================" << std::endl;
+            // DOUT() << "pushing back: " << i << std::endl;
+            vs.push_back(vi);
+            // DOUT() << "done." << std::endl;
+        }
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < N; ++j) {
+                Vec& vi = vs[i];
+                Vec& vj = vs[j];
+                std::cout << "==: " << (vi == vj) << std::endl;
+                std::cout << "!=: " << (vi != vj) << std::endl;
+                std::cout << "<=: " << (vi <= vj) << std::endl;
+                std::cout << "< : " << (vi < vj) << std::endl;
+                std::cout << ">=: " << (vi >= vj) << std::endl;
+                std::cout << "> : " << (vi > vj) << std::endl;
+            }
+        }
+        print_stats(vs, false);
+    }
+
     void    mass_test() {
         test_int::mass_assign(100000);
         test_int::mass_assign_range(30000);
@@ -299,7 +349,7 @@ namespace test_int {
         test_int::mass_insertion_n(1000);
         test_int::mass_insertion_range(1000, 1000);
         test_int::mass_pop_back(100000);
-        test_int::mass_resize(10000);
+        test_int::mass_resize(100000);
         test_int::mass_erase_1(100000);
         test_int::mass_erase_range(10000);
     }
@@ -378,7 +428,7 @@ int main() {
         // test_int::mass_erase_1(1);
         // test_int::mass_erase_1(100);
 
-        // test_int::mass_resize(10000);
+        // test_int::mass_resize(100000);
 
         // test_int::mass_erase_range(100000);
 
@@ -387,9 +437,11 @@ int main() {
         // test_int::mass_assign(2);
 
 
-        test_int::mass_assign(100000);
-        // test_int::mass_assign_range(30000);
+        test_int::mass_compare(1000);
 
-        // test_int::mass_test();
+        // test_int::mass_assign(100000);
+        // test_int::mass_assign_range(30000);
+        test_int::mass_test();
     // }
+    ft::sprint::list();
 }

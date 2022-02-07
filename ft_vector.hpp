@@ -142,6 +142,7 @@ namespace ft {
             // アロケータ指定
             explicit vector(const allocator_type& alloc)
                 : capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {
+                // DOUT() << "defcon: " << this << " / " << storage_ << std::endl;
             }
 
             // 要素数, (初期値(コピーされる), アロケータ)
@@ -163,19 +164,20 @@ namespace ft {
                 insert(end(), first, last);
             }
             // コピーコンストラクタ
-            vector(const vector& other) {
+            vector(const vector& other)
+                : capacity_(0), size_(0), allocator_(other.allocator_), storage_(NULL) {
+                // DOUT() << "copy: " << this << " <- " << &other << std::endl;
                 *this = other;
             }
 
             // [デストラクタ]
-            virtual ~vector() {
+            ~vector() {
                 obliterate_();
             }
 
             // [代入]
             // ?? signifierは無効化される？
             vector<T, Allocator>& operator=(const vector<T, Allocator> &rhs) {
-                DOUT() << this << " = " << &rhs << std::endl;
                 if (this == &rhs) { return *this; }
                 this->assign(rhs.begin(), rhs.end());
                 return *this;
@@ -202,6 +204,7 @@ namespace ft {
                 typename ft::disable_if< ft::is_integral<InputIt>::value >::type* = NULL
             ) {
                 vector<value_type, allocator_type>  new_one(first, last, allocator_);
+                // DOUT() << "new_one: " << &new_one << std::endl;
                 if (is_reallocation_needed_(new_one.size())) {
                     swap(new_one);
                 } else {
@@ -341,7 +344,8 @@ namespace ft {
             // (多くとも std::numeric_limits<difference_type>::max())。
             // 実行時の利用可能な RAM の量により、コンテナのサイズは max_size() より小さな値に制限される場合があります。 
             inline size_type max_size() const {
-                return allocator_.max_size();
+                return difference_type(-1) / sizeof(value_type);
+                // return allocator_.max_size();
             }
 
             // [reserve]
@@ -653,7 +657,9 @@ namespace ft {
                 // ASSERTION: size() + n <= capacity
                 size_type i = size();
                 for (iterator it = from; it != to; ++it) {
-                    storage_[i] = *it;
+                    // DOUT() << this << " construct at " << i << ", storage: " << storage_ << std::endl;
+                    allocator_.construct(&storage_[i], *it);
+                    // DOUT() << this << " constructed." << std::endl;
                     ++i;
                 }
                 size_ = i;
@@ -783,9 +789,10 @@ namespace ft {
             if (lhs[i] < rhs[i]) { return true; }
             if (lhs[i] > rhs[i]) { return false; }
         }
-        return ml <= mr;
+
+        return ml < mr;
     }
-    
+
     template< class T, class Alloc >
     bool operator<=(
         const ft::vector<T,Alloc>& lhs,
@@ -810,7 +817,7 @@ namespace ft {
         const ft::vector<T,Alloc>& rhs
     ) {
         // lhs の内容が rhs の内容より辞書的に大きいまたは等しい場合は true、そうでなければ false。
-        return rhs <= lhs;
+        return rhs < lhs;
     }
 
     template< class T, class Alloc >
@@ -818,7 +825,7 @@ namespace ft {
         const ft::vector<T,Alloc>& lhs,
         const ft::vector<T,Alloc>& rhs
     ) {
-        return rhs < lhs;
+        return rhs <= lhs;
     }
 
     // [swap]

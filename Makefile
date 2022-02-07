@@ -8,7 +8,7 @@ ifdef FT_DEBUG
 endif
 
 HPPS_VECTOR		:=	ft_vector.hpp
-HPPS_SRCS		:=	main_vector.cpp
+HPPS_SRCS		:=	main_vector.cpp ft_sprint.cpp ft_common.cpp
 HPPS_OBJS		:=	$(HPPS_SRCS:.cpp=.o)
 NAME_VECTOR_STL	:=	exe_vector_stl
 NAME_VECTOR_FT	:=	exe_vector_ft
@@ -36,7 +36,7 @@ vector			:
 vector_diff		:	vector vector_stl
 	time ./$(NAME_VECTOR_STL) > out1
 	time ./$(NAME_VECTOR_FT) 2> err2 > out2
-	diff -u out1 out2
+	diff out1 out2
 
 $(NAME_VECTOR_FT) $(NAME_VECTOR_STL)	:	$(HPPS_OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(HPPS_OBJS)
