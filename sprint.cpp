@@ -1,4 +1,4 @@
-#include "ft_sprint.hpp"
+#include "sprint.hpp"
 
 VectorClass<std::string>    ft::sprint::chronicle;
 

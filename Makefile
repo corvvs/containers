@@ -7,8 +7,8 @@ ifdef FT_DEBUG
 	CXXFLAGS	+=	-D FT_DEBUG=1 -g -fsanitize=address
 endif
 
-HPPS_VECTOR		:=	ft_vector.hpp
-HPPS_SRCS		:=	main_vector.cpp ft_sprint.cpp ft_common.cpp
+HPPS_VECTOR		:=	vector.hpp
+HPPS_SRCS		:=	main_vector.cpp sprint.cpp ft_common.cpp
 HPPS_OBJS		:=	$(HPPS_SRCS:.cpp=.o)
 NAME_VECTOR_STL	:=	exe_vector_stl
 NAME_VECTOR_FT	:=	exe_vector_ft

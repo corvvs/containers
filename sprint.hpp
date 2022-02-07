@@ -1,5 +1,5 @@
-#ifndef FT_SPRINT_HPP
-# define FT_SPRINT_HPP
+#ifndef SPRINT_HPP
+# define SPRINT_HPP
 
 # include <sys/time.h>
 # include <iostream>

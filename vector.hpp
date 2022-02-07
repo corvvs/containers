@@ -1,5 +1,5 @@
-#ifndef FT_VECTOR_HPP
-# define FT_VECTOR_HPP
+#ifndef VECTOR_HPP
+# define VECTOR_HPP
 
 # include "ft_common.hpp"
 # include "ft_meta_functions.hpp"

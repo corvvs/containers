@@ -10,10 +10,10 @@
 #  include <vector>
 #  define VectorClass std::vector
 # else
-#  include "ft_vector.hpp"
+#  include "vector.hpp"
 #  define VectorClass ft::vector
 # endif
 
-# include "ft_sprint.hpp"
+# include "sprint.hpp"
 
 #endif
