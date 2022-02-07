@@ -209,6 +209,20 @@ namespace test_int {
         print_stats(vi);
     }
 
+    void    mass_resize(Vec::size_type n) {
+        srand(n);
+        Vec vi;
+        for (Vec::size_type i = 0; i < n; ++i) {
+            vi.push_back(rand());
+        }
+        for (Vec::size_type i = 0; i < n / 100 + 10; ++i) {
+            Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * n);
+            vi.resize(at, rand());
+            print_elements(vi.begin(), vi.end());
+            print_stats(vi);
+        }
+    }
+
     void    mass_erase_1(Vec::size_type n) {
         srand(n);
         Vec vi;
@@ -220,10 +234,27 @@ namespace test_int {
         for (Vec::size_type i = 0; i < n; ++i) {
             Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * vi.size());
             Vec::iterator eit = vi.erase(vi.begin() + at);
-            std::cout << (eit - vi.begin()) << std::endl;
+            std::cout << (eit - vi.begin()) << " / " << (eit == vi.end()) << std::endl;
         }
         print_elements(vi.begin(), vi.end());
         print_stats(vi);
+    }
+
+    void    mass_erase_range(Vec::size_type n) {
+        srand(n);
+        Vec vi;
+        for (Vec::size_type t = 0; t < n / 100; ++t) {
+            for (Vec::size_type i = vi.size(); i < n; ++i) {
+                vi.push_back(rand());
+            }
+            Vec::size_type from = Vec::size_type(double(rand()) / RAND_MAX * (vi.size() - 1));
+            Vec::size_type to = Vec::size_type(double(rand()) / RAND_MAX * (vi.size() - from)) + from;
+            std::cout << "erase [" << from << ", " << to << ")" << std::endl;
+            Vec::iterator eit = vi.erase(vi.begin() + from, vi.begin() + to);
+            std::cout << (eit - vi.begin()) << " / " << (eit == vi.end()) << std::endl;
+            print_elements(vi.begin(), vi.end());
+            print_stats(vi);
+        }
     }
 
     void    mass_test() {
@@ -235,6 +266,9 @@ namespace test_int {
         test_int::mass_insertion_n(1000);
         test_int::mass_insertion_range(1000, 1000);
         test_int::mass_pop_back(100000);
+        test_int::mass_resize(10000);
+        test_int::mass_erase_1(100000);
+        test_int::mass_erase_range(10000);
     }
 }
 
@@ -308,11 +342,13 @@ int main() {
         // test_int::mass_pop_back(1);
         // test_int::mass_pop_back(2);
 
-        test_int::mass_erase_1(1);
-        test_int::mass_erase_1(100);
+        // test_int::mass_erase_1(1);
+        // test_int::mass_erase_1(100);
 
+        // test_int::mass_resize(10000);
 
+        // test_int::mass_erase_range(100000);
 
-        // test_int::mass_test();
+        test_int::mass_test();
     // }
 }
