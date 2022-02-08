@@ -1,6 +1,7 @@
 #include "sprint.hpp"
 
-VectorClass<std::string>    ft::sprint::chronicle;
+ft::vector<std::string>                 ft::sprint::chronicle;
+ft::vector<ft::sprint::duration_type>   ft::sprint::durations;
 
 unsigned long    get_ut(void)
 {
@@ -24,15 +25,29 @@ ft::sprint& ft::sprint::operator=(const ft::sprint& rhs) {
 }
 
 ft::sprint::~sprint() {
-    unsigned long time_current = get_ut();
-    double dt_ms = (time_current - time_origin_) / 1000.0;
-    std::stringstream ss;
-    ss << title_ << ":\t" << dt_ms << "ms";
-    ft::sprint::chronicle.push_back(ss.str());
+    ft::sprint::time_type time_current = get_ut();
+    ft::sprint::duration_type dt_ms = (time_current - time_origin_) / 1000.0;
+    std::string t = title_ + tail_.str();
+    ft::sprint::chronicle.push_back(t);
+    ft::sprint::durations.push_back(dt_ms);
+}
+std::stringstream&  ft::sprint::get_tail() {
+    return tail_;
 }
 
+
 void    ft::sprint::list() {
-    for (VectorClass<std::string>::iterator it = chronicle.begin(); it != chronicle.end(); ++it) {
-        std::cout << *it << std::endl;
+    std::size_t n = chronicle.size();
+    std::size_t w = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+        if (chronicle[i].length() > w) {
+            w = chronicle[i].length();
+        }
+    }
+    std::cout << std::left;
+    for (std::size_t i = 0; i < n; ++i) {
+        std::cout << std::setw(w + 1) << chronicle[i];
+        std::cout << std::setw(0) << ": ";
+        std::cout << durations[i] << "ms" << std::endl;
     }
 }

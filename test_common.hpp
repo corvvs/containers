@@ -6,6 +6,9 @@
 # include <cstdlib>
 # include "ft_common.hpp"
 # include "vector.hpp"
+# include <vector>
+# include <deque>
+# include <list>
 
 # ifdef USE_STL
 #  include <vector>
@@ -20,5 +23,10 @@
 # endif
 
 # include "sprint.hpp"
+
+template<class T>
+T   random_value_generator();
+template<>
+int	random_value_generator();
 
 #endif

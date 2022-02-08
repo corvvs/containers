@@ -5,9 +5,6 @@
 # include "ft_meta_functions.hpp"
 # include "vector.hpp"
 # include <memory>
-# include <vector>
-# include <deque>
-# include <list>
 
 namespace ft {
     template< class T, class Container = ft::vector<T> >

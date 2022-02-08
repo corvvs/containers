@@ -437,7 +437,7 @@ namespace ft {
                 iterator pos, InputIt first, InputIt last,
                 typename ft::disable_if< ft::is_integral<InputIt>::value >::type* = NULL
             ) {
-                // 一旦新しいvectorで受ける
+                // サイズを知るために一旦新しいvectorで受ける
                 vector<value_type, allocator_type>  receiver(allocator_);
                 for (; first != last; ++first) {
                     receiver.push_back(*first);

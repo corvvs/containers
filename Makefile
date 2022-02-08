@@ -8,12 +8,14 @@ ifdef FT_DEBUG
 endif
 
 
+SRCS_COMMON		:=	sprint.cpp ft_common.cpp test_common.cpp
+
 # vector
 HPPS_VECTOR		:=	vector.hpp
 NAME_VECTOR_STL	:=	exe_vector_stl
 NAME_VECTOR_FT	:=	exe_vector_ft
 NAMES_VECTOR	:=	$(NAME_VECTOR_STL) $(NAME_VECTOR_FT)
-SRCS_VECTOR		:=	main_vector.cpp sprint.cpp ft_common.cpp
+SRCS_VECTOR		:=	main_vector.cpp $(SRCS_COMMON)
 OBJS_VECTOR		:=	$(SRCS_VECTOR:.cpp=.o)
 
 # stack
@@ -21,7 +23,7 @@ HPPS_STACK		:=	stack.hpp
 NAME_STACK_STL	:=	exe_stack_stl
 NAME_STACK_FT	:=	exe_stack_ft
 NAMES_STACK		:=	$(NAME_STACK_STL) $(NAME_STACK_FT)
-SRCS_STACK		:=	main_stack.cpp sprint.cpp ft_common.cpp
+SRCS_STACK		:=	main_stack.cpp $(SRCS_COMMON)
 OBJS_STACK		:=	$(SRCS_STACK:.cpp=.o)
 
 NAMES			:=	$(NAMES_VECTOR) $(NAMES_STACK)

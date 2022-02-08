@@ -60,7 +60,6 @@ namespace test_int {
 
     // swap
     void    swap() {
-        SPRINT();
         Vec  vi;
         vi.push_back(1);
         vi.push_back(2);
@@ -72,14 +71,17 @@ namespace test_int {
         print_elements(vi.begin(), vi.end());
         print_elements(vj.begin(), vj.end());
         std::cout << *ii << " - " << *ij << std::endl;
-        vi.swap(vj);
+        {
+            SPRINT();
+            vi.swap(vj);
+        }
         print_elements(vi.begin(), vi.end());
         print_elements(vj.begin(), vj.end());
         std::cout << *ii << " - " << *ij << std::endl;
     }
 
     void    mass_assign(Vec::size_type n) {
-        SPRINT();
+        SPRINT() << "(" << n << ")";
         srand(n);
         Vec  vi;
         for (Vec::size_type i = 0; i < 5; ++i) {
@@ -93,31 +95,33 @@ namespace test_int {
     }
 
     void    mass_assign_range(Vec::size_type n) {
-        SPRINT();
         srand(n);
         Vec vj;
         for (Vec::size_type i = 0; i < n; ++i) {
             vj.push_back(rand());
         }
         Vec vi;
-        for (Vec::size_type i = 0; i <= n / 100; ++i) {
-            Vec::size_type from = Vec::size_type(double(rand()) / RAND_MAX * (vj.size() - 1));
-            Vec::size_type to = Vec::size_type(double(rand()) / RAND_MAX * (vj.size() - from)) + from;
-            std::cout << "insert [" << from << ", " << to << "), " << (to - from) << std::endl;
-            Vec::size_type cap = vi.capacity();
-            vi.assign(vj.begin() + from, vj.begin() + to);
-            std::cout << "cap: " << cap << " -> " << vi.capacity() << std::endl;
-            print_elements(vi.begin(), vi.end());
-            print_elements(vi.rbegin(), vi.rend());
-            print_stats(vi);
+        {
+            SPRINT() << "(" << n << ")";
+            for (Vec::size_type i = 0; i <= n / 100; ++i) {
+                Vec::size_type from = Vec::size_type(double(rand()) / RAND_MAX * (vj.size() - 1));
+                Vec::size_type to = Vec::size_type(double(rand()) / RAND_MAX * (vj.size() - from)) + from;
+                std::cout << "insert [" << from << ", " << to << "), " << (to - from) << std::endl;
+                Vec::size_type cap = vi.capacity();
+                vi.assign(vj.begin() + from, vj.begin() + to);
+                std::cout << "cap: " << cap << " -> " << vi.capacity() << std::endl;
+                print_elements(vi.begin(), vi.end());
+                print_elements(vi.rbegin(), vi.rend());
+                print_stats(vi);
+            }
         }
     }
 
     void    mass_assignation_eq(Vec::size_type n) {
-        SPRINT();
         srand(n);
         Vec  vj;
         {
+            SPRINT() << "(" << n << ")";
             Vec  vi;
             for (std::size_t i = 0; i < n; i += 1 ) {
                 std::size_t ca = vi.capacity();
@@ -144,7 +148,6 @@ namespace test_int {
     }
 
     void    mass_swap(Vec::size_type n) {
-        SPRINT();
         srand(n);
         Vec  vj;
         {
@@ -157,14 +160,17 @@ namespace test_int {
                     std::cout << "capacity updated: " << ca << " -> " << cb << std::endl;
                 }
             }
-            vj.swap(vi);
+            {
+                SPRINT() << "(" << n << ")";
+                vj.swap(vi);
+            }
             print_elements(vi.begin(), vi.end());
             print_elements(vj.begin(), vj.end());
         }
     }
 
     void    mass_repeated_allocation(Vec::size_type n, const Vec::value_type& i) {
-        SPRINT();
+        SPRINT() << "(" << n << ")";
         Vec vi(n, i);
         print_elements(vi.begin(), vi.end());
         print_elements(vi.rbegin(), vi.rend());
@@ -172,63 +178,70 @@ namespace test_int {
     }
 
     void    mass_range_allocation(Vec::size_type n) {
-        SPRINT();
         srand(n);
         int *arr = new int[n];
         for (std::size_t i = 0; i < n; i += 1 ) {
             arr[i] = (rand());
         }
-        Vec vj(arr, arr + n);
-        print_elements(vj.begin(), vj.end());
-        print_stats(vj);
+        {
+            SPRINT() << "(" << n << ")";
+            Vec vj(arr, arr + n);
+            print_elements(vj.begin(), vj.end());
+            print_stats(vj);
+        }
         delete[] arr;
     }
 
     void    mass_insertion_1(Vec::size_type n) {
-        SPRINT();
         srand(n);
         Vec vi;
         vi.push_back(0);
-        for (Vec::size_type i = 1; i <= n; ++i) {
-            Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * (vi.size() - 1)) + 1;
-            Vec::iterator itd = vi.insert(vi.begin() + at, i);
-            std::cout << "inserted at " << itd - vi.begin() << std::endl;
+        {
+            SPRINT() << "(" << n << ")";
+            for (Vec::size_type i = 1; i <= n; ++i) {
+                Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * (vi.size() - 1)) + 1;
+                Vec::iterator itd = vi.insert(vi.begin() + at, i);
+                std::cout << "inserted at " << itd - vi.begin() << std::endl;
+            }
         }
         print_elements(vi.begin(), vi.end());
         print_stats(vi);
     }
 
     void    mass_insertion_n(Vec::size_type n) {
-        SPRINT();
         srand(n);
         Vec vi;
         vi.push_back(rand());
-        for (Vec::size_type i = 1; i <= n; ++i) {
-            vi.insert(vi.begin() + 1, i, i);
+        {
+            SPRINT() << "(" << n << ")";
+            for (Vec::size_type i = 1; i <= n; ++i) {
+                vi.insert(vi.begin() + 1, i, i);
+            }
         }
         print_elements(vi.begin(), vi.end());
         print_stats(vi);
     }
 
     void    mass_insertion_range(Vec::size_type n, Vec::size_type m) {
-        SPRINT();
         srand(n);
         Vec vi;
         for (Vec::size_type i = 0; i < m; ++i) {
             vi.push_back(i);
         }
         Vec vj;
-        vj.insert(vj.end(), vi.begin(), vi.end());
-        for (Vec::size_type i = 0; i < n; ++i) {
-            Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * (vj.size() - 1)) + 1;
-            vj.insert(vj.begin() + at, vi.begin(), vi.end());
+        {
+            SPRINT() << "(" << n << ")";
+            vj.insert(vj.end(), vi.begin(), vi.end());
+            for (Vec::size_type i = 0; i < n; ++i) {
+                Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * (vj.size() - 1)) + 1;
+                vj.insert(vj.begin() + at, vi.begin(), vi.end());
+            }
         }
         print_elements(vi.begin(), vi.end());
         print_stats(vj);
     }
 
     void    mass_pop_back(Vec::size_type n) {
-        SPRINT();
         srand(n);
         Vec vi;
         for (Vec::size_type i = 0; i < n; ++i) {
@@ -236,26 +249,29 @@ namespace test_int {
         }
         print_elements(vi.begin(), vi.end());
         print_stats(vi);
-        for (Vec::size_type i = 0; i < n / 2; ++i) {
-            vi.pop_back();
-        }
-        print_elements(vi.begin(), vi.end());
-        print_stats(vi);
-        for (Vec::size_type i = 0; i < n; ++i) {
-            vi.push_back(rand());
-        }
-        print_elements(vi.begin(), vi.end());
-        print_stats(vi);
-        Vec::size_type m = vi.size();
-        for (Vec::size_type i = 0; i < m; ++i) {
-            vi.pop_back();
+        {
+            SPRINT() << "(" << n << ")";
+            for (Vec::size_type i = 0; i < n / 2; ++i) {
+                vi.pop_back();
+            }
+            print_elements(vi.begin(), vi.end());
+            print_stats(vi);
+            for (Vec::size_type i = 0; i < n; ++i) {
+                vi.push_back(rand());
+            }
+            print_elements(vi.begin(), vi.end());
+            print_stats(vi);
+            Vec::size_type m = vi.size();
+            for (Vec::size_type i = 0; i < m; ++i) {
+                vi.pop_back();
+            }
         }
         print_elements(vi.begin(), vi.end());
         print_stats(vi);
     }
 
     void    mass_resize(Vec::size_type n) {
-        SPRINT();
+        SPRINT() << "(" << n << ")";
         srand(n);
         Vec  vi;
         for (Vec::size_type i = 0; i < 5; ++i) {
@@ -269,7 +285,6 @@ namespace test_int {
     }
 
     void    mass_erase_1(Vec::size_type n) {
-        SPRINT();
         srand(n);
         Vec vi;
         for (Vec::size_type i = 0; i < n; ++i) {
@@ -277,17 +292,20 @@ namespace test_int {
         }
         print_elements(vi.begin(), vi.end());
         print_stats(vi);
-        for (Vec::size_type i = 0; i < n; ++i) {
-            Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * vi.size());
-            Vec::iterator eit = vi.erase(vi.begin() + at);
-            std::cout << (eit - vi.begin()) << " / " << (eit == vi.end()) << std::endl;
+        {
+            SPRINT() << "(" << n << ")";
+            for (Vec::size_type i = 0; i < n; ++i) {
+                Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * vi.size());
+                Vec::iterator eit = vi.erase(vi.begin() + at);
+                std::cout << (eit - vi.begin()) << " / " << (eit == vi.end()) << std::endl;
+            }
         }
         print_elements(vi.begin(), vi.end());
         print_stats(vi);
     }
 
     void    mass_erase_range(Vec::size_type n) {
-        SPRINT();
+        SPRINT() << "(" << n << ")";
         srand(n);
         Vec vi;
         for (Vec::size_type t = 0; t < n / 100; ++t) {
@@ -305,7 +323,6 @@ namespace test_int {
     }
 
     void    mass_compare(Vec::size_type n) {
-        SPRINT();
         srand(n);
         VectorClass<Vec> vs;
         // DOUT() << "vs is " << &vs << std::endl;
@@ -323,16 +340,19 @@ namespace test_int {
             vs.push_back(vi);
             // DOUT() << "done." << std::endl;
         }
-        for (int i = 0; i < N; ++i) {
-            for (int j = 0; j < N; ++j) {
-                Vec& vi = vs[i];
-                Vec& vj = vs[j];
-                std::cout << "==: " << (vi == vj) << std::endl;
-                std::cout << "!=: " << (vi != vj) << std::endl;
-                std::cout << "<=: " << (vi <= vj) << std::endl;
-                std::cout << "< : " << (vi < vj) << std::endl;
-                std::cout << ">=: " << (vi >= vj) << std::endl;
-                std::cout << "> : " << (vi > vj) << std::endl;
+        {
+            SPRINT() << "(" << n << ")";
+            for (int i = 0; i < N; ++i) {
+                for (int j = 0; j < N; ++j) {
+                    Vec& vi = vs[i];
+                    Vec& vj = vs[j];
+                    std::cout << "==: " << (vi == vj) << std::endl;
+                    std::cout << "!=: " << (vi != vj) << std::endl;
+                    std::cout << "<=: " << (vi <= vj) << std::endl;
+                    std::cout << "< : " << (vi < vj) << std::endl;
+                    std::cout << ">=: " << (vi >= vj) << std::endl;
+                    std::cout << "> : " << (vi > vj) << std::endl;
+                }
             }
         }
         print_stats(vs, false);
