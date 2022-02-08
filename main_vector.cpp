@@ -1,4 +1,4 @@
-#include "test_vector.hpp"
+#include "test_common.hpp"
 
 template<class T>
 void    print_stats(VectorClass<T> &v, bool with_stats = true) {

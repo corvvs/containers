@@ -264,13 +264,13 @@ namespace ft {
                 if (empty()) {
                     // 空
                 }
-                return *this[size_ - 1];
+                return (*this)[size_ - 1];
             }
             const_reference back() const {
                 if (empty()) {
                     // 空
                 }
-                return *this[size_ - 1];
+                return (*this)[size_ - 1];
             }
 
             // [begin]

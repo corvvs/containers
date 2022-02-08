@@ -5,13 +5,18 @@
 # include <string>
 # include <cstdlib>
 # include "ft_common.hpp"
+# include "vector.hpp"
 
 # ifdef USE_STL
 #  include <vector>
+#  include <stack>
 #  define VectorClass std::vector
+#  define StackClass std::stack
 # else
 #  include "vector.hpp"
+#  include "stack.hpp"
 #  define VectorClass ft::vector
+#  define StackClass ft::stack
 # endif
 
 # include "sprint.hpp"

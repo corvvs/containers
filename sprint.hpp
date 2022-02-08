@@ -5,8 +5,9 @@
 # include <iostream>
 # include <sstream>
 # include <string>
-# include "test_vector.hpp"
+# include "test_common.hpp"
 # define SPRINT() ft::sprint sprinter(__func__)
+# define NSPRINT(title) ft::sprint sprinter(title)
 
 namespace ft {
     class sprint {
