@@ -6,10 +6,10 @@
 # include <iomanip>
 # include <sstream>
 # include <string>
+# include <vector>
 # include "test_common.hpp"
 # include "vector.hpp"
-# define NSPRINT(title) ft::sprint sprinter(title); sprinter.get_tail()
-# define SPRINT() NSPRINT(__func__)
+# define SPRINT(title) ft::sprint sprinter(title); sprinter.get_tail()
 
 namespace ft {
     // 時間を測るためのクラス
@@ -26,6 +26,7 @@ namespace ft {
 
             std::stringstream&  get_tail();
 
+            static void insert_comment(const std::string& comment);
             static void list();
 
         private:

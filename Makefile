@@ -33,6 +33,8 @@ OBJS			:=	$(HPPS_OBJS)
 .PHONY			:	all
 all				:	stack_stl
 
+run				:	vector_diff stack_diff
+
 .PHONY			:	vector_clean vector_stl vector
 
 vector_clean	:
@@ -47,9 +49,9 @@ vector			:
 	$(MAKE) $(NAME_VECTOR_FT)
 
 vector_diff		:	vector vector_stl
-	time ./$(NAME_VECTOR_STL) > out1
-	time ./$(NAME_VECTOR_FT) 2> err2 > out2
-	diff out1 out2
+	time ./$(NAME_VECTOR_STL) > outv1
+	time ./$(NAME_VECTOR_FT) 2> err2 > outv2
+	diff outv1 outv2 || :
 
 $(NAMES_VECTOR)	:	$(OBJS_VECTOR)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_VECTOR)
@@ -68,9 +70,9 @@ stack			:
 	$(MAKE) $(NAME_STACK_FT)
 
 stack_diff		:	stack stack_stl
-	time ./$(NAME_STACK_STL) > out1
-	time ./$(NAME_STACK_FT) 2> err2 > out2
-	diff out1 out2
+	time ./$(NAME_STACK_STL) > outs1
+	time ./$(NAME_STACK_FT) 2> err2 > outs2
+	diff outs1 outs2 || :
 
 $(NAMES_STACK)	:	$(OBJS_STACK)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_STACK)

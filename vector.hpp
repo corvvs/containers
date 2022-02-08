@@ -53,6 +53,14 @@ namespace ft {
                         return *ptr_;
                     }
 
+                    pointer         operator->() {
+                        return ptr_;
+                    }
+
+                    const_pointer   operator->() const {
+                        return ptr_;
+                    }
+
                     iterator_type&  operator++() {
                         ptr_ += 1;
                         return *this;
@@ -513,7 +521,7 @@ namespace ft {
 
             // [push_back]
             // 指定された要素 value をコンテナの終端に追加します。
-            // 1) 新しい要素は value のコピーとして初期化されます。
+            // (1) 新しい要素は value のコピーとして初期化されます。
             // 新しい size() が capacity() より大きい場合は、すべてのイテレータおよび参照 (終端イテレータも含む) が無効化されます。 
             // そうでなければ、終端イテレータのみが無効化されます。 
             // <時間計算量: 償却定数>

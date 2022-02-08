@@ -25,8 +25,14 @@
 # include "sprint.hpp"
 
 template<class T>
-T   random_value_generator();
+T                   random_value_generator();
 template<>
-int	random_value_generator();
+int                 random_value_generator();
+template<>
+std::string         random_value_generator();
+template<>
+std::vector<int>    random_value_generator();
+template<>
+ft::vector<int>     random_value_generator();
 
 #endif

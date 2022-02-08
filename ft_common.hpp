@@ -4,6 +4,7 @@
 # include <iostream>
 # include <string>
 # define FT_PRIVATE private
+// TODO: 削除
 # define DOUT() debug_out(__func__, __FILE__, __LINE__)
 
 std::ostream&   debug_out(

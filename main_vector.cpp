@@ -35,7 +35,7 @@ namespace test_int {
 
     // 構築とreserve
     void    construct_and_reserve() {
-        SPRINT();
+        SPRINT("construct_and_reserve");
         Vec  vi;
         print_stats(vi);
         std::cout << "-- reserve(0)" << std::endl;
@@ -72,7 +72,7 @@ namespace test_int {
         print_elements(vj.begin(), vj.end());
         std::cout << *ii << " - " << *ij << std::endl;
         {
-            SPRINT();
+            SPRINT("swap");
             vi.swap(vj);
         }
         print_elements(vi.begin(), vi.end());
@@ -81,7 +81,7 @@ namespace test_int {
     }
 
     void    mass_assign(Vec::size_type n) {
-        SPRINT() << "(" << n << ")";
+        SPRINT("mass_assign") << "(" << n << ")";
         srand(n);
         Vec  vi;
         for (Vec::size_type i = 0; i < 5; ++i) {
@@ -102,7 +102,7 @@ namespace test_int {
         }
         Vec vi;
         {
-            SPRINT() << "(" << n << ")";
+            SPRINT("mass_assign_range") << "(" << n << ")";
             for (Vec::size_type i = 0; i <= n / 100; ++i) {
                 Vec::size_type from = Vec::size_type(double(rand()) / RAND_MAX * (vj.size() - 1));
                 Vec::size_type to = Vec::size_type(double(rand()) / RAND_MAX * (vj.size() - from)) + from;
@@ -121,7 +121,7 @@ namespace test_int {
         srand(n);
         Vec  vj;
         {
-            SPRINT() << "(" << n << ")";
+            SPRINT("mass_assignation_eq") << "(" << n << ")";
             Vec  vi;
             for (std::size_t i = 0; i < n; i += 1 ) {
                 std::size_t ca = vi.capacity();
@@ -161,7 +161,7 @@ namespace test_int {
                 }
             }
             {
-                SPRINT() << "(" << n << ")";
+                SPRINT("mass_swap") << "(" << n << ")";
                 vj.swap(vi);
             }
             print_elements(vi.begin(), vi.end());
@@ -170,7 +170,7 @@ namespace test_int {
     }
 
     void    mass_repeated_allocation(Vec::size_type n, const Vec::value_type& i) {
-        SPRINT() << "(" << n << ")";
+        SPRINT("mass_repeated_allocation") << "(" << n << ")";
         Vec vi(n, i);
         print_elements(vi.begin(), vi.end());
         print_elements(vi.rbegin(), vi.rend());
@@ -184,7 +184,7 @@ namespace test_int {
             arr[i] = (rand());
         }
         {
-            SPRINT() << "(" << n << ")";
+            SPRINT("mass_range_allocation") << "(" << n << ")";
             Vec vj(arr, arr + n);
             print_elements(vj.begin(), vj.end());
             print_stats(vj);
@@ -197,7 +197,7 @@ namespace test_int {
         Vec vi;
         vi.push_back(0);
         {
-            SPRINT() << "(" << n << ")";
+            SPRINT("mass_insertion_1") << "(" << n << ")";
             for (Vec::size_type i = 1; i <= n; ++i) {
                 Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * (vi.size() - 1)) + 1;
                 Vec::iterator itd = vi.insert(vi.begin() + at, i);
@@ -213,7 +213,7 @@ namespace test_int {
         Vec vi;
         vi.push_back(rand());
         {
-            SPRINT() << "(" << n << ")";
+            SPRINT("mass_insertion_n") << "(" << n << ")";
             for (Vec::size_type i = 1; i <= n; ++i) {
                 vi.insert(vi.begin() + 1, i, i);
             }
@@ -230,7 +230,7 @@ namespace test_int {
         }
         Vec vj;
         {
-            SPRINT() << "(" << n << ")";
+            SPRINT("mass_insertion_range") << "(" << n << ")";
             vj.insert(vj.end(), vi.begin(), vi.end());
             for (Vec::size_type i = 0; i < n; ++i) {
                 Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * (vj.size() - 1)) + 1;
@@ -250,7 +250,7 @@ namespace test_int {
         print_elements(vi.begin(), vi.end());
         print_stats(vi);
         {
-            SPRINT() << "(" << n << ")";
+            SPRINT("mass_pop_back") << "(" << n << ")";
             for (Vec::size_type i = 0; i < n / 2; ++i) {
                 vi.pop_back();
             }
@@ -271,7 +271,7 @@ namespace test_int {
     }
 
     void    mass_resize(Vec::size_type n) {
-        SPRINT() << "(" << n << ")";
+        SPRINT("mass_resize") << "(" << n << ")";
         srand(n);
         Vec  vi;
         for (Vec::size_type i = 0; i < 5; ++i) {
@@ -293,7 +293,7 @@ namespace test_int {
         print_elements(vi.begin(), vi.end());
         print_stats(vi);
         {
-            SPRINT() << "(" << n << ")";
+            SPRINT("mass_resize") << "(" << n << ")";
             for (Vec::size_type i = 0; i < n; ++i) {
                 Vec::size_type  at = Vec::size_type(double(rand()) / RAND_MAX * vi.size());
                 Vec::iterator eit = vi.erase(vi.begin() + at);
@@ -305,7 +305,7 @@ namespace test_int {
     }
 
     void    mass_erase_range(Vec::size_type n) {
-        SPRINT() << "(" << n << ")";
+        SPRINT("mass_erase_range") << "(" << n << ")";
         srand(n);
         Vec vi;
         for (Vec::size_type t = 0; t < n / 100; ++t) {
@@ -341,7 +341,7 @@ namespace test_int {
             // DOUT() << "done." << std::endl;
         }
         {
-            SPRINT() << "(" << n << ")";
+            SPRINT("mass_compare") << "(" << n << ")";
             for (int i = 0; i < N; ++i) {
                 for (int j = 0; j < N; ++j) {
                     Vec& vi = vs[i];

@@ -11,7 +11,6 @@ unsigned long    get_ut(void)
     return ((tv.tv_sec) * 1e6 + tv.tv_usec);
 }
 
-
 ft::sprint::sprint(const std::string title)
     : title_(title), time_origin_(get_ut()) {}
 
@@ -25,16 +24,20 @@ ft::sprint& ft::sprint::operator=(const ft::sprint& rhs) {
 }
 
 ft::sprint::~sprint() {
-    ft::sprint::time_type time_current = get_ut();
-    ft::sprint::duration_type dt_ms = (time_current - time_origin_) / 1000.0;
+    time_type time_current = get_ut();
+    duration_type dt_ms = (time_current - time_origin_) / 1000.0;
     std::string t = title_ + tail_.str();
-    ft::sprint::chronicle.push_back(t);
-    ft::sprint::durations.push_back(dt_ms);
+    chronicle.push_back(t);
+    durations.push_back(dt_ms);
 }
 std::stringstream&  ft::sprint::get_tail() {
     return tail_;
 }
 
+void    ft::sprint::insert_comment(const std::string& comment) {
+    chronicle.push_back(comment);
+    durations.push_back(-1);
+}
 
 void    ft::sprint::list() {
     std::size_t n = chronicle.size();
@@ -46,8 +49,12 @@ void    ft::sprint::list() {
     }
     std::cout << std::left;
     for (std::size_t i = 0; i < n; ++i) {
-        std::cout << std::setw(w + 1) << chronicle[i];
-        std::cout << std::setw(0) << ": ";
-        std::cout << durations[i] << "ms" << std::endl;
+        if (durations[i] >= 0) {
+            std::cout << std::setw(w + 1) << chronicle[i];
+            std::cout << std::setw(0) << ": ";
+            std::cout << durations[i] << "ms" << std::endl;
+        } else {
+            std::cout << chronicle[i] << std::endl;;
+        }
     }
 }
