@@ -1,15 +1,5 @@
 #include "test_common.hpp"
 
-template<class T>
-void    print_stats(VectorClass<T> &v, bool with_stats = true) {
-    std::cout << "capacity:     " << v.capacity() << std::endl;
-    std::cout << "size:         " << v.size() << std::endl;
-    std::cout << "empty:        " << v.empty() << std::endl;
-    if (with_stats) {
-        std::cout << "max_size:     " << v.max_size() << std::endl;
-    }
-}
-
 template <class T, class Container>
 void    print_elements(StackClass<T, Container> st) {
     StackClass<T, Container> receiver;
