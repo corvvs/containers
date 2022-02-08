@@ -450,6 +450,13 @@ namespace ft {
                 for (; first != last; ++first) {
                     receiver.push_back(*first);
                 }
+                // TODO: pos == begin() かつ capacity() == 0 の場合はここでswapして終わっていいはず？
+                // -> そうすると capacity が食い違う
+                // if (pos == begin() && capacity() == 0) {
+                //     swap(receiver);
+                //     return;
+                // }
+
                 size_type   count = receiver.size();
                 // サイズがわかるので、再確保の有無を計算
                 size_type   recommended_cap = recommended_capacity_(size() + count);

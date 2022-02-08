@@ -37,7 +37,7 @@ void    mass_push_and_pop(unsigned long n) {
     {
         SPRINT("mass_push_and_pop") << "(" << n << ")";
         for (unsigned long i = 0; i < n; ++i) {
-            if (random_value_generator<int>() % 3 == 0 && !s.empty()) {
+            if (rand() % 3 == 0 && !s.empty()) {
                 s.pop();
             } else {
                 s.push(random_value_generator<T>());
@@ -75,8 +75,8 @@ void    mass_assign(unsigned long n) {
     {
         SPRINT("mass_assign") << "(" << n << ")";
         t = s;
+        print_elements(t);
     }
-    print_elements(t);
 }
 
 template <class T, class Container>
@@ -100,6 +100,7 @@ void    run_mass_test(const std::string& main_title) {
 
 int main() {
     run_mass_test<int>("[int]");
+    run_mass_test<ft::IntWrapper>("[IntWrapper]");
     run_mass_test<std::string>("[std::string]");
     ft::sprint::list();
 }

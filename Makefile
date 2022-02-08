@@ -8,7 +8,7 @@ ifdef FT_DEBUG
 endif
 
 
-SRCS_COMMON		:=	sprint.cpp ft_common.cpp test_common.cpp
+SRCS_COMMON		:=	sprint.cpp ft_common.cpp test_common.cpp IntWrapper.cpp
 
 # vector
 HPPS_VECTOR		:=	vector.hpp

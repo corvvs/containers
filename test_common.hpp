@@ -23,6 +23,7 @@
 # endif
 
 # include "sprint.hpp"
+# include "IntWrapper.hpp"
 
 template<class T>
 T                   random_value_generator();
@@ -30,6 +31,8 @@ template<>
 int                 random_value_generator();
 template<>
 std::string         random_value_generator();
+template<>
+ft::IntWrapper      random_value_generator();
 template<>
 std::vector<int>    random_value_generator();
 template<>
