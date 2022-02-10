@@ -12,6 +12,7 @@ ft::IntWrapper::IntWrapper(int i) {
 
 ft::IntWrapper::IntWrapper(const IntWrapper& other) {
     i_ = new int;
+    *i_ = 0;
     *this = other;
 }
 

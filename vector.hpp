@@ -423,8 +423,14 @@ namespace ft {
                         }
                     } else {
                         // 再確保不要 & 末尾でない
+                        size_type   p = distance_(begin(), pos);
+                        size_type   old_size = size();
+                        // 既存要素の移動
                         mass_moveright_within_capacity_(pos, count);
-                        fill_within_capacity_(pos, count, value);
+                        // 新規要素の代入
+                        for (size_type i = 0; i < count; ++i) {
+                            substitute_to_(i + p, value, old_size);
+                        }
                     }
                 } else {
                     // 再確保が必要
@@ -469,9 +475,12 @@ namespace ft {
                     } else {
                         // 再確保不要 & 末尾でない
                         size_type   p = distance_(begin(), pos);
+                        size_type   old_size = size();
+                        // 既存要素の移動
                         mass_moveright_within_capacity_(pos, count);
+                        // 新規要素の代入
                         for (size_type i = 0; i < count; ++i) {
-                            allocator_.construct(&storage_[i + p], receiver[i]);
+                            substitute_to_(i + p, receiver[i], old_size);
                         }
                     }
                 } else {
@@ -496,14 +505,7 @@ namespace ft {
                 if (pos == end()) {
                     // pos を逆参照できない
                 }
-                size_type   i = distance_(begin(), pos);
-                size_type   sz = size();
-                allocator_.destroy(storage_ + i);
-                size_ -= 1;
-                for (size_type j = i + 1; j < sz; ++j) {
-                    storage_[j - 1] = storage_[j];
-                }
-                return begin() + i;
+                return erase(pos, pos + 1);
             }
 
             // 2) 範囲 [first, last) 内の要素を削除します。
@@ -517,12 +519,7 @@ namespace ft {
                 if (is_interval_empty_(first, last)) { return last; }
                 size_type   i = distance_(begin(), first);
                 size_type   count = distance_(first, last);
-                destroy_from_(first, last);
-                if (last != end()) {
-                    mass_moveleft_within_capacity_(last, count);
-                } else {
-                    size_ -= count;
-                }
+                mass_moveleft_within_capacity_(last, count);
                 return begin() + i;
             }
 
@@ -696,13 +693,16 @@ namespace ft {
                 if (d == 0) { return; }
                 if (!is_interval_empty_(pos, end())) {
                     // 区間が空でない場合
-                    size_type i_pos = distance_(begin(), pos);
-                    for (size_type i_from = size_; i_pos < i_from;) {
-                        if (i_pos + 1 > i_from) { break; }
-                        --i_from;
-                        size_type   i_to = i_from + d;
-                        storage_[i_to] = storage_[i_from];
+                    size_type   p = distance_(begin(), pos);
+                    size_type   old_size = size();
+                    size_type   border = p;
+                    if (p + d <= old_size) {
+                        border = old_size - d;
                     }
+                    for (size_type i = border; i < old_size; ++i) {
+                        allocator_.construct(&storage_[i + d], storage_[i]);
+                    }
+                    std::copy_backward(pos, begin() + border, begin() + border + d);
                 }
                 size_ += d;
             }
@@ -717,22 +717,28 @@ namespace ft {
                 if (d == 0) { return; }
                 if (!is_interval_empty_(pos, end())) {
                     // 区間が空でない場合
-                    size_type i_pos = distance_(begin(), pos);
-                    for (size_type i_from = i_pos; i_from < size_; ++i_from) {
-                        size_type   i_to = i_from - d;
-                        storage_[i_to] = storage_[i_from];
-                    }
+                    std::copy(pos, end(), pos - d);
+                }
+                reverse_iterator to = rbegin() + d;
+                for (reverse_iterator it = rbegin(); it != to; ++it) {
+                    allocator_.destroy(&*it);
                 }
                 size_ -= d;
             }
 
-            // pos から count 個の要素を value のコピーで塗りつぶす。
-            // 再確保が起きない前提。つまり、c
-            // ASSERTION: size_ + cou t <= capacity()
-            void    fill_within_capacity_(const_iterator pos, size_type count, const value_type& value) {
-                size_type   i_pos = distance_(begin(), pos);
-                for (size_type i = 0; i < count; ++i) {
-                    allocator_.construct(&storage_[i_pos + i], value);
+            // インデックス pos に value を入れる。
+            // ただし、入れ方が異なる:
+            // - pos < border:
+            //   - 代入
+            // - border <= pos:
+            //   - コピー構築
+            inline void substitute_to_(size_type pos, const value_type& value, size_type border) {
+                if (pos < border) {
+                    // end() より前に来るものは代入
+                    storage_[pos] = value;
+                } else {
+                    // end()以降に来るものはコピー構築
+                    allocator_.construct(&storage_[pos], value);
                 }
             }
 

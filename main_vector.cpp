@@ -367,20 +367,21 @@ namespace test_int {
     }
 
     template <class T>
-    void    mass_test() {
-        mass_assign<T>(100000);
-        mass_assign_range<T>(30000);
-        mass_assignation_eq<T>(100000);
-        mass_swap<T>(100000);
-        mass_range_allocation<T>(50000);
-        mass_repeated_allocation<T>(10000000);
-        mass_insertion_1<T>(100000);
-        mass_insertion_n<T>(1000);
-        mass_insertion_range<T>(1000, 1000);
-        mass_pop_back<T>(100000);
-        mass_resize<T>(100000);
-        mass_erase_1<T>(100000);
-        mass_erase_range<T>(10000);
+    void    mass_test(const std::string& sub_title, std::size_t n) {
+        ft::sprint::insert_comment(sub_title);
+        mass_assign<T>(100 * n);
+        mass_assign_range<T>(30 * n);
+        mass_assignation_eq<T>(100 * n);
+        mass_swap<T>(100 * n);
+        mass_range_allocation<T>(50 * n);
+        mass_repeated_allocation<T>(10000 * n);
+        mass_insertion_1<T>(100 * n);
+        mass_insertion_n<T>(n);
+        mass_insertion_range<T>(n, n);
+        mass_pop_back<T>(100 * n);
+        mass_resize<T>(100 * n);
+        mass_erase_1<T>(100 * n);
+        mass_erase_range<T>(10 * n);
     }
 }
 
@@ -470,7 +471,9 @@ int main() {
 
         // test_int::mass_assign(100000);
         // test_int::mass_assign_range(30000);
-        test_int::mass_test<std::string>();
+        test_int::mass_test<int>("[int]", 1000);
+        test_int::mass_test<ft::IntWrapper>("[ft::IntWrapper]", 100);
+        test_int::mass_test<std::string>("[std::string]", 100);
     // }
     ft::sprint::list();
 }
