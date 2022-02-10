@@ -38,4 +38,42 @@ std::vector<int>    random_value_generator();
 template<>
 ft::vector<int>     random_value_generator();
 
+template <class T>
+std::ostream& operator<<(std::ostream& stream, std::vector<T>& value) {
+    stream << "[";
+    for (typename std::vector<T>::iterator it = value.begin(); it != value.end(); ++it) {
+        if (it != value.begin()) {
+            stream << ", ";
+        }
+        stream << *it;
+    }
+    stream << "]";
+    return stream;
+}
+
+template <class T>
+std::ostream& operator<<(std::ostream& stream, ft::vector<T>& value) {
+    stream << "[";
+    for (typename ft::vector<T>::iterator it = value.begin(); it != value.end(); ++it) {
+        if (it != value.begin()) {
+            stream << ", ";
+        }
+        stream << *it;
+    }
+    stream << "]";
+    return stream;
+}
+
+template <class Iter>
+void    print_vector_elements(Iter from, Iter to) {
+    std::cout << "[";
+    for (Iter it = from; it != to; ++it) {
+        if (it != from) {
+            std::cout << ", ";
+        }
+        std::cout << *it;
+    }
+    std::cout << "]" << std::endl;
+}
+
 #endif

@@ -18,3 +18,23 @@ template<>
 ft::IntWrapper  random_value_generator() {
     return ft::IntWrapper(rand());
 }
+
+template<>
+std::vector<int>  random_value_generator() {
+    std::size_t n = rand() % 10;
+    std::vector<int> v;
+    for (std::size_t i = 0; i < n; ++i) {
+        v.push_back(random_value_generator<int>());
+    }
+    return v;
+}
+
+template<>
+ft::vector<int>  random_value_generator() {
+    std::size_t n = rand() % 10;
+    ft::vector<int> v;
+    for (std::size_t i = 0; i < n; ++i) {
+        v.push_back(random_value_generator<int>());
+    }
+    return v;
+}
