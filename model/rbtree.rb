@@ -931,16 +931,66 @@ def test_delete
     all_constraint(tree)
   end
 
+  def test_sample_add(n)
+    tree = BinTree.new
+    items = (1..n).to_a.shuffle
+    items[0...-40].each{ |k|
+      tree.add(k)
+    }
+    all_constraint(tree)
+    dts = []
+    items[-40..-1].each{ |k|
+      dts << clock {
+        tree.delete(k)
+      }
+    }
+    dts.sort!
+    mm = dts.size / 2
+    adt = dts[dts.size / 4 .. (dts.size / 4 + mm)].sum / mm
+    $stderr.puts sprintf("%d\t%1.4f", n, adt * 1000000)
+    all_constraint(tree)
+  end
+
+  def test_sample_find(n)
+    tree = BinTree.new
+    items = (1..n).to_a.shuffle
+    items.each{ |k|
+      tree.add(k)
+    }
+    all_constraint(tree)
+    dts = []
+
+    items.sample(40).each{ |k|
+      dts << clock {
+        tree.find(k)
+      }
+    }
+    adt = dts.sum / dts.size
+    $stderr.puts sprintf("%d\t%1.4f", n, adt * 1000000)
+  end
+
   # test_delete_root_only_root
   # test_delete_root_2_nodes
   # test_delete_case_6
   # test_delete_case_4
   # test_delete_case_5
+  # 1000.times {
+  #   s = 100
+  #   t = 10000000
+  #   n = (Math.exp(rand() * Math.log(t / s)) * s).to_i
+  #   test_sample_delete(n)
+  # }
+  # 1000.times {
+  #   s = 100
+  #   t = 10000000
+  #   n = (Math.exp(rand() * Math.log(t / s)) * s).to_i
+  #   test_sample_add(n)
+  # }
   1000.times {
     s = 100
     t = 10000000
     n = (Math.exp(rand() * Math.log(t / s)) * s).to_i
-    test_sample_delete(n)
+    test_sample_find(n)
   }
 end
 
