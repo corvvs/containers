@@ -13,16 +13,20 @@
 # ifdef USE_STL
 #  include <vector>
 #  include <stack>
+#  include <map>
 #  define VectorClass std::vector
 #  define StackClass std::stack
 #  define PairClass std::pair
+#  define TreeClass std::__tree
 # else
 #  include "vector.hpp"
 #  include "stack.hpp"
 #  include "pair.hpp"
+#  include "tree.hpp"
 #  define VectorClass ft::vector
 #  define StackClass ft::stack
 #  define PairClass ft::pair
+#  define TreeClass ft::tree
 # endif
 
 # include "sprint.hpp"
