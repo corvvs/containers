@@ -51,6 +51,56 @@ namespace ft {
         return ft::pair<First, Second>(x, y);
     }
 
+    template<class First, class Second>
+    bool operator==(
+        const ft::pair<First, Second>& lhs,
+        const ft::pair<First, Second>& rhs
+    ) {
+        return ((lhs.first == rhs.first) && (lhs.second == rhs.second));
+    }
+
+    template<class First, class Second>
+    bool operator!=(
+        const ft::pair<First, Second>& lhs,
+        const ft::pair<First, Second>& rhs
+    ) {
+        return !(lhs == rhs);
+    }
+
+    template<class First, class Second>
+    bool operator<(
+        const ft::pair<First, Second>& lhs,
+        const ft::pair<First, Second>& rhs
+    ) {
+        if (lhs.first == rhs.first) {
+            return lhs.second < rhs.second;
+        }
+        return (lhs.first < rhs.first);
+    }
+
+    template<class First, class Second>
+    bool operator>(
+        const ft::pair<First, Second>& lhs,
+        const ft::pair<First, Second>& rhs
+    ) {
+        return (rhs < lhs);
+    }
+
+    template<class First, class Second>
+    bool operator<=(
+        const ft::pair<First, Second>& lhs,
+        const ft::pair<First, Second>& rhs
+    ) {
+        return ((lhs < rhs) || (lhs == rhs));
+    }
+
+    template<class First, class Second>
+    bool operator>=(
+        const ft::pair<First, Second>& lhs,
+        const ft::pair<First, Second>& rhs
+    ) {
+        return (rhs <= lhs);
+    }
 }
 
 #endif
