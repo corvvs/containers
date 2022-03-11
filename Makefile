@@ -26,14 +26,37 @@ NAMES_STACK		:=	$(NAME_STACK_STL) $(NAME_STACK_FT)
 SRCS_STACK		:=	main_stack.cpp $(SRCS_COMMON)
 OBJS_STACK		:=	$(SRCS_STACK:.cpp=.o)
 
-NAMES			:=	$(NAMES_VECTOR) $(NAMES_STACK)
+# tree
+HPPS_PAIR		:=	pair.hpp
+NAME_PAIR_STL	:=	exe_pair_stl
+NAME_PAIR_FT	:=	exe_pair_ft
+NAMES_PAIR		:=	$(NAME_PAIR_STL) $(NAME_PAIR_FT)
+SRCS_PAIR		:=	main_pair.cpp $(SRCS_COMMON)
+OBJS_PAIR		:=	$(SRCS_PAIR:.cpp=.o)
 
-OBJS			:=	$(HPPS_OBJS)
+
+# tree
+HPPS_TREE		:=	tree.hpp
+NAME_TREE_STL	:=	exe_tree_stl
+NAME_TREE_FT	:=	exe_tree_ft
+NAMES_TREE		:=	$(NAME_TREE_STL) $(NAME_TREE_FT)
+SRCS_TREE		:=	main_tree.cpp $(SRCS_COMMON)
+OBJS_TREE		:=	$(SRCS_TREE:.cpp=.o)
+
+NAMES			:=	$(NAMES_VECTOR) $(NAMES_STACK) $(NAMES_PAIR) $(NAMES_TREE)
+
+OBJS			:=	$(OBJS_VECTOR) $(OBJS_STACK) $(OBJS_PAIR) $(OBJS_TREE)
 
 .PHONY			:	all
 all				:	stack_stl
 
 run				:	vector_diff stack_diff
+
+.PHONY			:	clean fclean
+clean			:
+	$(RM) $(OBJS)
+fclean			:	clean
+	$(RM) $(NAMES)
 
 .PHONY			:	vector_clean vector_stl vector
 
@@ -76,3 +99,30 @@ stack_diff		:	stack stack_stl
 
 $(NAMES_STACK)	:	$(OBJS_STACK)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_STACK)
+
+
+.PHONY			:	pair_clean pair_stl pair_ft
+
+pair_clean	:
+	$(RM) $(OBJS_PAIR)
+
+pair_stl		:
+	$(MAKE) pair_clean
+	$(MAKE) USE_STL=1 $(NAME_PAIR_STL)
+
+pair			:
+	$(MAKE) pair_clean
+	$(MAKE) $(NAME_PAIR_FT)
+
+pair_diff		:	pair pair_stl
+	time ./$(NAME_PAIR_STL) > outs1
+	time ./$(NAME_PAIR_FT) 2> err2 > outs2
+	diff outs1 outs2 || :
+
+$(NAMES_PAIR)	:	$(OBJS_PAIR)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_PAIR)
+
+.PHONY			:	tree_clean tree_stl tree_ft
+
+$(NAMES_TREE)	:	$(OBJS_TREE)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_TREE)

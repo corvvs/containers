@@ -15,11 +15,14 @@
 #  include <stack>
 #  define VectorClass std::vector
 #  define StackClass std::stack
+#  define PairClass std::pair
 # else
 #  include "vector.hpp"
 #  include "stack.hpp"
+#  include "pair.hpp"
 #  define VectorClass ft::vector
 #  define StackClass ft::stack
+#  define PairClass ft::pair
 # endif
 
 # include "sprint.hpp"
