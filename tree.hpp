@@ -69,7 +69,7 @@ namespace ft {
                     }
 
                     tree_value_pointer       value() { return tree_value_; }
-                    const tree_value_pointer value() const { return value(); }
+                    const tree_value_pointer value() const { return tree_value_; }
 
                     tree_node_pointer&          left() { return left_child_node_; }
                     tree_node_pointer&          right() { return right_child_node_; }
@@ -77,9 +77,6 @@ namespace ft {
                     const tree_node_pointer&    left() const { return left_child_node_; }
                     const tree_node_pointer&    right() const { return right_child_node_; }
                     const tree_node_pointer&    parent() const { return parent_node_; }
-                    void                        set_parent(const tree_node_pointer p) {
-                        parent_node_ = p;
-                    }
 
                     bool    is_end() const {
                         return has_parent();
@@ -463,19 +460,46 @@ namespace ft {
                 return *this;
             }
 
-            inline value_allocator_type&    get_allocator() { return value_allocator_; }
-            inline node_allocator_type&     get_node_allocator() { return node_allocator_; }
-            inline value_comparator_type&   value_compare() { return value_compare_; }
-            inline iterator                 end() { return iterator(end_node()); }
-            // TODO: キャッシュする
-            iterator                        begin() {
-                pointer min = end_node()->min_node();
-                return iterator(min);
+            inline value_allocator_type&        get_allocator() { return value_allocator_; }
+            inline const value_allocator_type&  get_allocator() const { return value_allocator_; }
+            inline node_allocator_type&         get_node_allocator() { return node_allocator_; }
+            inline const node_allocator_type&   get_node_allocator() const { return node_allocator_; }
+            inline value_comparator_type&       value_compare() { return value_compare_; }
+            inline const value_comparator_type& value_compare() const { return value_compare_; }
+            inline iterator                 end() {
+                return iterator(end_node());
             }
-
+            inline const_iterator           end() const {
+                return iterator(end_node());
+            }
+            // TODO: beginをキャッシュする
+            inline iterator                 begin() {
+                return iterator(end_node()->min_node());
+            }
+            inline const_iterator           begin() const {
+                return iterator(end_node()->min_node());
+            }
+            inline reverse_iterator rbegin() {
+                return reverse_iterator(end());
+            }
+            inline const_reverse_iterator rbegin() const {
+                return reverse_iterator(end());
+            }
+            inline reverse_iterator rend() {
+                return reverse_iterator(begin());
+            }
+            inline const_reverse_iterator rend() const {
+                return reverse_iterator(begin());
+            }
 
             inline size_type    size() const { return size_; }
             inline bool         empty() const { return size() == 0; }
+            inline size_type    max_size() const {
+                return std::min<size_type>(
+                    get_node_allocator().max_size(),
+                    std::numeric_limits<difference_type >::max()
+                );
+            }
 
             // [[ 変更系 ]]
 
@@ -501,9 +525,10 @@ namespace ft {
                 // -> place.second の位置に挿入する。
                 *(place.second) = create_node_(x);
                 std::cout << place.second << ", " << *(place.second) << std::endl;
-                (*(place.second))->set_parent(place.first);
-                // TODO: リバランス
+                (*(place.second))->parent() = place.first;
+                size_ += 1;
                 std::cout << "inserted " << x << ", parent is " << place.first << std::endl;
+                // TODO: リバランス
                 return pair<iterator, bool>(iterator(*place.second), true);
             }
 
@@ -553,9 +578,9 @@ namespace ft {
             // [find]
 
             // keyと等しい要素があれば返す。
-            // 言い換えると、 key <= element かつ !(key < element)が成り立つelementを返す。
+            // 言い換えると、 key <= element かつ element <= key が成り立つelementを返す。
             inline iterator         find(const value_type& key) {
-                return iterator(find_ptr_(key));
+                return iterator(const_cast<pointer>(find_ptr_(key)));
             }
             inline const_iterator   find(const value_type& key) const {
                 return const_iterator(find_ptr_(key));
@@ -579,7 +604,7 @@ namespace ft {
             }
 
             size_type count(const value_type& x) const {
-                return lower_bound_ptr_(x) == end_node() ? 0 : 1;
+                return find_ptr_(x) == end_node() ? 0 : 1;
             }
 
             // ツリーが key を保持しているなら、keyを含む最小の半開区間[lower_bound, upper_bound)を返す。
@@ -587,7 +612,7 @@ namespace ft {
             pair<iterator, iterator> equal_range(const value_type& key) {
                 pointer p = lower_bound_ptr_(key);
                 if (p != end_node()) {
-                    // p = min{ x | key <= x }
+                    // p = min{ x | key <= x }, つまり key <= p
                     if (!value_compare()(key, *p->value())) {
                         // p <= key
                         // -> p <= key <= p
@@ -608,15 +633,17 @@ namespace ft {
             }
 
         FT_PRIVATE:
-            inline pointer end_node() { return &end_node_; }
-            inline pointer root() { return end_node()->left(); }
+            inline pointer          end_node() { return &end_node_; }
+            inline const_pointer    end_node() const { return &end_node_; }
+            inline pointer          root() { return end_node()->left(); }
+            inline const_pointer    root() const { return end_node()->left(); }
             inline pointer begin_node() { return begin_node_; }
 
             // key と一致するノードがあれば、そのポインタを返す。
-            // "key と一致"とはつまり、xが key <= x && !(key < x) を満たすこと。
+            // "key と一致"とはつまり、xが key <= x && x <= key を満たすこと。
             // なければendのポインタを返す。
-            pointer find_ptr_(const value_type& key) {
-                pointer ptr = lower_bound_ptr_(key);
+            const_pointer   find_ptr_(const value_type& key) const {
+                const_pointer ptr = lower_bound_ptr_(key);
                 if (ptr != end_node()) {
                     // key <= ptr
                     if (value_compare()(key, *ptr->value())) {
@@ -646,7 +673,24 @@ namespace ft {
                 return rv;
             }
 
-            pointer    upper_bound_ptr_(const value_type& key) {
+            const_pointer   lower_bound_ptr_(const value_type& key) const {
+                const_pointer   rv = end_node();
+                const_pointer   target = root();
+                while (target != NULL) {
+                    if (value_compare()(*target->value(), key)) {
+                        // target < key
+                        target = target->right();
+                    } else {
+                        // key <= target
+                        // -> 返すべき値が存在する。
+                        rv = target;
+                        target = target->left();
+                    }
+                }
+                return rv;
+            }
+
+            pointer    upper_bound_ptr_(const value_type& key) const {
                 pointer rv = end_node();
                 pointer target = root();
                 while (target != NULL) {
@@ -695,6 +739,8 @@ namespace ft {
             }
 
     };
+
+
 }
 
 #endif
