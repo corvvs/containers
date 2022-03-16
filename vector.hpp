@@ -33,6 +33,10 @@ namespace ft {
                     typedef typename vector::const_reference            const_reference;
                     typedef typename std::random_access_iterator_tag    iterator_category;
 
+                FT_PRIVATE:
+                    pointer    ptr_;
+
+                public:
                     iterator(): ptr_(NULL) {}
                     iterator(pointer ptr): ptr_(ptr) {}
                     iterator(const iterator& other): ptr_(other.ptr_) {}
@@ -130,10 +134,6 @@ namespace ft {
                     bool operator>=(const iterator_type& rhs) const {
                         return &*rhs < &**this;
                     }
-
-
-                FT_PRIVATE:
-                    pointer    ptr_;
             };
 
             typedef const iterator                                  const_iterator;

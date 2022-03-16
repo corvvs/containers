@@ -26,7 +26,7 @@ NAMES_STACK		:=	$(NAME_STACK_STL) $(NAME_STACK_FT)
 SRCS_STACK		:=	main_stack.cpp $(SRCS_COMMON)
 OBJS_STACK		:=	$(SRCS_STACK:.cpp=.o)
 
-# tree
+# pair
 HPPS_PAIR		:=	pair.hpp
 NAME_PAIR_STL	:=	exe_pair_stl
 NAME_PAIR_FT	:=	exe_pair_ft
@@ -123,6 +123,22 @@ $(NAMES_PAIR)	:	$(OBJS_PAIR)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_PAIR)
 
 .PHONY			:	tree_clean tree_stl tree_ft
+
+tree_clean	:
+	$(RM) $(OBJS_TREE)
+
+tree_stl		:
+	$(MAKE) pair_clean
+	$(MAKE) USE_STL=1 $(NAME_TREE_STL)
+
+tree			:
+	$(MAKE) tree_clean
+	$(MAKE) $(NAME_TREE_FT)
+
+tree_diff		:	tree tree_stl
+	time ./$(NAME_TRRE_STL) > outs1
+	time ./$(NAME_TRRE_FT) 2> err2 > outs2
+	diff outs1 outs2 || :
 
 $(NAMES_TREE)	:	$(OBJS_TREE)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_TREE)
