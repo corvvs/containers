@@ -180,6 +180,10 @@ namespace ft {
                         if (right() == child) { return left(); }
                         return NULL;
                     }
+
+                    void    swap_value(const tree_node& other) {
+                        swap(tree_value_, other.tree_value_);
+                    }
             };
 
             // 要素のタイプ
@@ -349,12 +353,11 @@ namespace ft {
                 public:
                     iterator(): ptr_(NULL) {}
                     iterator(pointer ptr): ptr_(ptr) {}
-                    iterator(const iterator& other): ptr_(other.ptr_) {}
+                    iterator(const iterator_type& other): ptr_(other.ptr_) {}
                     iterator_type&  operator=(const iterator_type &rhs) {
                         ptr_ = rhs.ptr_;
                         return *this;
                     }
-
                     virtual         ~iterator() {}
 
                 FT_PRIVATE:
@@ -363,7 +366,7 @@ namespace ft {
 
                 public:
                     inline reference        operator*() { return *ptr_; }
-                    inline const reference  operator*() const { return *this; }
+                    inline const reference  operator*() const { return *ptr_; }
 
                     inline pointer          operator->() { return ptr_; }
                     inline const_pointer    operator->() const { return ptr_; }
@@ -426,26 +429,32 @@ namespace ft {
                 node_allocator_(node_allocator_type()),
                 size_(0),
                 value_compare_(value_comparator_type()) {
-
+                    begin_node_ = end_node();
                 }
             // コンパレータ指定
             tree(const value_comparator_type& comp):
                 end_node_(node_type()),
                 node_allocator_(node_allocator_type()),
                 size_(0),
-                value_compare_(comp) {}
+                value_compare_(comp) {
+                    begin_node_ = end_node();
+                }
             // アロケータ指定
             tree(const value_allocator_type& allocator):
                 end_node_(node_type()),
                 value_allocator_(allocator),
                 size_(0),
-                value_compare_(value_comparator_type()) {}
+                value_compare_(value_comparator_type()) {
+                    begin_node_ = end_node();
+                }
             // コンパレータ・アロケータ指定
             tree(const value_comparator_type& comp, const value_allocator_type& allocator):
                 end_node_(node_type()),
                 value_allocator_(allocator),
                 size_(0),
-                value_compare_(comp) {}
+                value_compare_(comp) {
+                    begin_node_ = end_node();
+                }
             // コピーコンストラクタ
             tree(const self_type& other) {
                 *this = other;
@@ -474,10 +483,10 @@ namespace ft {
             }
             // TODO: beginをキャッシュする
             inline iterator                 begin() {
-                return iterator(end_node()->min_node());
+                return iterator(begin_node());
             }
             inline const_iterator           begin() const {
-                return iterator(end_node()->min_node());
+                return iterator(begin_node());
             }
             inline reverse_iterator rbegin() {
                 return reverse_iterator(end());
@@ -514,22 +523,47 @@ namespace ft {
             // [insert]
             // insertの例外安全性はSTRONG
 
-            pair<iterator, bool>    insert(const value_type& x) {
-                pair<pointer, pointer*> place = find_equal_(x);
-                if (place.second == NULL) {
+            // 単一・ヒントなし挿入
+            pair<iterator, bool>    insert(const value_type& key) {
+                pair<pointer, pointer*> place = find_equal_(key);
+                if (place.first == *place.second) {
                     // 挿入できない場合
-                    std::cout << "failed to insert " << x << std::endl;
+                    DOUT() << "failed to insert " << key << std::endl;
                     return pair<iterator, bool>(iterator(place.first), false);
                 }
                 // 挿入できる場合
                 // -> place.second の位置に挿入する。
-                *(place.second) = create_node_(x);
-                std::cout << place.second << ", " << *(place.second) << std::endl;
-                (*(place.second))->parent() = place.first;
-                size_ += 1;
-                std::cout << "inserted " << x << ", parent is " << place.first << std::endl;
+                insert_at_(place, key);
                 // TODO: リバランス
                 return pair<iterator, bool>(iterator(*place.second), true);
+            }
+
+            // 単一・ヒントあり挿入
+            // > hint に可能な限り近い位置に key を挿入します。
+            // > 挿入が hint の直後の位置に行われた場合、償却定数時間。
+            // > そうでなければ、コンテナのサイズの対数。
+            iterator    insert(iterator hint, const value_type& key) {
+                pair<pointer, pointer*> place = find_equal_(&*hint, key);
+                if (place.first == *place.second) {
+                    // 挿入不可
+                    DOUT() << "failed to insert " << key << std::endl;
+                    return iterator(place.first);
+                }
+                // 挿入できる場合
+                // -> place.second の位置に挿入する。
+                insert_at_(place, key);
+                // TODO: リバランス
+                return iterator(*place.second);
+            }
+
+            // 範囲挿入
+            // TODO:
+            // > InputIt は LegacyInputIterator の要件を満たさなければなりません。 
+            template <class InputIterator>
+            void    insert(InputIterator first, InputIterator last) {
+                for (; first != last; ++first) {
+                    insert(*first);
+                }
             }
 
         FT_PRIVATE:
@@ -729,7 +763,7 @@ namespace ft {
                             target = target->right();
                         } else {
                             // key == target
-                            return pair<pointer, pointer*>(target, NULL);
+                            return pair<pointer, pointer*>(target, &target);
                         }
                     }
                 }
@@ -738,6 +772,72 @@ namespace ft {
                 return pair<pointer, pointer*>(end_node(), &(end_node()->left()));
             }
 
+            // ヒントありfind_equal
+            pair<pointer, pointer*> find_equal_(pointer hint, const value_type& key) {
+                // [ヒントとは]
+                // -> ツリー内に一致するノードがあり、
+                //    かつその直前または直後がvalueの入るべき位置であるようなノード
+                if (hint == end_node() || value_compare()(key, *(hint->value()))) {
+                    // (1) hint == end or key < *hint
+                    // -> prev = hint - 1 として、 prev == begin or *prev < key なら、
+                    //    prevとhintの間にkeyがあるべき。
+                    iterator    prev = hint;
+                    if (prev != begin_node() && value_compare()(*((--prev)->value()), key)) {
+                        // このとき、hintとprevの関係性は以下のいずれかとなり、
+                        // hintとprevのうち少なくとも一方が空き子を持つ。
+                        DOUT() << "found: prev < " << key << " < hint" << std::endl;
+                        if (prev->right() == NULL) {
+                            // 1. hintの左子がprev
+                            //   -> prevは右子を持たない。(持つならそれがhintとprevの間に入る)
+                            return pair<pointer, pointer*>(&*prev, &((*prev).right()));
+                        } else {
+                            // 2. prevの右部分木の最小値がhint
+                            //   -> hintは左子を持たない。(持つならそれがhintとprevの間に入る)
+                            return pair<pointer, pointer*>(&*hint, &((*hint).left()));
+                        }
+                    }
+                    return find_equal_(key);
+                } else if (value_compare()(*(hint->value()), key)) {
+                    // (2) *hint < key
+                    // -> next = hint + 1 として、 next == end or key < *next なら、
+                    //    hintとnextの間にkeyがあるべき。
+                    iterator    next = hint;
+                    if (next != end_node() && value_compare()(key, *(((++next)->value())))) {
+                        // この時、hintとnextの関係性は以下のいずれかとなり、
+                        // hintとnextのうち少なくとも一方が空き子を持つ。
+                        DOUT() << "found: hint < " << key << " < next" << std::endl;
+                        if (next->left() == NULL) {
+                            // 1. hintの右部分木の最小値がnext
+                            //   -> nextは左子を持たない。(持つならそれがhintとnextの間に入る)
+                            return pair<pointer, pointer*>(&*next, &((*next).left()));
+                        } else {
+                            // 2. nextの左子がhint
+                            //   -> hintは右子を持たない。(持つならそれがhintとnextの間に入る)
+                            return pair<pointer, pointer*>(&*hint, &((*hint).right()));
+                        }
+                    }
+                    return find_equal_(key);
+                }
+                // (3) *hint == key
+                std::cout << "target is null -> returns end: " << end_node() << std::endl;
+                std::cout << &(end_node_.left()) << std::endl;
+                return pair<pointer, pointer*>(end_node(), &(end_node()->left()));
+            }
+
+            void    insert_at_(pair<pointer, pointer*>& place, const value_type& x) {
+                *(place.second) = create_node_(x);
+                std::cout << place.second << ", " << *(place.second) << std::endl;
+                (*(place.second))->parent() = place.first;
+                size_ += 1;
+                std::cout << "inserted " << x << ", parent is " << place.first << std::endl;
+                // begin が変更されるのは:
+                // 1. beginより小さい要素が挿入された時
+                // 2. beginが削除された時
+                // -> 挿入されたノードがbeginのleftである場合, 1.に該当するのでキャッシュを更新する。
+                if (begin_node()->left() == *place.second) {
+                    begin_node_ = *place.second;
+                }
+            }
     };
 
 

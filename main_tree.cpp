@@ -3,9 +3,9 @@
 int main() {
     TreeClass<int> tree;
     std::cout << "empty: " << tree.empty() << ", size: " << tree.size() << ", max_size: " << tree.max_size() << std::endl;
-    tree.insert(2);
-    tree.insert(1);
-    tree.insert(5);
+    tree.insert(tree.end(), 2);
+    tree.insert(tree.begin(), 1);
+    tree.insert(tree.end(), 5);
     tree.insert(3);
     tree.insert(6);
     tree.insert(4);
@@ -18,7 +18,16 @@ int main() {
     if (it == tree.end()) {
         std::cout << "end!!" << std::endl;
     } else {
-        std::cout << "found!!: " << (*it).value() << std::endl;
+        std::cout << "found!!: " << *(*it).value() << std::endl;
+    }
+    it = tree.insert(it, 10);
+    it = tree.insert(it, 9);
+    it = tree.insert(it, 11);
+    TreeClass<int>::const_iterator cit = tree.find(5);
+    if (cit == tree.end()) {
+        std::cout << "end!!" << std::endl;
+    } else {
+        std::cout << "found!!: " << *(*cit).value() << std::endl;
     }
     for (it = tree.begin(); it != tree.end(); ++it) {
         std::cout << *((*it).value()) << std::endl;
