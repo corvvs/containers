@@ -181,8 +181,8 @@ namespace ft {
                         return NULL;
                     }
 
-                    void    swap_value(const tree_node& other) {
-                        swap(tree_value_, other.tree_value_);
+                    void    swap_value(tree_node& other) {
+                        std::swap(tree_value_, other.tree_value_);
                     }
             };
 
@@ -256,7 +256,7 @@ namespace ft {
                         return *this;
                     }
 
-                    void    swap(const self_type& other) {
+                    void    swap(self_type& other) {
                         std::swap(value_constructed_, other.value_constructed_);
                         std::swap(node_constructed_, other.node_constructed_);
                         std::swap(node_alloc_, other.node_alloc_);
@@ -475,31 +475,23 @@ namespace ft {
             inline const node_allocator_type&   get_node_allocator() const { return node_allocator_; }
             inline value_comparator_type&       value_compare() { return value_compare_; }
             inline const value_comparator_type& value_compare() const { return value_compare_; }
-            inline iterator                 end() {
-                return iterator(end_node());
-            }
-            inline const_iterator           end() const {
-                return iterator(end_node());
-            }
-            // TODO: beginをキャッシュする
-            inline iterator                 begin() {
-                return iterator(begin_node());
-            }
-            inline const_iterator           begin() const {
-                return iterator(begin_node());
-            }
-            inline reverse_iterator rbegin() {
-                return reverse_iterator(end());
-            }
-            inline const_reverse_iterator rbegin() const {
-                return reverse_iterator(end());
-            }
-            inline reverse_iterator rend() {
-                return reverse_iterator(begin());
-            }
-            inline const_reverse_iterator rend() const {
-                return reverse_iterator(begin());
-            }
+
+            inline iterator                 end()
+                { return iterator(end_node()); }
+            inline const_iterator           end() const
+                { return iterator(end_node()); }
+            inline iterator                 begin()
+                { return iterator(begin_node()); }
+            inline const_iterator           begin() const
+                { return iterator(begin_node()); }
+            inline reverse_iterator         rbegin()
+                { return reverse_iterator(end()); }
+            inline const_reverse_iterator   rbegin() const
+                { return reverse_iterator(end()); }
+            inline reverse_iterator         rend()
+                { return reverse_iterator(begin()); }
+            inline const_reverse_iterator   rend() const
+                { return reverse_iterator(begin()); }
 
             inline size_type    size() const { return size_; }
             inline bool         empty() const { return size() == 0; }
@@ -534,7 +526,7 @@ namespace ft {
                 // 挿入できる場合
                 // -> place.second の位置に挿入する。
                 insert_at_(place, key);
-                // TODO: リバランス
+                // TODO: 赤リバランス
                 return pair<iterator, bool>(iterator(*place.second), true);
             }
 
@@ -741,6 +733,9 @@ namespace ft {
                 return rv;
             }
 
+            // [[find_equal]]
+            // insertionに使うため、insertion先候補とその親をpairで返すメソッド
+
             // RVは
             // - first: 挿入されるノードの親となるノードのポインタ
             // - second: 親(first)のleft / right のうち、挿入されるべき方のポインタ。
@@ -763,9 +758,10 @@ namespace ft {
                             target = target->right();
                         } else {
                             // key == target
-                            return pair<pointer, pointer*>(target, &target);
+                            break;
                         }
                     }
+                    return pair<pointer, pointer*>(target, &target);
                 }
                 std::cout << "target is null -> returns end: " << end_node() << std::endl;
                 std::cout << &(end_node_.left()) << std::endl;
@@ -837,6 +833,67 @@ namespace ft {
                 if (begin_node()->left() == *place.second) {
                     begin_node_ = *place.second;
                 }
+            }
+
+        public:
+
+            // [[erase]]
+
+            // (1)
+            // 単一削除
+            void        erase(iterator position) {
+                // ある要素を消す時、その要素と「隣の要素」をスワップしてから
+                // 「隣の要素」を消すことにしても、要素の順序は変化しない。
+                // 「隣の要素」としてツリーを下る(=葉の方に向かう)方を選択し続ければ、
+                // やがて子を持たないノードに行き当たる。
+                // 「隣の要素」としては、以下のいずれかを採用する
+                // - 対象要素が右部分木を持つ -> 右部分木の最小要素
+                // - 対象要素が左部分木を持つ -> 左子
+                // - 対象要素が子を持たない -> 打ち止め
+                while (true) {
+                    iterator    dummy = position;
+                    if (position->right()) {
+                        ++position;
+                        (*position).swap_value(*dummy);
+                        DOUT() << "-> " << *(position->value()) << std::endl;
+                    } else if (position->left()) {
+                        --position;
+                        DOUT() << "-> " << *(position->value()) << std::endl;
+                        (*position).swap_value(*dummy);
+                    } else {
+                        break;
+                    }
+                }
+                // ここまで来たということは、positionは子を持たない。
+                pointer target = &(*position);
+                pointer parent = target->parent();
+                DOUT() << "erasing: " << *(target->value()) << ", parent: " << *(parent->value()) << std::endl;
+                // targetをツリーから切り離す
+                (parent->left() == target ? parent->left() : parent->right()) = NULL;
+                // targetを破壊する
+                destroy_node_(target);
+                // TODO: 黒リバランス
+            }
+
+            // (2)
+            // TODO: 範囲削除
+            void        erase(iterator first, iterator last) {
+                for (iterator it = first; it != last; ++it) {
+                    erase(it);
+                }
+            }
+            
+
+            // (3)
+            // key に一致するものがあれば削除
+            // -> 単にfindでerase(iterator)に投げるだけ
+            size_type   erase(const value_type& key) {
+                iterator it = find(key);
+                if (it == end()) {
+                    return 0;
+                }
+                erase(it);
+                return 1;
             }
     };
 

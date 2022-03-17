@@ -1,6 +1,12 @@
 #include "test_common.hpp"
 
 int main() {
+
+    VectorClass<int> v(10);
+    for (VectorClass<int>::size_type i = 0; i < v.size(); ++i) {
+        v[i] = i * 5;
+    }
+
     TreeClass<int> tree;
     std::cout << "empty: " << tree.empty() << ", size: " << tree.size() << ", max_size: " << tree.max_size() << std::endl;
     tree.insert(tree.end(), 2);
@@ -9,6 +15,7 @@ int main() {
     tree.insert(3);
     tree.insert(6);
     tree.insert(4);
+    tree.insert(v.begin(), v.end());
     std::cout << "empty: " << tree.empty() << ", size: " << tree.size() << ", max_size: " << tree.max_size() << std::endl;
     tree.insert(1);
     tree.insert(2);
@@ -29,7 +36,7 @@ int main() {
     } else {
         std::cout << "found!!: " << *(*cit).value() << std::endl;
     }
-    for (it = tree.begin(); it != tree.end(); ++it) {
+    for (it = tree.find(10); it != tree.end(); ++it) {
         std::cout << *((*it).value()) << std::endl;
     }
     for (TreeClass<int>::reverse_iterator rit = tree.rbegin(); rit != tree.rend(); ++rit) {
@@ -47,4 +54,9 @@ int main() {
     std::cout << "count: " << tree.count(1) << std::endl;
     std::cout << "count: " << tree.count(100) << std::endl;
     std::cout << "count: " << tree.count(-100) << std::endl;
+
+    tree.erase(tree.find(10));
+    for (TreeClass<int>::iterator rit = tree.begin(); rit != tree.end(); ++rit) {
+        std::cout << *((*rit).value()) << std::endl;
+    }
 }
