@@ -405,10 +405,12 @@ namespace ft {
             typedef typename std::reverse_iterator<const_iterator>  const_reverse_iterator;
 
         FT_PRIVATE:
-            // メンバ変数
+            // [[メンバ変数]]
 
             // endノード
             node_type               end_node_;
+            // beginノード(キャッシュ)
+            pointer                 begin_node_;
             // ノードアロケータ
             node_allocator_type     node_allocator_;
             // Valueのアロケータ
@@ -418,8 +420,6 @@ namespace ft {
             // Valueの比較関数
             value_comparator_type   value_compare_;
 
-            pointer                 begin_node_;
-        
         public:
             // [コンストラクタ群]
 
@@ -763,8 +763,8 @@ namespace ft {
                     }
                     return pair<pointer, pointer*>(target, &target);
                 }
-                std::cout << "target is null -> returns end: " << end_node() << std::endl;
-                std::cout << &(end_node_.left()) << std::endl;
+                DOUT() << "target is null -> returns end: " << end_node() << std::endl;
+                DOUT() << &(end_node_.left()) << std::endl;
                 return pair<pointer, pointer*>(end_node(), &(end_node()->left()));
             }
 
@@ -815,17 +815,17 @@ namespace ft {
                     return find_equal_(key);
                 }
                 // (3) *hint == key
-                std::cout << "target is null -> returns end: " << end_node() << std::endl;
-                std::cout << &(end_node_.left()) << std::endl;
+                DOUT() << "target is null -> returns end: " << end_node() << std::endl;
+                DOUT() << &(end_node_.left()) << std::endl;
                 return pair<pointer, pointer*>(end_node(), &(end_node()->left()));
             }
 
             void    insert_at_(pair<pointer, pointer*>& place, const value_type& x) {
                 *(place.second) = create_node_(x);
-                std::cout << place.second << ", " << *(place.second) << std::endl;
+                DOUT() << place.second << ", " << *(place.second) << std::endl;
                 (*(place.second))->parent() = place.first;
                 size_ += 1;
-                std::cout << "inserted " << x << ", parent is " << place.first << std::endl;
+                DOUT() << "inserted " << x << ", parent is " << place.first << std::endl;
                 // begin が変更されるのは:
                 // 1. beginより小さい要素が挿入された時
                 // 2. beginが削除された時
@@ -882,10 +882,10 @@ namespace ft {
                     erase(it);
                 }
             }
-            
 
             // (3)
-            // key に一致するものがあれば削除
+            // key に一致するものがあれば削除。
+            // 削除した場合は1, しなかった場合は0を返す。
             // -> 単にfindでerase(iterator)に投げるだけ
             size_type   erase(const value_type& key) {
                 iterator it = find(key);
@@ -895,9 +895,36 @@ namespace ft {
                 erase(it);
                 return 1;
             }
+
+            // [[swap]]
+
+            void    swap(self_type& other) {
+                std::swap(size_, other.size_);
+                std::swap(value_compare_, other.value_compare_);
+                std::swap(node_allocator_, other.node_allocator_);
+                std::swap(value_allocator_, other.value_allocator_);
+                std::swap(end_node_, other.end_node_);
+                std::swap(begin_node_, other.begin_node_);
+                // end_node_ はポインタではなく実体として持っているので、
+                // end_node_ 絡みのものを再設定する必要がある。
+                // さらに、 this だけでなく other の分もやってあげる必要がある。
+                after_swap_();
+                other.after_swap_();
+            }
+
+        FT_PRIVATE:
+
+            // swap 後のもろもろ再設定
+            void    after_swap_() {
+                if (size() == 0) {
+                    // size() == 0 なら、beginをendに再設定する。
+                    begin_node_ = end_node();
+                } else {
+                    // ルートノートがある(<=> size() > 0)なら、ルートの親を今のendに設定し直す。
+                    root()->parent = end_node();
+                }
+            }
     };
-
-
 }
 
 #endif
