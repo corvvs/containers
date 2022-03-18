@@ -53,14 +53,16 @@ namespace ft {
                 public:
                     // デフォルト構築
                     // endノードもこれで作る。
+                    // endノードは黒。
                     TreeNode()
                         :   tree_value_(NULL),
                             left_child_node_(NULL), right_child_node_(NULL), parent_node_(NULL),
                             is_black_(true) {}
+                    // endでないノードは赤。
                     TreeNode(tree_value& element)
                         :   tree_value_(&element),
                             left_child_node_(NULL), right_child_node_(NULL), parent_node_(NULL),
-                            is_black_(true) {}
+                            is_black_(false) {}
                     TreeNode(const TreeNode& other) {
                         *this = other;
                     }
@@ -78,13 +80,9 @@ namespace ft {
                     const tree_node_pointer&    right() const { return right_child_node_; }
                     const tree_node_pointer&    parent() const { return parent_node_; }
 
-                    bool    is_end() const {
-                        return has_parent();
-                    }
-
-                    bool    is_root() const {
-                        return has_parent() && parent()->is_end();
-                    }
+                    bool    is_black() const { return is_black_; }
+                    bool    is_end() const { return has_parent(); }
+                    bool    is_root() const { return has_parent() && parent()->is_end(); }
 
                     bool    is_left_child() const {
                         const tree_node_pointer& pp = parent();
@@ -101,6 +99,9 @@ namespace ft {
                     bool    has_left_child() const { return left() != NULL; }
                     bool    has_right_child() const { return right() != NULL; }
                     bool    has_parent() const { return parent() != NULL; }
+
+                    // 色を反転する
+                    void    flip_color() { is_black_ = !is_black_; }
 
                     // 自身を根とする部分木の最小ノードを返す
                     tree_node_pointer   min_node() {
@@ -175,14 +176,104 @@ namespace ft {
 
                     // childがthisの子である場合、childと逆の子を返す
                     // そうでない場合 NULL を返す
-                    tree_node_pointer    counter_child(const tree_node_pointer& child) {
+                    tree_node_pointer   counter_child(const tree_node_pointer& child) {
                         if (left() == child) { return right(); }
                         if (right() == child) { return left(); }
                         return NULL;
                     }
 
+                    // 自分がトランス子かどうかを返す。
+                    bool                is_trans_child() const {
+                        return !is_end() && is_left_child() == parent()->is_left_child();
+                    }
+
+                    // 自分がシス子かどうかを返す。
+                    bool                is_cis_child() const {
+                        return !is_end() && is_left_child() != parent()->is_left_child();
+                    }
+
+                    // valueだけをswapする。
                     void    swap_value(tree_node& other) {
                         std::swap(tree_value_, other.tree_value_);
+                    }
+
+                    // 自身とその親について、可能な回転を行う。
+                    void    rotate() {
+                        if (is_left_child()) {
+                            rotate_right_();
+                        } else {
+                            rotate_left_();
+                        }
+                    }
+
+                    void    rotate_flip() {
+                        flip_color();
+                        parent()->flip_color();
+                        rotate();
+                    }
+
+                    void    rotate_swap() {
+                        std::swap(is_black_, parent()->is_black_);
+                        rotate();
+                    }
+
+                FT_PRIVATE:
+
+                    // 自身とその親について左回転する
+                    void    rotate_left_() {
+                        DOUT() << "rot left" << std::endl;
+                        tree_node_pointer   c = this;
+                        tree_node_pointer   a = parent();
+                        bool                a_was_left_child = a->is_left_child();
+                        tree_node_pointer   pa = a->parent();
+                        tree_node_pointer   d = left();
+                        DOUT() << "(a, c, pa, d) = " << a << ", " << c << ", " << pa << ", " << d << std::endl;
+                        // 1. Aの右をDに向ける
+                        a->place_into_right_(d);
+                        // 2. Cの左をAに向ける
+                        c->place_into_left_(a);
+                        // 3. Aに入っていたエッジをCに向ける
+                        if (a_was_left_child) {
+                            pa->place_into_left_(c);
+                        } else {
+                            pa->place_into_right_(c);
+                        }
+                    }
+
+                    // 自身とその親について右回転する
+                    void    rotate_right_() {
+                        DOUT() << "rot left" << std::endl;
+                        tree_node_pointer   a = this;
+                        tree_node_pointer   c = parent();
+                        bool                c_was_left_child = c->is_left_child();
+                        tree_node_pointer   pc = c->parent();
+                        tree_node_pointer   d = left();
+                        // 1. Cの左をDに向ける
+                        c->place_into_left_(d);
+                        // 2. Aの右をCに向ける
+                        a->place_into_right_(c);
+                        // 3. Cに入っていたエッジをAに向ける
+                        if (c_was_left_child) {
+                            pc->place_into_left_(a);
+                        } else {
+                            pc->place_into_right_(a);
+                        }
+                    }
+
+                    // child を自身の左子として配置する
+                    void    place_into_left_(tree_node_pointer child) {
+                        this->left() = child;
+                        if (child != NULL) {
+                            child->parent() = this;
+                        }
+                    }
+
+                    // child を自身の右子として配置する
+                    void    place_into_right_(tree_node_pointer child) {
+                        this->right() = child;
+                        if (child != NULL) {
+                            child->parent() = this;
+                        }
                     }
             };
 
@@ -272,6 +363,7 @@ namespace ft {
                             node_ptr_ = node_alloc_.allocate(1);
                             if (node_ptr_ && !node_constructed_) {
                                 node_alloc_.construct(node_ptr_, node_type(*value_ptr_));
+                                // end 以外の新しいノードは赤とする
                                 node_constructed_ = true;
                             }
                         }
@@ -526,7 +618,6 @@ namespace ft {
                 // 挿入できる場合
                 // -> place.second の位置に挿入する。
                 insert_at_(place, key);
-                // TODO: 赤リバランス
                 return pair<iterator, bool>(iterator(*place.second), true);
             }
 
@@ -615,21 +706,21 @@ namespace ft {
             // 「key より小さくない最小の要素」を返す
             // 言い換えると   min{ element | key <= element }
             // または        min{ element | !value_comp()(element, key) }
-            iterator    lower_bound(const value_type& key) {
+            iterator        lower_bound(const value_type& key) {
                 return iterator(lower_bound_ptr_(key));
             }
             const_iterator  lower_bound(const value_type& key) const {
                 return const_iterator(lower_bound_ptr_(key));
             }
             // 「key より大きい最小の要素」を返す
-            iterator    upper_bound(const value_type& key) {
+            iterator        upper_bound(const value_type& key) {
                 return iterator(upper_bound_ptr_(key));
             }
             const_iterator  upper_bound(const value_type& key) const {
                 return const_iterator(upper_bound_ptr_(key));
             }
 
-            size_type count(const value_type& x) const {
+            size_type       count(const value_type& x) const {
                 return find_ptr_(x) == end_node() ? 0 : 1;
             }
 
@@ -659,11 +750,12 @@ namespace ft {
             }
 
         FT_PRIVATE:
+
             inline pointer          end_node() { return &end_node_; }
             inline const_pointer    end_node() const { return &end_node_; }
             inline pointer          root() { return end_node()->left(); }
             inline const_pointer    root() const { return end_node()->left(); }
-            inline pointer begin_node() { return begin_node_; }
+            inline pointer          begin_node() { return begin_node_; }
 
             // key と一致するノードがあれば、そのポインタを返す。
             // "key と一致"とはつまり、xが key <= x && x <= key を満たすこと。
@@ -833,6 +925,7 @@ namespace ft {
                 if (begin_node()->left() == *place.second) {
                     begin_node_ = *place.second;
                 }
+                rebalance_after_insertion_(*(place.second));
             }
 
         public:
