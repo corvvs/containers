@@ -1,28 +1,65 @@
 #include "test_common.hpp"
 
 void    insert_and_erase_random(int n) {
-    TreeClass<int>  tree;
+    VectorClass<int> ns;
     for (int i = 0; i < n; ++i) {
         int k = rand() % (100 * n);
+        ns.push_back(k);
+    }
+    for (int i = 0; i < 10 * n; ++i) {
+        int j = rand() % ns.size();
+        int k = rand() % ns.size();
+        std::swap(ns[j], ns[k]);
+    }
+    TreeClass<int>  tree;
+    for (int i = 0; i < n; ++i) {
+        int k = ns[i];
         DOUT() << "insert: " << k << std::endl;
         tree.insert(k);
         // print_iterative_container_elements(tree);
     }
-    DOUT() << "longest  height: " << tree.debug_longest_height() << std::endl;
-    DOUT() << "shortest height: " << tree.debug_shortest_height() << std::endl;
-    DOUT() << "longest  b-height: " << tree.debug_shortest_black_height() << std::endl;
-    DOUT() << "shortest b-height: " << tree.debug_longest_black_height() << std::endl;
-    for (TreeClass<int>::iterator it = tree.begin(); it != tree.end();) {
+    print_iterative_container_elements(tree);
+    for (VectorClass<int>::size_type i = 0; i < ns.size(); ++i) {
         // print_iterative_container_elements(tree);
-        DOUT() << "it: " << &*it << std::endl;
-        tree.erase(it++);
+        TreeClass<int>::size_type lh = tree.debug_longest_height();
+        TreeClass<int>::size_type sh = tree.debug_shortest_height();
+        TreeClass<int>::size_type lb = tree.debug_longest_black_height();
+        TreeClass<int>::size_type sb = tree.debug_shortest_black_height();
+        if (sh * 2 > lh) {
+            DOUT() << "longest  height: " << tree.debug_longest_height() << std::endl;
+            DOUT() << "shortest height: " << tree.debug_shortest_height() << std::endl;
+        }
+        if (sb != lb) {
+            DOUT() << "longest  b-height: " << tree.debug_shortest_black_height() << std::endl;
+            DOUT() << "shortest b-height: " << tree.debug_longest_black_height() << std::endl;
+        }
+        DOUT() << "erase: " << ns[i] << std::endl;
+        tree.erase(ns[i]);
     }
+    DOUT() << "size: " << tree.size() << std::endl;
+    // for (TreeClass<int>::iterator it = tree.begin(); it != tree.end();) {
+    //     // print_iterative_container_elements(tree);
+    //     TreeClass<int>::size_type lh = tree.debug_longest_height();
+    //     TreeClass<int>::size_type sh = tree.debug_shortest_height();
+    //     TreeClass<int>::size_type lb = tree.debug_longest_black_height();
+    //     TreeClass<int>::size_type sb = tree.debug_shortest_black_height();
+    //     if (sh * 2 > lh) {
+    //         DOUT() << "longest  height: " << tree.debug_longest_height() << std::endl;
+    //         DOUT() << "shortest height: " << tree.debug_shortest_height() << std::endl;
+    //     }
+    //     if (sb != lb) {
+    //         DOUT() << "longest  b-height: " << tree.debug_shortest_black_height() << std::endl;
+    //         DOUT() << "shortest b-height: " << tree.debug_longest_black_height() << std::endl;
+    //     }
+    //     DOUT() << "it: " << &*it << std::endl;
+    //     tree.erase(it++);
+    // }
     // print_iterative_container_elements(tree);
 }
 
 int main() {
 
-    insert_and_erase_random(200000);
+    insert_and_erase_random(40);
 
     // VectorClass<int> v(10);
     // for (VectorClass<int>::size_type i = 0; i < v.size(); ++i) {
