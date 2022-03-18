@@ -70,6 +70,21 @@ namespace ft {
                         DOUT() << this << ", " << tree_value_ << std::endl;
                     }
 
+                    friend std::ostream&    operator<<(std::ostream& stream, const tree_node& rhs) {
+                        stream << "[";
+                        if (rhs.is_end())
+                            stream << "(end)";
+                        else
+                            stream << *(rhs.value());
+                        stream << ":" << (rhs.is_black() ? "B" : "r");
+                        stream << ":";
+                        stream << (rhs.has_parent() ? "P" : "-");
+                        stream << (rhs.has_left_child() ? "L" : "-");
+                        stream << (rhs.has_right_child() ? "R" : "-");
+                        return stream << "]";
+                    }
+
+
                     tree_value_pointer       value() { return tree_value_; }
                     const tree_value_pointer value() const { return tree_value_; }
 
@@ -81,7 +96,7 @@ namespace ft {
                     const tree_node_pointer&    parent() const { return parent_node_; }
 
                     bool    is_black() const { return is_black_; }
-                    bool    is_end() const { return has_parent(); }
+                    bool    is_end() const { return !has_parent(); }
                     bool    is_root() const { return has_parent() && parent()->is_end(); }
 
                     bool    is_left_child() const {
@@ -160,7 +175,7 @@ namespace ft {
 
                     // 「シス子」、つまり
                     // 自分が左子なら右子、自分が右子なら左子を返す。
-                    tree_node_pointer    cis_child() {
+                    tree_node_pointer    cis_child() const {
                         if (is_left_child()) { return right(); }
                         if (is_right_child()) { return left(); }
                         return NULL;
@@ -168,7 +183,7 @@ namespace ft {
 
                     // 「トランス子」、つまり
                     // 自分が左子なら左子、自分が右子なら右子を返す。
-                    tree_node_pointer    trans_child() {
+                    tree_node_pointer    trans_child() const {
                         if (is_left_child()) { return left(); }
                         if (is_right_child()) { return right(); }
                         return NULL;
@@ -176,7 +191,8 @@ namespace ft {
 
                     // childがthisの子である場合、childと逆の子を返す
                     // そうでない場合 NULL を返す
-                    tree_node_pointer   counter_child(const tree_node_pointer& child) {
+                    tree_node_pointer   counter_child(const tree_node_pointer& child) const {
+                        DOUT() << this << " , " << left() << " - " << right() << " ? " << child << std::endl;
                         if (left() == child) { return right(); }
                         if (right() == child) { return left(); }
                         return NULL;
@@ -197,6 +213,10 @@ namespace ft {
                         std::swap(tree_value_, other.tree_value_);
                     }
 
+                    void    swap_color(tree_node& other) {
+                        std::swap(is_black_, other.is_black_);
+                    }
+
                     // 自身とその親について、可能な回転を行う。
                     void    rotate() {
                         if (is_left_child()) {
@@ -215,6 +235,22 @@ namespace ft {
                     void    rotate_swap() {
                         std::swap(is_black_, parent()->is_black_);
                         rotate();
+                    }
+
+                    // child を自身の左子として配置する
+                    void    place_into_left_(tree_node_pointer child) {
+                        this->left() = child;
+                        if (child != NULL) {
+                            child->parent() = this;
+                        }
+                    }
+
+                    // child を自身の右子として配置する
+                    void    place_into_right_(tree_node_pointer child) {
+                        this->right() = child;
+                        if (child != NULL) {
+                            child->parent() = this;
+                        }
                     }
 
                 FT_PRIVATE:
@@ -260,21 +296,7 @@ namespace ft {
                         }
                     }
 
-                    // child を自身の左子として配置する
-                    void    place_into_left_(tree_node_pointer child) {
-                        this->left() = child;
-                        if (child != NULL) {
-                            child->parent() = this;
-                        }
-                    }
 
-                    // child を自身の右子として配置する
-                    void    place_into_right_(tree_node_pointer child) {
-                        this->right() = child;
-                        if (child != NULL) {
-                            child->parent() = this;
-                        }
-                    }
             };
 
             // 要素のタイプ
@@ -635,7 +657,6 @@ namespace ft {
                 // 挿入できる場合
                 // -> place.second の位置に挿入する。
                 insert_at_(place, key);
-                // TODO: リバランス
                 return iterator(*place.second);
             }
 
@@ -670,7 +691,9 @@ namespace ft {
             // node_ptr が指し示すノードを破壊する
             void    destroy_node_(pointer node_ptr) {
                 if (node_ptr == NULL) { return; }
+                DOUT() << *node_ptr << ": destroying node"  << std::endl;
                 if (node_ptr != end_node() && node_ptr->value()) {
+                    DOUT() << *node_ptr << ": destroying value" << std::endl;
                     value_allocator_type&   va = get_allocator();
                     va.destroy(node_ptr->value());
                     va.deallocate(node_ptr->value(), 1);
@@ -945,11 +968,12 @@ namespace ft {
                 // - 対象要素が子を持たない -> 打ち止め
                 while (true) {
                     iterator    dummy = position;
-                    if (position->right()) {
+                    DOUT() << &*position << std::endl;
+                    if (position->has_right_child()) {
                         ++position;
                         (*position).swap_value(*dummy);
                         DOUT() << "-> " << *(position->value()) << std::endl;
-                    } else if (position->left()) {
+                    } else if (position->has_left_child()) {
                         --position;
                         DOUT() << "-> " << *(position->value()) << std::endl;
                         (*position).swap_value(*dummy);
@@ -957,15 +981,29 @@ namespace ft {
                         break;
                     }
                 }
+                DOUT() << "erasing: " << *position << std::endl;
+
                 // ここまで来たということは、positionは子を持たない。
                 pointer target = &(*position);
                 pointer parent = target->parent();
-                DOUT() << "erasing: " << *(target->value()) << ", parent: " << *(parent->value()) << std::endl;
-                // targetをツリーから切り離す
-                (parent->left() == target ? parent->left() : parent->right()) = NULL;
-                // targetを破壊する
-                destroy_node_(target);
-                // TODO: 黒リバランス
+                bool    detroying_begin = target == begin_node();
+                if (!position->is_black()) {
+                    // Case 0. is red
+                    // Tが赤である
+                    // > Case 0 Tを葉ノードにする
+                    release_node_from_parent_(target);
+                    destroy_node_(target);
+                } else {
+                    // targetを破壊する
+                    release_node_from_parent_(target);
+                    destroy_node_(target);
+                    rebalance_after_erasure_(parent, NULL);
+                }
+                // 必要なら begin_node_ を更新
+                if (detroying_begin) {
+                    DOUT() << "change begin: " << begin_node_ << " -> " << *parent << std::endl;
+                    begin_node_ = parent;
+                }
             }
 
             // (2)
@@ -1086,6 +1124,159 @@ namespace ft {
                     rebalance_after_insertion_(q);
                 }
             }
+
+            // 削除後リバランス
+            void    rebalance_after_erasure_(pointer np, pointer nm) {
+                if (nm == root()) {
+                    // Mは根である
+                    // -> Case 1.
+                    // なにもしない
+                    DOUT() << "Case 1. do nothing" << std::endl;
+                    return;
+                }
+                // nm は NULL である可能性がある。
+                // 正しい赤黒木であれば、ns != NULL のはず。
+                pointer ns = np->counter_child(nm);
+                pointer nx = ns->cis_child();
+                pointer ny = ns->trans_child();
+                DOUT()
+                    << "(nm, np, ns, nx, ny) = ("
+                    << nm << ", "
+                    << np << ", "
+                    << ns << ", "
+                    << nx << ", "
+                    << ny
+                    << ")" << std::endl;
+                if (np->is_black() &&
+                    ns->is_black() &&
+                    (!nx || nx->is_black()) &&
+                    (!ny || ny->is_black())
+                ) {
+                    // Case 3. BBBB
+                    // PSXYすべて黒
+                    // -> Sを赤に色変し。Pを基準にしてもう一度黒リバランスを行う
+                    DOUT() << "Case 3. flip ns and rebalance recursively" << std::endl;
+                    ns->flip_color();
+                    rebalance_after_erasure_(np->parent(), np);
+                    return;
+                }
+                if (np->is_black() &&
+                    !ns->is_black() &&
+                    (!nx || nx->is_black()) &&
+                    (!ny || ny->is_black())
+                ) {
+                    // Case 2. BRBB
+                    // PXYが黒, Sが赤
+                    // BSBB
+                    DOUT() << "Case 2." << std::endl;
+                    rotate_flip_(np, ns);
+                    // np = nm->parent();
+                    ns = np->counter_child(nm);
+                    nx = ns->cis_child();
+                    ny = ns->trans_child();
+                }
+                if (!np->is_black() &&
+                    ns->is_black() &&
+                    (!nx || nx->is_black()) &&
+                    (!ny || ny->is_black())
+                ) {
+                    // Case 4. RBBB
+                    // SXYが黒, Pが赤
+                    // RBBB
+                    DOUT() << "Case 4." << std::endl;
+                    np->flip_color();
+                    ns->flip_color();
+                    return;
+                }
+                if (ns->is_black() &&
+                    nx && !nx->is_black() &&
+                    (!ny || ny->is_black())
+                ) {
+                    // SYが黒, Xが赤
+                    // ?BRB
+                    // -> Case 5.
+                    DOUT() << "Case 5." << std::endl;
+                    rotate_flip_(ns, nx);
+                    ns = np->counter_child(nm);
+                    nx = ns->cis_child();
+                    ny = ns->trans_child();
+                }
+                // Case 6. ?B?R
+                // ?B?R
+                DOUT() << "Case 6." << std::endl;
+                ns->rotate_swap();
+                ny->flip_color();
+            }
+
+            void    release_node_from_parent_(pointer node) {
+                pointer parent = node->parent();
+                DOUT() << "releasing: " << *node << " from parent: " << *parent << std::endl;
+                // targetをツリーから切り離す
+                (node->is_left_child() ? parent->left() : parent->right()) = NULL;
+                --size_;
+            }
+
+            // [[リバランス関連staticメンバ関数]]
+
+            // ノードとその親について、可能な回転を行う。
+            static void rotate_(pointer parent, pointer node) {
+                if (node == parent->left()) {
+                    rotate_right_(node, parent);
+                } else if (node == parent->right()) {
+                    rotate_left_(node, parent);
+                } else {
+                    throw "invalid rotation";
+                }
+            }
+
+            // 自身とその親について左回転する
+            static void rotate_left_(pointer c, pointer a) {
+                DOUT() << *c << " - " << *a << std::endl;
+                bool    a_was_left_child = a->is_left_child();
+                pointer pa = a->parent();
+                pointer d = c->left();
+                DOUT() << "(a, c, pa, d) = " << a << ", " << c << ", " << pa << ", " << d << std::endl;
+                // 1. Aの右をDに向ける
+                a->place_into_right_(d);
+                // 2. Cの左をAに向ける
+                c->place_into_left_(a);
+                // 3. Aに入っていたエッジをCに向ける
+                if (a_was_left_child) {
+                    pa->place_into_left_(c);
+                } else {
+                    pa->place_into_right_(c);
+                }
+            }
+
+            // 自身とその親について右回転する
+            static void rotate_right_(pointer a, pointer c) {
+                DOUT() << *a << " - " << *c << std::endl;
+                bool      c_was_left_child = c->is_left_child();
+                pointer   pc = c->parent();
+                pointer   d = a->left();
+                // 1. Cの左をDに向ける
+                c->place_into_left_(d);
+                // 2. Aの右をCに向ける
+                a->place_into_right_(c);
+                // 3. Cに入っていたエッジをAに向ける
+                if (c_was_left_child) {
+                    pc->place_into_left_(a);
+                } else {
+                    pc->place_into_right_(a);
+                }
+            }
+
+            static void    rotate_flip_(pointer parent, pointer node) {
+                node->flip_color();
+                parent->flip_color();
+                rotate_(parent, node);
+            }
+
+            static void    rotate_swap_(pointer parent, pointer node) {
+                parent->swap_color(node);
+                rotate_(parent, node);
+            }
+        };
 }
 
 #endif

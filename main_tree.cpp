@@ -59,4 +59,8 @@ int main() {
     for (TreeClass<int>::iterator rit = tree.begin(); rit != tree.end(); ++rit) {
         std::cout << *((*rit).value()) << std::endl;
     }
+    while (tree.size() > 0) {
+        std::cout << "size is " << tree.size() << std::endl;
+        tree.erase(tree.begin());
+    }
 }
