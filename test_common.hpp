@@ -83,4 +83,16 @@ void    print_vector_elements(Iter from, Iter to) {
     std::cout << "]" << std::endl;
 }
 
+template <class Container>
+void    print_iterative_container_elements(Container& container) {
+    std::cout << "[";
+    for (typename Container::iterator it = container.begin(); it != container.end(); ++it) {
+        if (it != container.begin()) {
+            std::cout << ", ";
+        }
+        std::cout << *it;
+    }
+    std::cout << "]" << std::endl;
+}
+
 #endif
