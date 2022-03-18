@@ -153,6 +153,7 @@ namespace ft {
 
                     // 後隣接するノードを返す
                     tree_node_pointer   forward_neighbor() {
+                        // DOUT() << "this is: " << *this << std::endl;
                         if (has_right_child()) {
                             // 右子がある場合
                             // -> 右子のminを返す
@@ -166,6 +167,7 @@ namespace ft {
                         while (ptr->is_right_child()) {
                             ptr = ptr->parent();
                         }
+                        // DOUT() << "ptr is: " << *ptr << std::endl;
                         return ptr->parent();
                     }
 
@@ -226,6 +228,67 @@ namespace ft {
                         std::swap(tree_value_, other.tree_value_);
                     }
 
+                    // 2つのノードの位置関係、
+                    // つまり接続されているエッジを入れ替える。
+                    // 入れ替え対象はどちらも通常のノード。
+                    void    swap_position(tree_node& other) {
+                        DOUT() << *this << " <-> " << other << std::endl;
+                        bool    this_was_left_child = is_root() || is_left_child();
+                        bool    other_was_left_child = other.is_root() || other.is_left_child();
+                        DOUT() << "this_was_left_child?: " << !!this_was_left_child << ", other_was_left_child?: " << !!other_was_left_child << std::endl;
+                        // 色をswap
+                        std::swap(is_black_, other.is_black_);
+                        // 出る方のswap
+                        std::swap(parent(), other.parent());
+                        std::swap(left(), other.left());
+                        std::swap(right(), other.right());
+                        DOUT() << *this << " : " << other << std::endl;
+                        DOUT() << *parent() << std::endl;
+                        // 入る方
+                        if (left())
+                        {
+                            if (left() == this)
+                                left() = &other;
+                            else
+                                left()->parent() = this;
+                        }
+                        if (right())
+                        {
+                            if (right() == this)
+                                right() = &other;
+                            else
+                                right()->parent() = this;
+                        }
+                        if (parent() == this)
+                            parent() = &other;
+                        else
+                            (other_was_left_child ? parent()->left() : parent()->right())
+                                = parent() == this ? &other : this;
+                        DOUT() << *this << " @ " << other << std::endl;
+                        DOUT() << *parent() << std::endl;
+                        if (other.left())
+                        {
+                            if (other.left() == &other)
+                                other.left() = this;
+                            else
+                                other.left()->parent() = &other;
+                        }
+                        if (other.right())
+                        {
+                            if (other.right() == &other)
+                                other.right() = this;
+                            else
+                                other.right()->parent() = &other;
+                        }
+                        if (other.parent() == &other)
+                            other.parent() = this;
+                        else
+                            (this_was_left_child ? other.parent()->left() : other.parent()->right())
+                                = other.parent() == &other ? this : &other;
+                        DOUT() << *this << " | " << other << std::endl;
+                        DOUT() << *parent() << std::endl;
+                    }
+
                     void    swap_color(tree_node& other) {
                         std::swap(is_black_, other.is_black_);
                     }
@@ -246,6 +309,36 @@ namespace ft {
                         }
                     }
 
+                // [[デバッグメソッド]]
+                public:
+
+                    std::size_t debug_shortest_height() const {
+                        return 1 + std::min(
+                            left() ? left()->debug_shortest_height() : 0,
+                            right() ? right()->debug_shortest_height() : 0
+                        );
+                    }
+
+                    std::size_t debug_longest_height() const {
+                        return 1 + std::max(
+                            left() ? left()->debug_longest_height() : 0,
+                            right() ? right()->debug_longest_height() : 0
+                        );
+                    }
+
+                    std::size_t debug_shortest_black_height() const {
+                        return (is_black() ? 1 : 0) + std::min(
+                            left() ? left()->debug_shortest_black_height() : 0,
+                            right() ? right()->debug_shortest_black_height() : 0
+                        );
+                    }
+
+                    std::size_t debug_longest_black_height() const {
+                        return (is_black() ? 1 : 0) + std::max(
+                            left() ? left()->debug_longest_black_height() : 0,
+                            right() ? right()->debug_longest_black_height() : 0
+                        );
+                    }
             };
 
             // 要素のタイプ
@@ -435,6 +528,7 @@ namespace ft {
                     inline const_pointer    operator->() const { return ptr_; }
 
                     iterator_type&          operator++() {
+                        // DOUT() << this << ", " << ptr_ << std::endl;
                         ptr_ = next();
                         return *this;
                     }
@@ -924,20 +1018,22 @@ namespace ft {
                 // - 対象要素が右部分木を持つ -> 右部分木の最小要素
                 // - 対象要素が左部分木を持つ -> 左子
                 // - 対象要素が子を持たない -> 打ち止め
+                DOUT() << "pos: " << *position << std::endl;
+                DOUT() << "[END] " << end_node_ << std::endl;
                 while (true) {
                     iterator    dummy = position;
-                    DOUT() << &*position << std::endl;
                     if (position->has_right_child()) {
                         ++position;
-                        (*position).swap_value(*dummy);
-                        DOUT() << "-> " << *(position->value()) << std::endl;
+                        (*position).swap_position(*dummy);
                     } else if (position->has_left_child()) {
                         --position;
-                        DOUT() << "-> " << *(position->value()) << std::endl;
-                        (*position).swap_value(*dummy);
+                        (*position).swap_position(*dummy);
                     } else {
                         break;
                     }
+                    DOUT() << "pos: " << *position << ", dum: " << *dummy << std::endl;
+                    DOUT() << "[END] " << end_node_ << std::endl;
+                    position = dummy;
                 }
                 DOUT() << "erasing: " << *position << std::endl;
 
@@ -965,10 +1061,9 @@ namespace ft {
             }
 
             // (2)
-            // TODO: 範囲削除
             void        erase(iterator first, iterator last) {
-                for (iterator it = first; it != last; ++it) {
-                    erase(it);
+                for (iterator it = first; it != last;) {
+                    erase(it++);
                 }
             }
 
@@ -1059,6 +1154,7 @@ namespace ft {
                     node = parent;
                 }
 
+                // 変数名については別図を参照のこと
                 pointer p = node->parent();
                 pointer q = p->parent();
                 pointer u = q->counter_child(p);
@@ -1085,6 +1181,8 @@ namespace ft {
 
             // 削除後リバランス
             void    rebalance_after_erasure_(pointer np, pointer nm) {
+                DOUT() << "nm: " << nm << std::endl;
+                DOUT() << "np: " << np << ", " << *np << std::endl;
                 if (nm == root()) {
                     // Mは根である
                     // -> Case 1.
@@ -1095,6 +1193,7 @@ namespace ft {
                 // nm は NULL である可能性がある。
                 // 正しい赤黒木であれば、ns != NULL のはず。
                 pointer ns = np->counter_child(nm);
+                DOUT() << "ns: " << ns << ", " << *ns << std::endl;
                 pointer nx = ns->cis_child();
                 pointer ny = ns->trans_child();
                 DOUT()
@@ -1244,7 +1343,28 @@ namespace ft {
                 parent->swap_color(*node);
                 rotate_(parent, node);
             }
-        };
+
+        // [[デバッグメソッド]]
+        public:
+
+            // 葉ノードまでの長さのうち、最も短いものを返す
+            size_type   debug_shortest_height() const {
+                return root() ? root()->debug_shortest_height() : 0;
+            }
+
+            // 葉ノードまでの長さのうち、最も長いものを返す
+            size_type   debug_longest_height() const {
+                return root() ? root()->debug_longest_height() : 0;
+            }
+
+            size_type   debug_shortest_black_height() const {
+                return root() ? root()->debug_shortest_black_height() : 0;
+            }
+
+            size_type   debug_longest_black_height() const {
+                return root() ? root()->debug_longest_black_height() : 0;
+            }
+    };
 }
 
 #endif

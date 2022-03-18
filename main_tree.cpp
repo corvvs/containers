@@ -4,20 +4,25 @@ void    insert_and_erase_random(int n) {
     TreeClass<int>  tree;
     for (int i = 0; i < n; ++i) {
         int k = rand() % (100 * n);
-        std::cout << "insert: " << k << std::endl;
+        DOUT() << "insert: " << k << std::endl;
         tree.insert(k);
-        print_iterative_container_elements(tree);
+        // print_iterative_container_elements(tree);
     }
-    while (tree.size() > 0) {
-        std::cout << "size is " << tree.size() << std::endl;
-        tree.erase(tree.begin());
-        print_iterative_container_elements(tree);
+    DOUT() << "longest  height: " << tree.debug_longest_height() << std::endl;
+    DOUT() << "shortest height: " << tree.debug_shortest_height() << std::endl;
+    DOUT() << "longest  b-height: " << tree.debug_shortest_black_height() << std::endl;
+    DOUT() << "shortest b-height: " << tree.debug_longest_black_height() << std::endl;
+    for (TreeClass<int>::iterator it = tree.begin(); it != tree.end();) {
+        // print_iterative_container_elements(tree);
+        DOUT() << "it: " << &*it << std::endl;
+        tree.erase(it++);
     }
+    // print_iterative_container_elements(tree);
 }
 
 int main() {
 
-    insert_and_erase_random(100);
+    insert_and_erase_random(200000);
 
     // VectorClass<int> v(10);
     // for (VectorClass<int>::size_type i = 0; i < v.size(); ++i) {
