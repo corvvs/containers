@@ -1017,7 +1017,75 @@ namespace ft {
                     root()->parent = end_node();
                 }
             }
-    };
+
+        FT_PRIVATE:
+
+            // [[リバランシング]]
+
+            // 挿入後リバランス
+            void    rebalance_after_insertion_(pointer node) {
+                DOUT() << node << std::endl;
+                // 0. Nが通常ノードでないか、黒ノードの場合
+                // -> なにもしない
+                if (node == NULL) {
+                    DOUT() << "do nothing; is NULL" << std::endl;
+                    return;
+                }
+                if (node == end_node()) {
+                    DOUT() << "do nothing; is end" << std::endl;
+                    return;
+                }
+                if (node->is_black()) {
+                    DOUT() << "do nothing; is black" << std::endl;
+                    return;
+                }
+                // 1. Nが根ノードの場合
+                // -> 色変して終わり
+                if (node == root()) {
+                    DOUT() << "flip and exit; is root" << std::endl;
+                    node->flip_color();
+                    return;
+                }
+                // 2. Nの親が黒ノードの場合
+                // -> なにもしなくてよい
+                if (node->parent()->is_black()) {
+                    DOUT() << "do nothing; parent is black" << std::endl;
+                    return;
+                }
+                // 3. Nの親が赤ノードの場合
+                if (node->is_cis_child()) {
+                    // 曲がっている場合(シス)
+                    // -> Nの親の親とNの親で回転させる(トランスにする)
+                    // https://ja.wikipedia.org/wiki/%E3%82%B7%E3%82%B9_(%E5%8C%96%E5%AD%A6)
+                    DOUT() << "cis -> trans" << std::endl;
+                    pointer parent = node->parent();
+                    node->rotate();
+                    node = parent;
+                }
+
+                pointer p = node->parent();
+                pointer q = p->parent();
+                pointer u = q->counter_child(p);
+                DOUT() << "p = " << p << std::endl;
+                DOUT() << "q = " << q << std::endl;
+                DOUT() << "u = " << u << std::endl;
+                if (u == NULL || u->is_black()) {
+                    // Uが黒ノードの場合
+                    // P, Qを色変する
+                    // さらにQ-Pに対して右回転を行う。
+                    p->flip_color();
+                    q->flip_color();
+                    p->rotate();
+                } else {
+                    // Uが赤ノードの場合
+                    // P, Q, Uの色を反転する。
+                    // Q -> N として、再帰的に処理を繰り返すことにする。
+                    p->flip_color();
+                    q->flip_color();
+                    u->flip_color();
+                    rebalance_after_insertion_(q);
+                }
+            }
 }
 
 #endif
