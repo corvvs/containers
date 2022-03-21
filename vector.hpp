@@ -3,6 +3,7 @@
 
 # include "ft_common.hpp"
 # include "ft_meta_functions.hpp"
+# include "ft_algorithm.hpp"
 # include <memory>
 # include <iostream>
 # include <iterator>
@@ -779,11 +780,7 @@ namespace ft {
         const ft::vector<T,Alloc>& lhs,
         const ft::vector<T,Alloc>& rhs
     ) {
-        if (lhs.size() != rhs.size()) { return false; }
-        for (typename ft::vector<T,Alloc>::size_type i = 0; i < lhs.size(); i += 1) {
-            if (lhs[i] != rhs[i]) { return false; }
-        }
-        return true;
+        return equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 
     template< class T, class Alloc >
@@ -802,16 +799,7 @@ namespace ft {
         const ft::vector<T,Alloc>& rhs
     ) {
         // lhs の内容が rhs の内容より辞書的に小さいまたは等しい場合は true、そうでなければ false。
-        typename ft::vector<T,Alloc>::size_type ml = lhs.size();
-        typename ft::vector<T,Alloc>::size_type mr = rhs.size();
-        typename ft::vector<T,Alloc>::size_type m = ml;
-        if (mr < m) { m = mr; }
-        for (typename ft::vector<T,Alloc>::size_type i = 0; i < m; i += 1) {
-            if (lhs[i] < rhs[i]) { return true; }
-            if (lhs[i] > rhs[i]) { return false; }
-        }
-
-        return ml < mr;
+        return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 
     template< class T, class Alloc >
@@ -819,17 +807,7 @@ namespace ft {
         const ft::vector<T,Alloc>& lhs,
         const ft::vector<T,Alloc>& rhs
     ) {
-        // lhs の内容が rhs の内容より辞書的に大きい場合は true、そうでなければ false。
-        // lhs の内容が rhs の内容より辞書的に小さいまたは等しい場合は true、そうでなければ false。
-        typename ft::vector<T,Alloc>::size_type ml = lhs.size();
-        typename ft::vector<T,Alloc>::size_type mr = rhs.size();
-        typename ft::vector<T,Alloc>::size_type m = ml;
-        if (mr < m) { m = mr; }
-        for (typename ft::vector<T,Alloc>::size_type i = 0; i < m; i += 1) {
-            if (lhs[i] < rhs[i]) { return true; }
-            if (lhs[i] > rhs[i]) { return false; }
-        }
-        return ml <= mr;
+        return !(lhs > rhs);
     }
 
     template< class T, class Alloc >
@@ -846,16 +824,15 @@ namespace ft {
         const ft::vector<T,Alloc>& lhs,
         const ft::vector<T,Alloc>& rhs
     ) {
-        return rhs <= lhs;
+        return !(lhs < rhs);
     }
 
     // [swap]
-    // ft::vector に対する std::swap アルゴリズムの特殊化。 lhs と rhs の内容を入れ替えます。 lhs.swap(rhs) を呼びます。 
+    // ft::vector に対する std::swap アルゴリズムの特殊化。
+    // lhs と rhs の内容を入れ替えます。 lhs.swap(rhs) を呼びます。 
     template< class T, class Alloc >
     void swap( vector<T,Alloc>& lhs, vector<T,Alloc>& rhs ) {
         lhs.swap(rhs);
     }
-
-
 }
 #endif

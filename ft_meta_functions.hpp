@@ -59,9 +59,18 @@ namespace ft {
     struct bidirectional_iterator_tag : public forward_iterator_tag         {};
     struct random_access_iterator_tag : public bidirectional_iterator_tag   {};
 
+
+    template <class>
+    struct type_void { typedef void type; };
+
     // [type_identity]
     template<class T>
     struct type_identity { typedef T type; };
+
+    // template <class From, class To>
+    // struct rebind_pointer {
+    //     typedef typename pointer_traits<From>::template rebind<To>        type;
+    // };
 }
 
 #endif
