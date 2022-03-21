@@ -14,10 +14,13 @@
 #  include <vector>
 #  include <stack>
 #  include <map>
+#  include "pair.hpp"
+#  include "tree.hpp"
 #  define VectorClass std::vector
 #  define StackClass std::stack
 #  define PairClass std::pair
-#  define TreeClass std::__tree
+#  define TreeClass ft::tree
+// #  define TreeClass std::__tree
 # else
 #  include "vector.hpp"
 #  include "stack.hpp"
