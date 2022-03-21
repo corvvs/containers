@@ -128,7 +128,7 @@ tree_clean	:
 	$(RM) $(OBJS_TREE)
 
 tree_stl		:
-	$(MAKE) pair_clean
+	$(MAKE) tree_clean
 	$(MAKE) USE_STL=1 $(NAME_TREE_STL)
 
 tree			:
@@ -136,8 +136,8 @@ tree			:
 	$(MAKE) $(NAME_TREE_FT)
 
 tree_diff		:	tree tree_stl
-	time ./$(NAME_TRRE_STL) > outs1
-	time ./$(NAME_TRRE_FT) 2> err2 > outs2
+	time ./$(NAME_TREE_STL) 2> err2 > outs1
+	time ./$(NAME_TREE_FT) 2> err2 > outs2
 	diff outs1 outs2 || :
 
 $(NAMES_TREE)	:	$(OBJS_TREE)

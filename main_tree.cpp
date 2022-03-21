@@ -25,7 +25,7 @@ void    insert_and_erase_random(int n) {
         TreeClass<int>::size_type sh = tree.debug_shortest_height();
         TreeClass<int>::size_type lb = tree.debug_longest_black_height();
         TreeClass<int>::size_type sb = tree.debug_shortest_black_height();
-        if (sh * 2 > lh) {
+        if (lh > sh * 2) {
             DOUT() << "longest  height: " << tree.debug_longest_height() << std::endl;
             DOUT() << "shortest height: " << tree.debug_shortest_height() << std::endl;
         }
@@ -57,9 +57,48 @@ void    insert_and_erase_random(int n) {
     // print_iterative_container_elements(tree);
 }
 
+void    insertion_with_hint(int n, int key) {
+    TreeClass<int> tree;
+    for (int i = 0; i < n; ++i) {
+        tree.insert(i < key ? i : i + 1);
+    }
+    print_iterative_container_elements(tree);
+
+    TreeClass<int>::iterator hint;
+
+    DOUT() << "#1" << std::endl;
+    hint = tree.lower_bound(key);
+    DOUT() << *hint << std::endl;
+    tree.insert(hint, key);
+    print_iterative_container_elements(tree);
+    DOUT() << tree.size() << std::endl;
+
+    DOUT() << "#2" << std::endl;
+    hint = tree.begin();
+    DOUT() << *hint << std::endl;
+    tree.insert(hint, n + 1);
+    print_iterative_container_elements(tree);
+    DOUT() << tree.size() << std::endl;
+
+    DOUT() << "#3" << std::endl;
+    hint = tree.end();
+    DOUT() << *hint << std::endl;
+    tree.insert(hint, -1000);
+    print_iterative_container_elements(tree);
+    DOUT() << tree.size() << std::endl;
+
+    DOUT() << "#4" << std::endl;
+    hint = tree.end();
+    DOUT() << *hint << std::endl;
+    tree.insert(hint, -1);
+    print_iterative_container_elements(tree);
+    DOUT() << tree.size() << std::endl;
+}
+
 int main() {
 
-    insert_and_erase_random(40);
+    insert_and_erase_random(100);
+    insertion_with_hint(10000, 27);
 
     // VectorClass<int> v(10);
     // for (VectorClass<int>::size_type i = 0; i < v.size(); ++i) {

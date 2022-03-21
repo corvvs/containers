@@ -85,12 +85,14 @@ void    print_vector_elements(Iter from, Iter to) {
 
 template <class Container>
 void    print_iterative_container_elements(Container& container) {
+    DOUT() << &*(container.begin()) << std::endl;
     std::cout << "[";
     for (typename Container::iterator it = container.begin(); it != container.end(); ++it) {
         if (it != container.begin()) {
             std::cout << ", ";
         }
-        std::cout << *it;
+        // std::cout << *it;
+        std::cout << *(it->value());
     }
     std::cout << "]" << std::endl;
 }
