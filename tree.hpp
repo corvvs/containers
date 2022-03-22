@@ -57,12 +57,12 @@ namespace ft {
                     // デフォルト構築
                     // endノードもこれで作る。
                     // endノードは黒。
-                    TreeNode()
+                    explicit TreeNode()
                         :   tree_value_(NULL),
                             left_child_node_(NULL), right_child_node_(NULL), parent_node_(NULL),
                             is_black_(true) {}
                     // endでないノードは赤。
-                    TreeNode(tree_value& element)
+                    explicit TreeNode(tree_value& element)
                         :   tree_value_(&element),
                             left_child_node_(NULL), right_child_node_(NULL), parent_node_(NULL),
                             is_black_(false) {}
@@ -506,7 +506,7 @@ namespace ft {
 
                 public:
                     iterator(): ptr_(NULL) {}
-                    iterator(pointer ptr): ptr_(ptr) {}
+                    explicit iterator(pointer ptr): ptr_(ptr) {}
                     iterator(const iterator_type& other): ptr_(other.ptr_) {}
                     iterator_type&  operator=(const iterator_type &rhs) {
                         ptr_ = rhs.ptr_;
@@ -549,6 +549,13 @@ namespace ft {
                         return ptr_ == rhs.ptr_;
                     }
                     bool                    operator!=(const iterator_type& rhs) const {
+                        return !(*this == rhs);
+                    }
+
+                    bool                    operator==(iterator_type& rhs) {
+                        return ptr_ == rhs.ptr_;
+                    }
+                    bool                    operator!=(iterator_type& rhs) {
                         return !(*this == rhs);
                     }
 
@@ -935,8 +942,8 @@ namespace ft {
                     // (1) hint == end or key < *hint
                     // -> prev = hint - 1 として、 prev == begin or *prev < key なら、
                     //    prevとhintの間にkeyがあるべき。
-                    iterator    prev = hint;
-                    if (prev != begin_node() && value_compare()(*((--prev)->value()), key)) {
+                    iterator    prev(hint);
+                    if (&*prev != begin_node() && value_compare()(*((--prev)->value()), key)) {
                         // このとき、hintとprevの関係性は以下のいずれかとなり、
                         // hintとprevのうち少なくとも一方が空き子を持つ。
                         DOUT() << "found: prev < " << key << " < hint" << std::endl;
@@ -956,8 +963,8 @@ namespace ft {
                     // (2) *hint < key
                     // -> next = hint + 1 として、 next == end or key < *next なら、
                     //    hintとnextの間にkeyがあるべき。
-                    iterator    next = hint;
-                    if (next != end_node() && value_compare()(key, *(((++next)->value())))) {
+                    iterator    next(hint);
+                    if (&*next != end_node() && value_compare()(key, *(((++next)->value())))) {
                         // この時、hintとnextの関係性は以下のいずれかとなり、
                         // hintとnextのうち少なくとも一方が空き子を持つ。
                         DOUT() << "found: hint < " << key << " < next" << std::endl;
