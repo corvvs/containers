@@ -1,6 +1,7 @@
 #ifndef FT_ALGORITHM_HPP
 # define FT_ALGORITHM_HPP
 # include "ft_common.hpp"
+# include "ft_iterator.hpp"
 # include <algorithm>
 # include <iterator>
 
@@ -20,7 +21,7 @@ namespace ft {
             first1, last1,
             first2, last2,
             r1, r2,
-            std::equal_to< typename std::iterator_traits<Iterator1>::value_type >()
+            std::equal_to< typename ft::iterator_traits<Iterator1>::value_type >()
         );
     }
 
@@ -86,8 +87,8 @@ namespace ft {
         return equal_(
             first1, last1,
             first2, last2,
-            typename std::iterator_traits<InputIterator1>::iterator_category(),
-            typename std::iterator_traits<InputIterator2>::iterator_category()
+            typename ft::iterator_traits<InputIterator1>::iterator_category(),
+            typename ft::iterator_traits<InputIterator2>::iterator_category()
         );
     }
 
@@ -100,8 +101,8 @@ namespace ft {
         return equal_(
             first1, last1,
             first2, last2,
-            typename std::iterator_traits<InputIterator1>::iterator_category(),
-            typename std::iterator_traits<InputIterator2>::iterator_category(),
+            typename ft::iterator_traits<InputIterator1>::iterator_category(),
+            typename ft::iterator_traits<InputIterator2>::iterator_category(),
             comp
         );
     }
@@ -116,7 +117,7 @@ namespace ft {
         return equal_(
             first1, last1,
             first2,
-            std::equal_to< typename std::iterator_traits<InputIterator1>::value_type >()
+            std::equal_to< typename ft::iterator_traits<InputIterator1>::value_type >()
         );
     }
 
@@ -143,7 +144,7 @@ namespace ft {
         return lexicographical_compare(
             first1, last1,
             first2, last2,
-            std::less< typename std::iterator_traits<InputIterator1>::value_type >()
+            std::less< typename ft::iterator_traits<InputIterator1>::value_type >()
         );
     }
 

@@ -3,6 +3,9 @@
 
 # include "ft_common.hpp"
 # include "ft_meta_functions.hpp"
+# include "pair.hpp"
+# include "ft_iterator.hpp"
+# include "ft_common.hpp"
 # include <memory>
 # include <iostream>
 # include <iterator>
@@ -552,8 +555,8 @@ namespace ft {
             };
 
             typedef const iterator                                  const_iterator;
-            typedef typename std::reverse_iterator<iterator>        reverse_iterator;
-            typedef typename std::reverse_iterator<const_iterator>  const_reverse_iterator;
+            typedef typename ft::reverse_iterator<iterator>         reverse_iterator;
+            typedef typename ft::reverse_iterator<const_iterator>   const_reverse_iterator;
 
         FT_PRIVATE:
             // [[メンバ変数]]

@@ -4,6 +4,7 @@
 # include "ft_common.hpp"
 # include "ft_meta_functions.hpp"
 # include "ft_algorithm.hpp"
+# include "ft_iterator.hpp"
 # include <memory>
 # include <iostream>
 # include <iterator>
@@ -15,132 +16,18 @@ namespace ft {
     class vector {
         public:
 
-            typedef T                                                   value_type;
-            typedef Allocator                                           allocator_type;
-            typedef typename std::size_t                                size_type;
-            typedef typename std::ptrdiff_t                             difference_type;
-            typedef typename Allocator::reference                       reference;
-            typedef typename Allocator::const_reference                 const_reference;
-            typedef typename Allocator::pointer                         pointer;
-            typedef typename Allocator::const_pointer                   const_pointer;
-
-            class iterator {
-                public:
-                    typedef iterator                                    iterator_type;
-                    typedef typename vector::value_type                 value_type;
-                    typedef typename vector::difference_type            difference_type;
-                    typedef typename vector::pointer                    pointer;
-                    typedef typename vector::reference                  reference;
-                    typedef typename vector::const_reference            const_reference;
-                    typedef typename std::random_access_iterator_tag    iterator_category;
-
-                FT_PRIVATE:
-                    pointer    ptr_;
-
-                public:
-                    iterator(): ptr_(NULL) {}
-                    iterator(pointer ptr): ptr_(ptr) {}
-                    iterator(const iterator& other): ptr_(other.ptr_) {}
-                    iterator_type&  operator=(const iterator_type &rhs) {
-                        ptr_ = rhs.ptr_;
-                        return *this;
-                    }
-
-                    virtual         ~iterator() {}
-
-                    // for 入力イテレータ
-                    reference       operator*() {
-                        return *ptr_;
-                    }
-
-                    // for 出力イテレータ
-                    const reference operator*() const {
-                        return *ptr_;
-                    }
-
-                    pointer         operator->() {
-                        return ptr_;
-                    }
-
-                    const_pointer   operator->() const {
-                        return ptr_;
-                    }
-
-                    iterator_type&  operator++() {
-                        ptr_ += 1;
-                        return *this;
-                    }
-
-                    iterator_type   operator++(int) {
-                        iterator_type    it = *this;
-                        ++*this;
-                        return it;
-                    }
-
-                    iterator_type&  operator--() {
-                        ptr_ -= 1;
-                        return *this;
-                    }
-
-                    iterator_type   operator--(int) {
-                        iterator_type    it = *this;
-                        --*this;
-                        return it;
-                    }
-
-                    iterator_type&  operator+=(difference_type n) {
-                        ptr_ += n;
-                        return *this;
-                    }
-
-                    iterator_type&    operator-=(difference_type n) {
-                        ptr_ -= n;
-                        return *this;
-                    }
-
-                    iterator_type    operator+(difference_type n) const {
-                        return iterator_type(ptr_ + n);
-                    }
-
-                    iterator_type    operator-(difference_type n) const {
-                        return iterator_type(ptr_ - n);
-                    }
-
-                    // アドレスの差を返す
-                    difference_type operator-(const iterator_type& rhs) const {
-                        return &**this - &*rhs;
-                    }
-
-                    // 比較: ポインタアドレスを見る
-                    bool operator==(const iterator_type& rhs) const {
-                        return &**this == &*rhs;
-                    }
-
-                    bool operator!=(const iterator_type& rhs) const {
-                        return !(*this == rhs);
-                    }
-
-                    bool operator<(const iterator_type& rhs) const {
-                        return &**this < &*rhs;
-                    }
-
-                    bool operator<=(const iterator_type& rhs) const {
-                        return (*this < rhs) || (*this == rhs);
-                    }
-
-                    bool operator>(const iterator_type& rhs) const {
-                        return &*rhs <= &**this;
-                    }
-
-                    bool operator>=(const iterator_type& rhs) const {
-                        return &*rhs < &**this;
-                    }
-            };
-
+            typedef T                                               value_type;
+            typedef Allocator                                       allocator_type;
+            typedef typename std::size_t                            size_type;
+            typedef typename std::ptrdiff_t                         difference_type;
+            typedef typename Allocator::reference                   reference;
+            typedef typename Allocator::const_reference             const_reference;
+            typedef typename Allocator::pointer                     pointer;
+            typedef typename Allocator::const_pointer               const_pointer;
+            typedef T*                                              iterator;
             typedef const iterator                                  const_iterator;
-            // ?? std::reverse_iteratorは実装する必要あり？
-            typedef typename std::reverse_iterator<iterator>        reverse_iterator;
-            typedef typename std::reverse_iterator<const_iterator>  const_reverse_iterator;
+            typedef typename ft::reverse_iterator<iterator>         reverse_iterator;
+            typedef typename ft::reverse_iterator<const_iterator>   const_reverse_iterator;
 
             // [コンストラクタ]
             // デフォルト
@@ -151,7 +38,6 @@ namespace ft {
             // アロケータ指定
             explicit vector(const allocator_type& alloc)
                 : capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {
-                // DOUT() << "defcon: " << this << " / " << storage_ << std::endl;
             }
 
             // 要素数, (初期値(コピーされる), アロケータ)
@@ -175,7 +61,6 @@ namespace ft {
             // コピーコンストラクタ
             vector(const vector& other)
                 : capacity_(0), size_(0), allocator_(other.allocator_), storage_(NULL) {
-                // DOUT() << "copy: " << this << " <- " << &other << std::endl;
                 *this = other;
             }
 
@@ -772,67 +657,67 @@ namespace ft {
 
 
     };
+}
 
-    // [比較演算子]
-    // lhs と rhs の内容が等しいかどうか調べます。 つまり、それらが同じ個数の要素を持ち、 lhs 内のそれぞれの要素が rhs 内の同じ位置の要素と等しいかどうか比較します。
-    template< class T, class Alloc >
-    bool operator==(
-        const ft::vector<T,Alloc>& lhs,
-        const ft::vector<T,Alloc>& rhs
-    ) {
-        return equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-    }
+// [比較演算子]
+// lhs と rhs の内容が等しいかどうか調べます。 つまり、それらが同じ個数の要素を持ち、 lhs 内のそれぞれの要素が rhs 内の同じ位置の要素と等しいかどうか比較します。
+template< class T, class Alloc >
+bool operator==(
+    const ft::vector<T,Alloc>& lhs,
+    const ft::vector<T,Alloc>& rhs
+) {
+    return equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
 
-    template< class T, class Alloc >
-    bool operator!=(
-        const ft::vector<T,Alloc>& lhs,
-        const ft::vector<T,Alloc>& rhs
-    ) {
-        return !(lhs == rhs);
-    }
+template< class T, class Alloc >
+bool operator!=(
+    const ft::vector<T,Alloc>& lhs,
+    const ft::vector<T,Alloc>& rhs
+) {
+    return !(lhs == rhs);
+}
 
-    // lhs と rhs の内容を辞書的に比較します。 比較は std::lexicographical_compare と同等の関数によって行われます。 
-    // lhs の内容が rhs の内容より辞書的に小さい場合は true、そうでなければ false。
-    template< class T, class Alloc >
-    bool operator<(
-        const ft::vector<T,Alloc>& lhs,
-        const ft::vector<T,Alloc>& rhs
-    ) {
-        // lhs の内容が rhs の内容より辞書的に小さいまたは等しい場合は true、そうでなければ false。
-        return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-    }
+// lhs と rhs の内容を辞書的に比較します。 比較は std::lexicographical_compare と同等の関数によって行われます。 
+// lhs の内容が rhs の内容より辞書的に小さい場合は true、そうでなければ false。
+template< class T, class Alloc >
+bool operator<(
+    const ft::vector<T,Alloc>& lhs,
+    const ft::vector<T,Alloc>& rhs
+) {
+    // lhs の内容が rhs の内容より辞書的に小さいまたは等しい場合は true、そうでなければ false。
+    return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
 
-    template< class T, class Alloc >
-    bool operator<=(
-        const ft::vector<T,Alloc>& lhs,
-        const ft::vector<T,Alloc>& rhs
-    ) {
-        return !(lhs > rhs);
-    }
+template< class T, class Alloc >
+bool operator<=(
+    const ft::vector<T,Alloc>& lhs,
+    const ft::vector<T,Alloc>& rhs
+) {
+    return !(lhs > rhs);
+}
 
-    template< class T, class Alloc >
-    bool operator>(
-        const ft::vector<T,Alloc>& lhs,
-        const ft::vector<T,Alloc>& rhs
-    ) {
-        // lhs の内容が rhs の内容より辞書的に大きいまたは等しい場合は true、そうでなければ false。
-        return rhs < lhs;
-    }
+template< class T, class Alloc >
+bool operator>(
+    const ft::vector<T,Alloc>& lhs,
+    const ft::vector<T,Alloc>& rhs
+) {
+    // lhs の内容が rhs の内容より辞書的に大きいまたは等しい場合は true、そうでなければ false。
+    return rhs < lhs;
+}
 
-    template< class T, class Alloc >
-    bool operator>=(
-        const ft::vector<T,Alloc>& lhs,
-        const ft::vector<T,Alloc>& rhs
-    ) {
-        return !(lhs < rhs);
-    }
+template< class T, class Alloc >
+bool operator>=(
+    const ft::vector<T,Alloc>& lhs,
+    const ft::vector<T,Alloc>& rhs
+) {
+    return !(lhs < rhs);
+}
 
-    // [swap]
-    // ft::vector に対する std::swap アルゴリズムの特殊化。
-    // lhs と rhs の内容を入れ替えます。 lhs.swap(rhs) を呼びます。 
-    template< class T, class Alloc >
-    void swap( vector<T,Alloc>& lhs, vector<T,Alloc>& rhs ) {
-        lhs.swap(rhs);
-    }
+// [swap]
+// ft::vector に対する std::swap アルゴリズムの特殊化。
+// lhs と rhs の内容を入れ替えます。 lhs.swap(rhs) を呼びます。 
+template< class T, class Alloc >
+void swap( ft::vector<T,Alloc>& lhs, ft::vector<T,Alloc>& rhs ) {
+    lhs.swap(rhs);
 }
 #endif

@@ -95,10 +95,48 @@ void    insertion_with_hint(int n, int key) {
     DOUT() << tree.size() << std::endl;
 }
 
+void    traversing(int n) {
+    TreeClass<int> tree;
+    for (int i = 0; i < n; ++i) {
+        tree.insert(rand() % (n * 10));
+    }
+    {
+        SPRINT("traverse by normal iterator") << "(" << n << ")";
+        TreeClass<int>::iterator it = tree.begin();
+        std::cout << "[normal-traverse by normal iterator]" << std::endl;
+        for (; it != tree.end(); ++it) {
+            std::cout << *(it->value()) << " ";
+        }
+        std::cout << std::endl;
+        std::cout << "[reversal-traverse by normal iterator]" << std::endl;
+        for (;it != tree.begin();) {
+            --it;
+            std::cout << *(it->value()) << " ";
+        }
+        std::cout << std::endl;
+    }
+    {
+        SPRINT("traverse by reverse iterator") << "(" << n << ")";
+        TreeClass<int>::reverse_iterator it = tree.rbegin();
+        std::cout << "[reversal-traverse by reverse iterator]" << std::endl;
+        for (; it != tree.rend(); ++it) {
+            std::cout << *(it->value()) << " ";
+        }
+        std::cout << std::endl;
+        std::cout << "[normal-traverse by normal iterator]" << std::endl;
+        for (;it != tree.rbegin();) {
+            --it;
+            std::cout << *(it->value()) << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
 int main() {
 
-    insert_and_erase_random(100);
-    insertion_with_hint(10000, 27);
+    // insert_and_erase_random(100);
+    // insertion_with_hint(10000, 27);
+    traversing(10);
 
     // VectorClass<int> v(10);
     // for (VectorClass<int>::size_type i = 0; i < v.size(); ++i) {
@@ -161,4 +199,5 @@ int main() {
     //     std::cout << "size is " << tree.size() << std::endl;
     //     tree.erase(tree.begin());
     // }
+    ft::sprint::list();
 }
