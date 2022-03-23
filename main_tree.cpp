@@ -95,7 +95,7 @@ void    insertion_with_hint(int n, int key) {
     DOUT() << tree.size() << std::endl;
 }
 
-void    traversing(int n) {
+void    traverse_by_iterator(int n) {
     TreeClass<int> tree;
     for (int i = 0; i < n; ++i) {
         tree.insert(rand() % (n * 10));
@@ -132,11 +132,24 @@ void    traversing(int n) {
     }
 }
 
-int main() {
+void    compare_iterators()
+{
+    ft::tree<int> v;
+    v.insert(1);
+    ft::tree<int>::const_iterator	cit = v.begin();
+    ft::tree<int>::iterator 		vit = v.begin();
+    std::cout << (vit == cit) << std::endl;
+    ++vit;
+    std::cout << (vit == cit) << std::endl;
+    ++cit;
+    std::cout << (vit == cit) << std::endl;
+}
 
+int main() {
+    compare_iterators();
     // insert_and_erase_random(100);
     // insertion_with_hint(10000, 27);
-    traversing(10);
+    // traverse_by_iterator(10);
 
     // VectorClass<int> v(10);
     // for (VectorClass<int>::size_type i = 0; i < v.size(); ++i) {

@@ -17,8 +17,23 @@ namespace ft {
 
     // tree (Red-Black Tree)
     template <
+        // ノードに載る値の型
+        // - map<MK, MV, MKC, MA>   -> pair<MK, MV>
+        // - set<SK, SKC, SA>       -> SK
+        // ※Valueはノードではない！
         class Value,
+        // Valueのコンパレータ
+        // - map<MK, MV, MKC, MA>
+        //  - Value同士を取り、MK同士として比較するコンパレータ
+        //  - bool compare(const pair<MK, MV>&, const pair<MK, MV>&);
+        //                          -> map_value_compare<MK, pair<MK, MV>, MKC>
+        // - set<SK, SKC, SA>       
+        //  - bool compare(const SK&, const SK&);
+        //                          -> SKC
         class ValueComparator = std::less<Value>,
+        // Valueのアロケータ
+        // - map<MK, MV, MKC, MA>   -> MA
+        // - set<SK, SKC, SA>       -> SA
         class ValueAllocator = std::allocator<Value>
     >
     class tree {
@@ -404,6 +419,8 @@ namespace ft {
                         destroy();
                     }
 
+                    // TODO: これでよい？
+                    // コピーと代入は禁止した方がよくない？
                     TreeNodeHolder&  operator=(const self_type &rhs) {
                         if (this != &rhs) {
                             swap(rhs);
@@ -488,17 +505,19 @@ namespace ft {
             public:
                 typedef TreeNodeHolder  node_holder_type;
 
-            // [イテレータ]
+            class const_iterator;
+
+            // [(variable)イテレータ]
             // treeのイテレータはノードを返す。
             // ノードに乗ってる要素を返すのは利用者(map, set)の責任とする。
             class iterator {
                 public:
                     typedef iterator                                    iterator_type;
+                    typedef const_iterator                              const_iterator_type;
                     typedef typename tree::value_type                   value_type;
                     typedef typename tree::difference_type              difference_type;
                     typedef typename tree::pointer                      pointer;
                     typedef typename tree::reference                    reference;
-                    typedef typename tree::const_reference              const_reference;
                     typedef typename std::bidirectional_iterator_tag    iterator_category;
 
                 FT_PRIVATE:
@@ -508,6 +527,8 @@ namespace ft {
                     iterator(): ptr_(NULL) {}
                     explicit iterator(pointer ptr): ptr_(ptr) {}
                     iterator(const iterator_type& other): ptr_(other.ptr_) {}
+                    // TODO: これ, いいんかなー・・・
+                    iterator(const_iterator_type variable): ptr_(variable.operator->()) {}
                     iterator_type&  operator=(const iterator_type &rhs) {
                         ptr_ = rhs.ptr_;
                         return *this;
@@ -519,11 +540,69 @@ namespace ft {
                     inline pointer  prev() const { return ptr_->backward_neighbor(); }
 
                 public:
-                    inline reference        operator*() { return *ptr_; }
-                    inline const reference  operator*() const { return *ptr_; }
+                    inline reference        operator*() const { return *ptr_; }
+                    inline pointer          operator->() const { return ptr_; }
 
-                    inline pointer          operator->() { return ptr_; }
-                    inline const_pointer    operator->() const { return ptr_; }
+                    iterator_type&          operator++() {
+                        ptr_ = next();
+                        return *this;
+                    }
+                    iterator_type           operator++(int) {
+                        iterator_type   it = *this;
+                        ++*this;
+                        return it;
+                    }
+
+                    iterator_type&          operator--() {
+                        ptr_ = prev();
+                        return *this;
+                    }
+                    iterator_type           operator--(int) {
+                        iterator_type   it = *this;
+                        --*this;
+                        return it;
+                    }
+
+                    bool                    operator==(const iterator_type& rhs) const {
+                        return ptr_ == rhs.ptr_;
+                    }
+                    bool                    operator!=(const iterator_type& rhs) const {
+                        return !(*this == rhs);
+                    }
+            };
+
+            // [constイテレータ]
+            class const_iterator {
+                public:
+                    typedef const_iterator                              iterator_type;
+                    typedef iterator                                    variable_iterator_type;
+                    typedef typename tree::value_type                   value_type;
+                    typedef typename tree::difference_type              difference_type;
+                    typedef typename tree::pointer                      pointer;
+                    typedef typename tree::const_reference              reference;
+                    typedef typename std::bidirectional_iterator_tag    iterator_category;
+
+                FT_PRIVATE:
+                    pointer    ptr_;
+
+                public:
+                    const_iterator(): ptr_(NULL) {}
+                    explicit const_iterator(pointer ptr): ptr_(ptr) {}
+                    const_iterator(const iterator_type& other): ptr_(other.ptr_) {}
+                    const_iterator(variable_iterator_type variable): ptr_(variable.operator->()) {}
+                    iterator_type&  operator=(const iterator_type &rhs) {
+                        ptr_ = rhs.ptr_;
+                        return *this;
+                    }
+                    virtual         ~const_iterator() {}
+
+                FT_PRIVATE:
+                    inline pointer  next() const { return ptr_->forward_neighbor(); }
+                    inline pointer  prev() const { return ptr_->backward_neighbor(); }
+
+                public:
+                    inline reference        operator*() const { return *ptr_; }
+                    inline pointer          operator->() const { return ptr_; }
 
                     iterator_type&          operator++() {
                         ptr_ = next();
@@ -552,16 +631,8 @@ namespace ft {
                         return !(*this == rhs);
                     }
 
-                    bool                    operator==(iterator_type& rhs) {
-                        return ptr_ == rhs.ptr_;
-                    }
-                    bool                    operator!=(iterator_type& rhs) {
-                        return !(*this == rhs);
-                    }
-
             };
 
-            typedef const iterator                                  const_iterator;
             typedef typename ft::reverse_iterator<iterator>         reverse_iterator;
             typedef typename ft::reverse_iterator<const_iterator>   const_reverse_iterator;
 
@@ -582,7 +653,7 @@ namespace ft {
             value_comparator_type   value_compare_;
 
         public:
-            // [コンストラクタ群]
+            // [[コンストラクタ群]]
 
             // デフォルト
             tree():
@@ -627,6 +698,15 @@ namespace ft {
 
             self_type& operator=(const self_type& rhs) {
                 if (this == &rhs) { return *this; }
+                // copy and swap.
+                // - temp の作成に           O(1)
+                // - ranged-insertion に    O(N)
+                // - swapに                 O(1)
+                // - tempの破壊に            O(N)
+                // 全体で O(N).
+                self_type   temp(rhs.value_compare_, rhs.value_allocator_);
+                temp.insert(rhs.begin(), rhs.end());
+                swap(temp);
                 return *this;
             }
 
@@ -637,14 +717,14 @@ namespace ft {
             inline value_comparator_type&       value_compare() { return value_compare_; }
             inline const value_comparator_type& value_compare() const { return value_compare_; }
 
-            inline iterator                 end()
-                { return iterator(end_node()); }
-            inline const_iterator           end() const
-                { return iterator(end_node()); }
             inline iterator                 begin()
                 { return iterator(begin_node()); }
             inline const_iterator           begin() const
-                { return iterator(begin_node()); }
+                { return const_iterator(begin_node()); }
+            inline iterator                 end()
+                { return iterator(end_node()); }
+            inline const_iterator           end() const
+                { return const_iterator(end_node()); }
             inline reverse_iterator         rbegin()
                 { return reverse_iterator(end()); }
             inline const_reverse_iterator   rbegin() const
@@ -716,7 +796,14 @@ namespace ft {
             template <class InputIterator>
             void    insert(InputIterator first, InputIterator last) {
                 for (; first != last; ++first) {
-                    insert(*first);
+                    // 常にendをヒントにしながら挿入するので,
+                    //   - 挿入元ツリーが空
+                    //   - [first, last)が挿入元ツリーのコンパレータにおいてsorted
+                    // の2条件を満たすなら線形時間になる
+                    // (例えばtreeをコピーする時にこの条件が満たされる).
+                    // そうでなければO(nlogn)になる
+                    // (もしかすると線形になることもあるかもしれないが).
+                    insert(end(), *first);
                 }
             }
 
