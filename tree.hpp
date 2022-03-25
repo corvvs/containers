@@ -54,6 +54,7 @@ namespace ft {
                     typedef tree_value*             tree_value_pointer;
                     typedef TreeNode<tree_value>    tree_node;
                     typedef tree_node*              tree_node_pointer;
+                    typedef const tree_node*        tree_node_const_pointer;
 
 
                 FT_PRIVATE:
@@ -174,6 +175,16 @@ namespace ft {
                         }
                         return ptr->parent();
                     }
+                    tree_node_const_pointer forward_neighbor() const {
+                        if (has_right_child()) {
+                            return right()->min_node();
+                        }
+                        tree_node_const_pointer    ptr = this;
+                        while (ptr->is_right_child()) {
+                            ptr = ptr->parent();
+                        }
+                        return ptr->parent();
+                    }
 
                     // 前隣接するノードを返す
                     // O(log2 n)
@@ -187,6 +198,16 @@ namespace ft {
                         // -> 自身が右子になるまで(=左子である間は)親に遡る
                         // -> 最後に親(「左親」)を返す。
                         tree_node_pointer    ptr = this;
+                        while (ptr->is_left_child()) {
+                            ptr = ptr->parent();
+                        }
+                        return ptr->parent();
+                    }
+                    tree_node_const_pointer    backward_neighbor() const {
+                        if (has_left_child()) {
+                            return left()->max_node();
+                        }
+                        tree_node_const_pointer    ptr = this;
                         while (ptr->is_left_child()) {
                             ptr = ptr->parent();
                         }
@@ -307,7 +328,7 @@ namespace ft {
                         {
                             if (rhs.is_root_())
                                 stream << "(root)";
-                            stream << *(rhs.value());
+                            // stream << *(rhs.value());
                         }
                         stream << ":" << &rhs;
                         stream << ":" << (rhs.is_black() ? "B" : "r");
@@ -526,9 +547,11 @@ namespace ft {
                 public:
                     iterator(): ptr_(NULL) {}
                     explicit iterator(pointer ptr): ptr_(ptr) {}
-                    iterator(const iterator_type& other): ptr_(other.ptr_) {}
+                    iterator(const iterator_type& other)
+                        : ptr_(other.ptr_) {}
                     // TODO: これ, いいんかなー・・・
-                    iterator(const_iterator_type variable): ptr_(variable.operator->()) {}
+                    iterator(const_iterator_type constant)
+                        : ptr_(const_cast<pointer>(constant.operator->())) {}
                     iterator_type&  operator=(const iterator_type &rhs) {
                         ptr_ = rhs.ptr_;
                         return *this;
@@ -540,33 +563,33 @@ namespace ft {
                     inline pointer  prev() const { return ptr_->backward_neighbor(); }
 
                 public:
-                    inline reference        operator*() const { return *ptr_; }
-                    inline pointer          operator->() const { return ptr_; }
+                    inline reference    operator*() const { return *ptr_; }
+                    inline pointer      operator->() const { return ptr_; }
 
-                    iterator_type&          operator++() {
+                    iterator_type&      operator++() {
                         ptr_ = next();
                         return *this;
                     }
-                    iterator_type           operator++(int) {
+                    iterator_type       operator++(int) {
                         iterator_type   it = *this;
                         ++*this;
                         return it;
                     }
 
-                    iterator_type&          operator--() {
+                    iterator_type&      operator--() {
                         ptr_ = prev();
                         return *this;
                     }
-                    iterator_type           operator--(int) {
+                    iterator_type       operator--(int) {
                         iterator_type   it = *this;
                         --*this;
                         return it;
                     }
 
-                    bool                    operator==(const iterator_type& rhs) const {
+                    bool                operator==(const iterator_type& rhs) const {
                         return ptr_ == rhs.ptr_;
                     }
-                    bool                    operator!=(const iterator_type& rhs) const {
+                    bool                operator!=(const iterator_type& rhs) const {
                         return !(*this == rhs);
                     }
             };
@@ -578,7 +601,7 @@ namespace ft {
                     typedef iterator                                    variable_iterator_type;
                     typedef typename tree::value_type                   value_type;
                     typedef typename tree::difference_type              difference_type;
-                    typedef typename tree::pointer                      pointer;
+                    typedef typename tree::const_pointer                pointer;
                     typedef typename tree::const_reference              reference;
                     typedef typename std::bidirectional_iterator_tag    iterator_category;
 
@@ -588,8 +611,10 @@ namespace ft {
                 public:
                     const_iterator(): ptr_(NULL) {}
                     explicit const_iterator(pointer ptr): ptr_(ptr) {}
-                    const_iterator(const iterator_type& other): ptr_(other.ptr_) {}
-                    const_iterator(variable_iterator_type variable): ptr_(variable.operator->()) {}
+                    const_iterator(const iterator_type& other)
+                        : ptr_(other.ptr_) {}
+                    const_iterator(variable_iterator_type variable)
+                        : ptr_(variable.operator->()) {}
                     iterator_type&  operator=(const iterator_type &rhs) {
                         ptr_ = rhs.ptr_;
                         return *this;
@@ -761,13 +786,12 @@ namespace ft {
                 pair<pointer, pointer*> place = find_equal_(key);
                 if (place.first == *place.second) {
                     // 挿入できない場合
-                    DOUT() << "failed to insert " << key << std::endl;
+                    // DOUT() << "failed to insert " << key << std::endl;
                     return pair<iterator, bool>(iterator(place.first), false);
                 }
                 // 挿入できる場合
                 // -> place.second の位置に挿入する。
-                insert_at_(place, key);
-                return pair<iterator, bool>(iterator(*place.second), true);
+                return pair<iterator, bool>(iterator(insert_at_(place, key)), true);
             }
 
             // 単一・ヒントあり挿入
@@ -858,37 +882,53 @@ namespace ft {
 
             // keyと等しい要素があれば返す。
             // 言い換えると、 key <= element かつ element <= key が成り立つelementを返す。
-            inline iterator         find(const value_type& key) {
-                return iterator(const_cast<pointer>(find_ptr_(key)));
+            template <class Key>
+            inline iterator         find(const Key& key) {
+                iterator it = lower_bound(key);
+                if (it == end() || value_compare()(key, *(it->value()))) {
+                    return end();
+                }
+                return it;
             }
-            inline const_iterator   find(const value_type& key) const {
-                return const_iterator(find_ptr_(key));
+            template <class Key>
+            inline const_iterator   find(const Key& key) const {
+                const_iterator it = lower_bound(key);
+                if (it == end() || value_compare()(key, *(it->value()))) {
+                    return end();
+                }
+                return it;
             }
 
             // 「key より小さくない最小の要素」を返す
             // 言い換えると   min{ element | key <= element }
             // または        min{ element | !value_comp()(element, key) }
-            inline iterator         lower_bound(const value_type& key) {
+            template <class Key>
+            inline iterator         lower_bound(const Key& key) {
                 return iterator(lower_bound_ptr_(key));
             }
-            inline const_iterator   lower_bound(const value_type& key) const {
+            template <class Key>
+            inline const_iterator   lower_bound(const Key& key) const {
                 return const_iterator(lower_bound_ptr_(key));
             }
             // 「key より大きい最小の要素」を返す
-            inline iterator         upper_bound(const value_type& key) {
+            template <class Key>
+            inline iterator         upper_bound(const Key& key) {
                 return iterator(upper_bound_ptr_(key));
             }
-            inline const_iterator   upper_bound(const value_type& key) const {
+            template <class Key>
+            inline const_iterator   upper_bound(const Key& key) const {
                 return const_iterator(upper_bound_ptr_(key));
             }
 
-            inline size_type        count(const value_type& x) const {
+            template <class Key>
+            inline size_type        count(const Key& x) const {
                 return find_ptr_(x) == end_node() ? 0 : 1;
             }
 
             // ツリーが key を保持しているなら、keyを含む最小の半開区間[lower_bound, upper_bound)を返す。
             // 保持していないなら、[upper_bound, upper_bound)を返す。
-            pair<iterator, iterator>    equal_range(const value_type& key) {
+            template <class Key>
+            pair<iterator, iterator>    equal_range(const Key& key) {
                 pointer p = lower_bound_ptr_(key);
                 if (p != end_node()) {
                     // p = min{ x | key <= x }, つまり key <= p
@@ -901,7 +941,7 @@ namespace ft {
                         return ft::pair<iterator, iterator>(it1, it2);
                     }
                 }
-                return ft::pair<iterator, iterator>(p, p);
+                return ft::pair<iterator, iterator>(iterator(p), iterator(p));
             }
             pair<const_iterator, const_iterator> equal_range(const value_type& key) const {
                 pair<iterator, iterator>    pp = equal_range(key);
@@ -918,11 +958,13 @@ namespace ft {
             inline pointer          root() { return end_node()->left(); }
             inline const_pointer    root() const { return end_node()->left(); }
             inline pointer          begin_node() { return begin_node_; }
+            inline const_pointer    begin_node() const { return begin_node_; }
 
             // key と一致するノードがあれば、そのポインタを返す。
             // "key と一致"とはつまり、xが key <= x && x <= key を満たすこと。
             // なければendのポインタを返す。
-            const_pointer   find_ptr_(const value_type& key) const {
+            template <class Key>
+            const_pointer   find_ptr_(const Key& key) const {
                 const_pointer ptr = lower_bound_ptr_(key);
                 if (ptr != end_node()) {
                     // key <= ptr
@@ -936,7 +978,8 @@ namespace ft {
 
             // key以上の要素があれば、それらのうち最も小さいもののポインタを返す。
             // なければendのポインタを返す。
-            pointer    lower_bound_ptr_(const value_type& key) {
+            template <class Key>
+            pointer    lower_bound_ptr_(const Key& key) {
                 pointer rv = end_node();
                 pointer target = root();
                 while (target != NULL) {
@@ -953,7 +996,8 @@ namespace ft {
                 return rv;
             }
 
-            const_pointer   lower_bound_ptr_(const value_type& key) const {
+            template <class Key>
+            const_pointer   lower_bound_ptr_(const Key& key) const {
                 const_pointer   rv = end_node();
                 const_pointer   target = root();
                 while (target != NULL) {
@@ -970,9 +1014,28 @@ namespace ft {
                 return rv;
             }
 
-            pointer    upper_bound_ptr_(const value_type& key) const {
+            template <class Key>
+            pointer    upper_bound_ptr_(const Key& key) {
                 pointer rv = end_node();
                 pointer target = root();
+                while (target != NULL) {
+                    if (value_compare()(key, *target->value())) {
+                        // key < target
+                        // -> 返すべき値が存在する。
+                        rv = target;
+                        target = target->left();
+                    } else {
+                        // target <= key
+                        target = target->right();
+                    }
+                }
+                return rv;
+            }
+
+            template <class Key>
+            const_pointer    upper_bound_ptr_(const Key& key) const {
+                const_pointer rv = end_node();
+                const_pointer target = root();
                 while (target != NULL) {
                     if (value_compare()(key, *target->value())) {
                         // key < target
@@ -1073,8 +1136,9 @@ namespace ft {
                 return pair<pointer, pointer*>(end_node(), &(end_node()->left()));
             }
 
-            void    insert_at_(pair<pointer, pointer*>& place, const value_type& x) {
+            pointer insert_at_(pair<pointer, pointer*>& place, const value_type& x) {
                 *(place.second) = create_node_(x);
+                pointer inserted = *(place.second);
                 (*(place.second))->parent() = place.first;
                 size_ += 1;
                 // begin が変更されるのは:
@@ -1085,6 +1149,7 @@ namespace ft {
                     begin_node_ = *place.second;
                 }
                 rebalance_after_insertion_(*(place.second));
+                return inserted;
             }
 
         public:
@@ -1233,7 +1298,6 @@ namespace ft {
                     rotate_(parent, node);
                     node = parent;
                 }
-
                 // 変数名については別図を参照のこと
                 pointer p = node->parent();
                 pointer q = p->parent();

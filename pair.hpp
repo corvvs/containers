@@ -9,8 +9,6 @@
 # include <exception>
 # include <stdexcept>
 
-
-
 namespace ft {
     template <class First, class Second>
     class pair {
@@ -24,9 +22,8 @@ namespace ft {
         public:
             pair()
                 : first(), second() {}
-            pair(const pair<First, Second>& other) {
-                *this = other;
-            }
+            pair(const pair<First, Second>& other)
+                : first(other.first), second(other.second) {}
             pair(const First& f, const Second& s)
                 : first(f), second(s) {}
             template <class U, class V>
@@ -48,18 +45,18 @@ namespace ft {
 
     template<class First, class Second>
     pair<First, Second> make_pair(First x, Second y) {
-        return ft::pair<First, Second>(x, y);
+        return pair<First, Second>(x, y);
     }
 
-    template<class First, class Second>
+    template <class First, class Second>
     bool operator==(
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs
     ) {
-        return ((lhs.first == rhs.first) && (lhs.second == rhs.second));
+        return (lhs.first == rhs.first) && (lhs.second == rhs.second);
     }
 
-    template<class First, class Second>
+    template <class First, class Second>
     bool operator!=(
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs
@@ -67,7 +64,7 @@ namespace ft {
         return !(lhs == rhs);
     }
 
-    template<class First, class Second>
+    template <class First, class Second>
     bool operator<(
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs
@@ -78,7 +75,7 @@ namespace ft {
         return (lhs.first < rhs.first);
     }
 
-    template<class First, class Second>
+    template <class First, class Second>
     bool operator>(
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs
@@ -86,7 +83,7 @@ namespace ft {
         return (rhs < lhs);
     }
 
-    template<class First, class Second>
+    template <class First, class Second>
     bool operator<=(
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs
@@ -94,7 +91,7 @@ namespace ft {
         return ((lhs < rhs) || (lhs == rhs));
     }
 
-    template<class First, class Second>
+    template <class First, class Second>
     bool operator>=(
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs

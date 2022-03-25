@@ -6,9 +6,20 @@
 # include <iterator>
 
 namespace ft {
+
+    // template <class T>
+    // struct equal_to {
+    //     bool    operator()(const T& x, const T& y) const {
+    //         return x == y;
+    //     }
+    //     typedef T       first_argument_type;
+    //     typedef T       second_argument_type;
+    //     typedef bool    result_type;
+    // };
+    
     // [[equal, 内部関数]]
 
-    template <class Iterator1, class Iterator2, class Compare>
+    template <class Iterator1, class Iterator2>
     // compあり, ランダムアクセスイテレータが与えられた場合のequal
     // -> compありに転送
     bool    equal_(
@@ -46,11 +57,30 @@ namespace ft {
         );
     }
 
+    template <class Iterator1, class Iterator2>
+    // compなし, 一般イテレータが与えられた場合のequal
+    // -> compありに転送
+    bool    equal_(
+        Iterator1 first1, Iterator1 last1,
+        Iterator2 first2, Iterator2 last2,
+        std::input_iterator_tag r1,
+        std::input_iterator_tag r2
+    ) {
+        return equal_(
+            first1, last1,
+            first2, last2,
+            r1, r2,
+            std::equal_to< typename ft::iterator_traits<Iterator1>::value_type >()
+        );
+    }
+
     template <class Iterator1, class Iterator2, class Compare>
     // compあり, 一般イテレータが与えられた場合のequal
     bool    equal_(
         Iterator1 first1, Iterator1 last1,
         Iterator2 first2, Iterator2 last2,
+        std::input_iterator_tag,
+        std::input_iterator_tag,
         Compare comp
     ) {
         for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
@@ -66,6 +96,8 @@ namespace ft {
     bool    equal_(
         Iterator1 first1, Iterator1 last1,
         Iterator2 first2,
+        std::input_iterator_tag,
+        std::input_iterator_tag,
         Compare comp
     ) {
         for (; first1 != last1; ++first1, ++first2) {
@@ -74,7 +106,7 @@ namespace ft {
             }
         }
         return true;
-    }    
+    }
 
     // [[equal, インターフェース]]
 
@@ -164,8 +196,8 @@ namespace ft {
         }
         return first1 == last1 && first2 != last2;
     }
-
-
 }
+
+
 
 #endif

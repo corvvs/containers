@@ -134,6 +134,7 @@ void    traverse_by_iterator(int n) {
 
 void    compare_iterators()
 {
+    // "constでないiterator"と"const_iterator"が比較できることを確かめる.
     ft::tree<int> v;
     v.insert(1);
     ft::tree<int>::const_iterator	cit = v.begin();
@@ -147,35 +148,35 @@ void    compare_iterators()
 
 int main() {
     compare_iterators();
-    // insert_and_erase_random(100);
-    // insertion_with_hint(10000, 27);
-    // traverse_by_iterator(10);
+    insert_and_erase_random(100);
+    insertion_with_hint(1000, 27);
+    traverse_by_iterator(10);
 
-    // VectorClass<int> v(10);
-    // for (VectorClass<int>::size_type i = 0; i < v.size(); ++i) {
-    //     v[i] = i * 5;
-    // }
+    VectorClass<int> v(10);
+    for (VectorClass<int>::size_type i = 0; i < v.size(); ++i) {
+        v[i] = i * 5;
+    }
 
-    // TreeClass<int> tree;
-    // std::cout << "empty: " << tree.empty() << ", size: " << tree.size() << ", max_size: " << tree.max_size() << std::endl;
-    // tree.insert(tree.end(), 2);
-    // tree.insert(tree.begin(), 1);
-    // tree.insert(tree.end(), 5);
-    // tree.insert(3);
-    // tree.insert(6);
-    // tree.insert(4);
-    // tree.insert(v.begin(), v.end());
-    // std::cout << "empty: " << tree.empty() << ", size: " << tree.size() << ", max_size: " << tree.max_size() << std::endl;
-    // tree.insert(1);
-    // tree.insert(2);
-    // tree.insert(3);
-    // std::cout << "empty: " << tree.empty() << ", size: " << tree.size() << ", max_size: " << tree.max_size() << std::endl;
-    // TreeClass<int>::iterator it = tree.find(1);
-    // if (it == tree.end()) {
-    //     std::cout << "end!!" << std::endl;
-    // } else {
-    //     std::cout << "found!!: " << *(*it).value() << std::endl;
-    // }
+    TreeClass<int> tree;
+    std::cout << "empty: " << tree.empty() << ", size: " << tree.size() << ", max_size: " << tree.max_size() << std::endl;
+    tree.insert(tree.end(), 2);
+    tree.insert(tree.begin(), 1);
+    tree.insert(tree.end(), 5);
+    tree.insert(3);
+    tree.insert(6);
+    tree.insert(4);
+    tree.insert(v.begin(), v.end());
+    std::cout << "empty: " << tree.empty() << ", size: " << tree.size() << ", max_size: " << tree.max_size() << std::endl;
+    tree.insert(1);
+    tree.insert(2);
+    tree.insert(3);
+    std::cout << "empty: " << tree.empty() << ", size: " << tree.size() << ", max_size: " << tree.max_size() << std::endl;
+    TreeClass<int>::iterator it = tree.find(1);
+    if (it == tree.end()) {
+        std::cout << "end!!" << std::endl;
+    } else {
+        std::cout << "found!!: " << *(*it).value() << std::endl;
+    }
     // it = tree.insert(it, 10);
     // it = tree.insert(it, 9);
     // it = tree.insert(it, 11);
