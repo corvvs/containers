@@ -730,7 +730,7 @@ namespace ft {
                 // - tempの破壊に            O(N)
                 // 全体で O(N).
                 self_type   temp(rhs.value_compare_, rhs.value_allocator_);
-                temp.insert(rhs.begin(), rhs.end());
+                temp.insert_node_(rhs.begin(), rhs.end());
                 swap(temp);
                 return *this;
             }
@@ -802,14 +802,14 @@ namespace ft {
                 pair<pointer, pointer*> place = find_equal_(&*hint, key);
                 if (place.first == *place.second) {
                     // 挿入不可
-                    DOUT() << "failed to insert " << key << std::endl;
+                    // DOUT() << "failed to insert " << key << std::endl;
                     return iterator(place.first);
                 }
                 // 挿入できる場合
                 // -> place.second の位置に挿入する。
-                DOUT()
-                    << "insert: " << key << " with hint: "
-                    << *place.first << ", " << place.second << std::endl;
+                // DOUT()
+                //     << "insert: " << key << " with hint: "
+                //     << *place.first << ", " << place.second << std::endl;
                 insert_at_(place, key);
                 return iterator(*place.second);
             }
@@ -1096,7 +1096,7 @@ namespace ft {
                     if (&*prev != begin_node() && value_compare()(*((--prev)->value()), key)) {
                         // このとき、hintとprevの関係性は以下のいずれかとなり、
                         // hintとprevのうち少なくとも一方が空き子を持つ。
-                        DOUT() << "found: prev < " << key << " < hint" << std::endl;
+                        // DOUT() << "found: prev < " << key << " < hint" << std::endl;
                         if (prev->right() == NULL) {
                             // 1. hintの左子がprev
                             //   -> prevは右子を持たない。(持つならそれがhintとprevの間に入る)
@@ -1117,7 +1117,7 @@ namespace ft {
                     if (&*next != end_node() && value_compare()(key, *(((++next)->value())))) {
                         // この時、hintとnextの関係性は以下のいずれかとなり、
                         // hintとnextのうち少なくとも一方が空き子を持つ。
-                        DOUT() << "found: hint < " << key << " < next" << std::endl;
+                        // DOUT() << "found: hint < " << key << " < next" << std::endl;
                         if (next->left() == NULL) {
                             // 1. hintの右部分木の最小値がnext
                             //   -> nextは左子を持たない。(持つならそれがhintとnextの間に入る)
@@ -1152,6 +1152,13 @@ namespace ft {
                 return inserted;
             }
 
+            void    insert_node_(const_iterator first, const_iterator last) {
+                for (; first != last; ++first) {
+                    insert(end(), *(first->value()));
+                }
+            }
+
+
         public:
             // [[swap]]
 
@@ -1178,7 +1185,7 @@ namespace ft {
                     begin_node_ = end_node();
                 } else {
                     // ルートノートがある(<=> size() > 0)なら、ルートの親を今のendに設定し直す。
-                    root()->parent = end_node();
+                    root()->parent() = end_node();
                 }
             }
 

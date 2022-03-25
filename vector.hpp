@@ -657,67 +657,67 @@ namespace ft {
 
 
     };
-}
 
-// [比較演算子]
-// lhs と rhs の内容が等しいかどうか調べます。 つまり、それらが同じ個数の要素を持ち、 lhs 内のそれぞれの要素が rhs 内の同じ位置の要素と等しいかどうか比較します。
-template< class T, class Alloc >
-bool operator==(
-    const ft::vector<T,Alloc>& lhs,
-    const ft::vector<T,Alloc>& rhs
-) {
-    return equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-}
+    // [比較演算子]
+    // lhs と rhs の内容が等しいかどうか調べます。 つまり、それらが同じ個数の要素を持ち、 lhs 内のそれぞれの要素が rhs 内の同じ位置の要素と等しいかどうか比較します。
+    template< class T, class Alloc >
+    bool operator==(
+        const ft::vector<T,Alloc>& lhs,
+        const ft::vector<T,Alloc>& rhs
+    ) {
+        return equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
 
-template< class T, class Alloc >
-bool operator!=(
-    const ft::vector<T,Alloc>& lhs,
-    const ft::vector<T,Alloc>& rhs
-) {
-    return !(lhs == rhs);
-}
+    template< class T, class Alloc >
+    bool operator!=(
+        const ft::vector<T,Alloc>& lhs,
+        const ft::vector<T,Alloc>& rhs
+    ) {
+        return !(lhs == rhs);
+    }
 
-// lhs と rhs の内容を辞書的に比較します。 比較は std::lexicographical_compare と同等の関数によって行われます。 
-// lhs の内容が rhs の内容より辞書的に小さい場合は true、そうでなければ false。
-template< class T, class Alloc >
-bool operator<(
-    const ft::vector<T,Alloc>& lhs,
-    const ft::vector<T,Alloc>& rhs
-) {
-    // lhs の内容が rhs の内容より辞書的に小さいまたは等しい場合は true、そうでなければ false。
-    return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-}
+    // lhs と rhs の内容を辞書的に比較します。 比較は std::lexicographical_compare と同等の関数によって行われます。 
+    // lhs の内容が rhs の内容より辞書的に小さい場合は true、そうでなければ false。
+    template< class T, class Alloc >
+    bool operator<(
+        const ft::vector<T,Alloc>& lhs,
+        const ft::vector<T,Alloc>& rhs
+    ) {
+        // lhs の内容が rhs の内容より辞書的に小さいまたは等しい場合は true、そうでなければ false。
+        return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
 
-template< class T, class Alloc >
-bool operator<=(
-    const ft::vector<T,Alloc>& lhs,
-    const ft::vector<T,Alloc>& rhs
-) {
-    return !(lhs > rhs);
-}
+    template< class T, class Alloc >
+    bool operator<=(
+        const ft::vector<T,Alloc>& lhs,
+        const ft::vector<T,Alloc>& rhs
+    ) {
+        return !(lhs > rhs);
+    }
 
-template< class T, class Alloc >
-bool operator>(
-    const ft::vector<T,Alloc>& lhs,
-    const ft::vector<T,Alloc>& rhs
-) {
-    // lhs の内容が rhs の内容より辞書的に大きいまたは等しい場合は true、そうでなければ false。
-    return rhs < lhs;
-}
+    template< class T, class Alloc >
+    bool operator>(
+        const ft::vector<T,Alloc>& lhs,
+        const ft::vector<T,Alloc>& rhs
+    ) {
+        // lhs の内容が rhs の内容より辞書的に大きいまたは等しい場合は true、そうでなければ false。
+        return rhs < lhs;
+    }
 
-template< class T, class Alloc >
-bool operator>=(
-    const ft::vector<T,Alloc>& lhs,
-    const ft::vector<T,Alloc>& rhs
-) {
-    return !(lhs < rhs);
-}
+    template< class T, class Alloc >
+    bool operator>=(
+        const ft::vector<T,Alloc>& lhs,
+        const ft::vector<T,Alloc>& rhs
+    ) {
+        return !(lhs < rhs);
+    }
 
-// [swap]
-// ft::vector に対する std::swap アルゴリズムの特殊化。
-// lhs と rhs の内容を入れ替えます。 lhs.swap(rhs) を呼びます。 
-template< class T, class Alloc >
-void swap( ft::vector<T,Alloc>& lhs, ft::vector<T,Alloc>& rhs ) {
-    lhs.swap(rhs);
+    // [swap]
+    // ft::vector に対する std::swap アルゴリズムの特殊化。
+    // lhs と rhs の内容を入れ替えます。 lhs.swap(rhs) を呼びます。 
+    template< class T, class Alloc >
+    void swap( ft::vector<T,Alloc>& lhs, ft::vector<T,Alloc>& rhs ) {
+        lhs.swap(rhs);
+    }
 }
 #endif

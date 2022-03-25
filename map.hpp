@@ -227,9 +227,9 @@ namespace ft {
         // pair<MK, MV> のコンパレータ
         // (KeyCompareから作られる)
         class value_compare {
-                // なんでfriend?
-                // -> とりあえずなしてやってみる
-                // friend class map;
+            // map::value_compare() が value_compare コンストラクタを呼ぶが,
+            // これは protected なのでそのままでは map から呼べない。
+            friend class map;
 
             protected:
 
@@ -393,71 +393,71 @@ namespace ft {
             }
 
     };
-}
 
-// [比較演算子]
-// lhs と rhs の内容が等しいかどうか調べます。 つまり、それらが同じ個数の要素を持ち、 lhs 内のそれぞれの要素が rhs 内の同じ位置の要素と等しいかどうか比較します。
-template <class Key, class Value, class KeyComparator, class PairAllocator>
-bool operator==(
-    const ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
-    const ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
-) {
-    // ランダムアクセスイテレータを持つコンテナなら equal 側でサイズ比較をするが、
-    // map はそうではないので, 自前でサイズ比較をやる.
-    return lhs.size() == rhs.size()
-        && equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-}
+    // [比較演算子]
+    // lhs と rhs の内容が等しいかどうか調べます。 つまり、それらが同じ個数の要素を持ち、 lhs 内のそれぞれの要素が rhs 内の同じ位置の要素と等しいかどうか比較します。
+    template <class Key, class Value, class KeyComparator, class PairAllocator>
+    bool operator==(
+        const ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
+        const ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
+    ) {
+        // ランダムアクセスイテレータを持つコンテナなら equal 側でサイズ比較をするが、
+        // map はそうではないので, 自前でサイズ比較をやる.
+        return lhs.size() == rhs.size()
+            && equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
 
-template <class Key, class Value, class KeyComparator, class PairAllocator>
-bool operator!=(
-    const ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
-    const ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
-) {
-    return !(lhs == rhs);
-}
+    template <class Key, class Value, class KeyComparator, class PairAllocator>
+    bool operator!=(
+        const ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
+        const ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
+    ) {
+        return !(lhs == rhs);
+    }
 
-// lhs と rhs の内容を辞書的に比較します。 比較は std::lexicographical_compare と同等の関数によって行われます。 
-// lhs の内容が rhs の内容より辞書的に小さい場合は true、そうでなければ false。
-template <class Key, class Value, class KeyComparator, class PairAllocator>
-bool operator<(
-    const ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
-    const ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
-) {
-    // lhs の内容が rhs の内容より辞書的に小さいまたは等しい場合は true、そうでなければ false。
-    return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), lhs.value_comp);
-}
+    // lhs と rhs の内容を辞書的に比較します。 比較は std::lexicographical_compare と同等の関数によって行われます。 
+    // lhs の内容が rhs の内容より辞書的に小さい場合は true、そうでなければ false。
+    template <class Key, class Value, class KeyComparator, class PairAllocator>
+    bool operator<(
+        const ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
+        const ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
+    ) {
+        // lhs の内容が rhs の内容より辞書的に小さいまたは等しい場合は true、そうでなければ false。
+        return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), lhs.value_comp());
+    }
 
-template <class Key, class Value, class KeyComparator, class PairAllocator>
-bool operator<=(
-    const ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
-    const ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
-) {
-    return !(lhs > rhs);
-}
+    template <class Key, class Value, class KeyComparator, class PairAllocator>
+    bool operator<=(
+        const ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
+        const ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
+    ) {
+        return !(lhs > rhs);
+    }
 
-template <class Key, class Value, class KeyComparator, class PairAllocator>
-bool operator>(
-    const ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
-    const ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
-) {
-    // lhs の内容が rhs の内容より辞書的に大きいまたは等しい場合は true、そうでなければ false。
-    return rhs < lhs;
-}
+    template <class Key, class Value, class KeyComparator, class PairAllocator>
+    bool operator>(
+        const ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
+        const ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
+    ) {
+        // lhs の内容が rhs の内容より辞書的に大きいまたは等しい場合は true、そうでなければ false。
+        return rhs < lhs;
+    }
 
-template <class Key, class Value, class KeyComparator, class PairAllocator>
-bool operator>=(
-    const ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
-    const ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
-) {
-    return !(lhs < rhs);
-}
+    template <class Key, class Value, class KeyComparator, class PairAllocator>
+    bool operator>=(
+        const ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
+        const ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
+    ) {
+        return !(lhs < rhs);
+    }
 
-template <class Key, class Value, class KeyComparator, class PairAllocator>
-void swap(
-    ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
-    ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
-) {
-    lhs.swap(rhs);
+    template <class Key, class Value, class KeyComparator, class PairAllocator>
+    void swap(
+        ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
+        ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
+    ) {
+        lhs.swap(rhs);
+    }
 }
 
 #endif
