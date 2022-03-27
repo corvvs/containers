@@ -73,9 +73,9 @@ OBJS			:=	$(OBJS_VECTOR) $(OBJS_STACK) $(OBJS_PAIR) \
 					$(OBJS_TREE) $(OBJS_MAP) $(OBJS_SET) $(OBJS_MAIN)
 
 .PHONY			:	all
-all				:	stack_stl
+all				:	$(NAMES)
 
-run				:	vector_diff stack_diff
+run				:	stack_diff vector_diff map_diff set_diff
 
 .PHONY			:	clean fclean
 clean			:

@@ -56,7 +56,6 @@ namespace ft {
                     typedef tree_node*              tree_node_pointer;
                     typedef const tree_node*        tree_node_const_pointer;
 
-
                 FT_PRIVATE:
                     // ツリーが保持する要素
                     tree_value_pointer  tree_value_;
@@ -68,7 +67,7 @@ namespace ft {
                     tree_node_pointer   parent_node_;
                     // ノードが黒か
                     bool                is_black_;
-                
+
                 public:
                     // デフォルト構築
                     // endノードもこれで作る。
@@ -102,6 +101,7 @@ namespace ft {
                 public:
 
                     // [[getters]]
+
                     inline tree_value_pointer       value() { return tree_value_; }
                     inline const tree_value_pointer value() const { return tree_value_; }
                     inline tree_node_pointer&       left() { return left_child_node_; }
@@ -112,6 +112,7 @@ namespace ft {
                     inline const tree_node_pointer& parent() const { return parent_node_; }
 
                     // [[predicates]]
+
                     inline bool is_black() const { return is_black_; }
                     // 自身が左子かどうか
                     // (rootに対してはfalseを返すことに注意！)
@@ -295,15 +296,13 @@ namespace ft {
                     // 自分と隣接するノードを自分に向ける。
                     // ただし、自分とcounterが隣接している場合は特別扱いが必要。
                     void pull_in_(tree_node& counter, bool counter_was_left_child) {
-                        if (left())
-                        {
+                        if (left()) {
                             if (left() == this)
                                 left() = &counter;
                             else
                                 left()->parent() = this;
                         }
-                        if (right())
-                        {
+                        if (right()) {
                             if (right() == this)
                                 right() = &counter;
                             else
@@ -429,8 +428,8 @@ namespace ft {
                             node_ptr_(NULL), value_ptr_(NULL) {}
                     TreeNodeHolder(
                         const node_allocator_type& node_alloc,
-                        const value_allocator_type& value_alloc)
-                        :   value_constructed_(false), node_constructed_(false),
+                        const value_allocator_type& value_alloc
+                    ):      value_constructed_(false), node_constructed_(false),
                             node_alloc_(node_alloc), value_alloc_(value_alloc),
                             node_ptr_(NULL), value_ptr_(NULL) {}
                     TreeNodeHolder(const self_type& other) {
@@ -549,7 +548,6 @@ namespace ft {
                     explicit iterator(pointer ptr): ptr_(ptr) {}
                     iterator(const iterator_type& other)
                         : ptr_(other.ptr_) {}
-                    // TODO: これ, いいんかなー・・・
                     iterator(const_iterator_type constant)
                         : ptr_(const_cast<pointer>(constant.operator->())) {}
                     iterator_type&  operator=(const iterator_type &rhs) {

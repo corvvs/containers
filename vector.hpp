@@ -344,10 +344,6 @@ namespace ft {
                 }
                 // TODO: pos == begin() かつ capacity() == 0 の場合はここでswapして終わっていいはず？
                 // -> そうすると capacity が食い違う
-                // if (pos == begin() && capacity() == 0) {
-                //     swap(receiver);
-                //     return;
-                // }
 
                 size_type   count = receiver.size();
                 // サイズがわかるので、再確保の有無を計算
