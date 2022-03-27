@@ -121,13 +121,13 @@ namespace ft {
                 if (size_ <= pos) {
                     throw std::out_of_range("oor");
                 }
-                return *this[pos];
+                return (*this)[pos];
             }
             const_reference at( size_type pos ) const {
                 if (size_ <= pos) {
                     throw std::out_of_range("oor");
                 }
-                return *this[pos];
+                return (*this)[pos];
             }
 
             // [[]]

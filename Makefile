@@ -1,5 +1,5 @@
 CXX				:=	clang++
-CXXFLAGS		:=	-Wall -Wextra -Werror -std=c++98 --pedantic -g -fsanitize=address
+CXXFLAGS		:=	-Wall -Wextra -Werror -std=c++98 --pedantic -I./ -g -fsanitize=address
 ifdef USE_STL
 	CXXFLAGS	+=	-D USE_STL=1
 endif
@@ -59,9 +59,18 @@ NAMES_SET		:=	$(NAME_SET_STL) $(NAME_SET_FT)
 SRCS_SET		:=	main_set.cpp $(SRCS_COMMON)
 OBJS_SET		:=	$(SRCS_SET:.cpp=.o)
 
-NAMES			:=	$(NAMES_VECTOR) $(NAMES_STACK) $(NAMES_PAIR) $(NAMES_TREE) $(NAMES_MAP) $(NAMES_SET)
+# main
+NAME_MAIN_STL	:=	exe_main_stl
+NAME_MAIN_FT	:=	exe_main_ft
+NAMES_MAIN		:=	$(NAME_MAIN_STL) $(NAME_MAIN_FT)
+SRCS_MAIN		:=	main.cpp $(SRCS_COMMON)
+OBJS_MAIN		:=	$(SRCS_MAIN:.cpp=.o)
 
-OBJS			:=	$(OBJS_VECTOR) $(OBJS_STACK) $(OBJS_PAIR) $(OBJS_TREE) $(OBJS_MAP) $(OBJS_SET)
+NAMES			:=	$(NAMES_VECTOR) $(NAMES_STACK) $(NAMES_PAIR) \
+					$(NAMES_TREE) $(NAMES_MAP) $(NAMES_SET) $(NAMES_MAIN)
+
+OBJS			:=	$(OBJS_VECTOR) $(OBJS_STACK) $(OBJS_PAIR) \
+					$(OBJS_TREE) $(OBJS_MAP) $(OBJS_SET) $(OBJS_MAIN)
 
 .PHONY			:	all
 all				:	stack_stl
@@ -207,3 +216,26 @@ set_diff	:	set set_stl
 
 $(NAMES_SET)	:	$(OBJS_SET)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_SET)
+
+# [[set]]
+.PHONY			:	main_clean main_stl main_ft
+
+main_clean	:
+	$(RM) $(OBJS_MAP)
+
+main_stl	:
+	$(MAKE) main_clean
+	$(MAKE) USE_STL=1 $(NAME_MAIN_STL)
+
+main			:
+	$(MAKE) main_clean
+	$(MAKE) $(NAME_MAIN_FT)
+
+main_diff	:	main main_stl
+	time ./$(NAME_MAIN_STL) 100 2> err2 > outs1
+	time ./$(NAME_MAIN_FT) 100 2> err2 > outs2
+	diff outs1 outs2 || :
+
+$(NAMES_MAIN)	:	$(OBJS_MAIN)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_MAIN)
+
