@@ -51,9 +51,17 @@ NAMES_MAP		:=	$(NAME_MAP_STL) $(NAME_MAP_FT)
 SRCS_MAP		:=	main_map.cpp $(SRCS_COMMON)
 OBJS_MAP		:=	$(SRCS_MAP:.cpp=.o)
 
-NAMES			:=	$(NAMES_VECTOR) $(NAMES_STACK) $(NAMES_PAIR) $(NAMES_TREE) $(NAMES_MAP)
+# set
+HPPS_SET		:=	set.hpp
+NAME_SET_STL	:=	exe_set_stl
+NAME_SET_FT		:=	exe_set_ft
+NAMES_SET		:=	$(NAME_SET_STL) $(NAME_SET_FT)
+SRCS_SET		:=	main_set.cpp $(SRCS_COMMON)
+OBJS_SET		:=	$(SRCS_SET:.cpp=.o)
 
-OBJS			:=	$(OBJS_VECTOR) $(OBJS_STACK) $(OBJS_PAIR) $(OBJS_TREE) $(OBJS_MAP)
+NAMES			:=	$(NAMES_VECTOR) $(NAMES_STACK) $(NAMES_PAIR) $(NAMES_TREE) $(NAMES_MAP) $(NAMES_SET)
+
+OBJS			:=	$(OBJS_VECTOR) $(OBJS_STACK) $(OBJS_PAIR) $(OBJS_TREE) $(OBJS_MAP) $(OBJS_SET)
 
 .PHONY			:	all
 all				:	stack_stl
@@ -66,6 +74,7 @@ clean			:
 fclean			:	clean
 	$(RM) $(NAMES)
 
+# [[vector]]
 .PHONY			:	vector_clean vector_stl vector
 
 vector_clean	:
@@ -87,6 +96,7 @@ vector_diff		:	vector vector_stl
 $(NAMES_VECTOR)	:	$(OBJS_VECTOR)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_VECTOR)
 
+# [[stack]]
 .PHONY			:	stack_clean stack_stl stack_ft
 
 stack_clean	:
@@ -109,6 +119,7 @@ $(NAMES_STACK)	:	$(OBJS_STACK)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_STACK)
 
 
+# [[pair]]
 .PHONY			:	pair_clean pair_stl pair_ft
 
 pair_clean	:
@@ -130,6 +141,7 @@ pair_diff		:	pair pair_stl
 $(NAMES_PAIR)	:	$(OBJS_PAIR)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_PAIR)
 
+# [[tree]]
 .PHONY			:	tree_clean tree_stl tree_ft
 
 tree_clean	:
@@ -151,7 +163,8 @@ tree_diff		:	tree tree_stl
 $(NAMES_TREE)	:	$(OBJS_TREE)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_TREE)
 
-.PHONY			:	tree_clean tree_stl tree_ft
+# [[map]]
+.PHONY			:	map_clean map_stl map_ft
 
 map_clean	:
 	$(RM) $(OBJS_MAP)
@@ -171,3 +184,26 @@ map_diff	:	map map_stl
 
 $(NAMES_MAP)	:	$(OBJS_MAP)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_MAP)
+
+
+# [[set]]
+.PHONY			:	set_clean set_stl set_ft
+
+set_clean	:
+	$(RM) $(OBJS_MAP)
+
+set_stl		:
+	$(MAKE) set_clean
+	$(MAKE) USE_STL=1 $(NAME_SET_STL)
+
+set			:
+	$(MAKE) set_clean
+	$(MAKE) $(NAME_SET_FT)
+
+set_diff	:	set set_stl
+	time ./$(NAME_SET_STL) 2> err2 > outs1
+	time ./$(NAME_SET_FT) 2> err2 > outs2
+	diff outs1 outs2 || :
+
+$(NAMES_SET)	:	$(OBJS_SET)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_SET)

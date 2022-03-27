@@ -15,27 +15,24 @@
 #  include <vector>
 #  include <stack>
 #  include <map>
+#  include <set>
 #  include "tree.hpp"
-#  define VectorClass std::vector
-#  define StackClass std::stack
-#  define PairClass std::pair
-#  define TreeClass ft::tree
-#  define MapClass std::map
 #  define NS std
-// #  define TreeClass std::__tree
 # else
 #  include "vector.hpp"
 #  include "stack.hpp"
 #  include "pair.hpp"
 #  include "tree.hpp"
 #  include "map.hpp"
-#  define VectorClass ft::vector
-#  define StackClass ft::stack
-#  define PairClass ft::pair
-#  define TreeClass ft::tree
-#  define MapClass ft::map
+#  include "set.hpp"
 #  define NS ft
 # endif
+# define TreeClass   ft::tree
+# define VectorClass NS::vector
+# define StackClass  NS::stack
+# define PairClass   NS::pair
+# define MapClass    NS::map
+# define SetClass    NS::set
 
 # include "sprint.hpp"
 # include "IntWrapper.hpp"
