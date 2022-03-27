@@ -373,9 +373,9 @@ void    mass_test(const std::string& sub_title, std::size_t n) {
 
 
 int main() {
-    // mass_test<int>("[int]", 1000);
-    // mass_test<ft::IntWrapper>("[ft::IntWrapper]", 100);
-    // mass_test<std::string>("[std::string]", 100);
+    mass_test<int>("[int]", 1000);
+    mass_test<ft::IntWrapper>("[ft::IntWrapper]", 100);
+    mass_test<std::string>("[std::string]", 100);
     mass_test<std::vector<int> >("[std::vector<int>]", 20);
     mass_test<ft::vector<int> >("[ft::vector<int>]", 20);
     ft::sprint::list();

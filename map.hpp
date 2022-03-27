@@ -258,10 +258,17 @@ namespace ft {
 
             // [[コンストラクタ群]]
 
+            map(): tree_(map_value_compare_type(KeyComparator()), PairAllocator()) {}
+
             explicit map(
-                const KeyComparator& comp = KeyComparator(),
-                const PairAllocator& alloc = PairAllocator()
+                const KeyComparator& comp
+            ): tree_(map_value_compare_type(comp), PairAllocator()) {}
+
+            explicit map(
+                const KeyComparator& comp,
+                const PairAllocator& alloc
             ): tree_(map_value_compare_type(comp), alloc) {}
+
 
             template <class InputIterator>
             map(InputIterator first,
@@ -269,8 +276,7 @@ namespace ft {
                 const KeyComparator& comp = KeyComparator(),
                 const PairAllocator& alloc = PairAllocator()
             ): tree_(map_value_compare_type(comp), alloc) {
-                // TODO: ranged-insertion
-
+                insert(first, last);
             }
 
             map(const self_type& other) {
@@ -347,8 +353,11 @@ namespace ft {
             void        erase(iterator position) {
                 tree_.erase(position.tree_iter());
             }
+            void        erase(const_iterator position) {
+                tree_.erase(position.tree_iter());
+            }
             size_type   erase(const key_type& x) {
-                return tree_.erase(x);
+                return tree_.erase_by_key(x);
             }
             void        erase(iterator first, iterator last) {
                 return tree_.erase(first.tree_iter(), last.tree_iter());
@@ -358,8 +367,8 @@ namespace ft {
 
             Value&                      operator[](const key_type& x) {
                 ft::pair<iterator, bool> result = insert(ft::make_pair(x, mapped_type()));
-                DOUT() << result.first.operator->() << std::endl;
-                DOUT() << result.second << std::endl;
+                // DOUT() << result.first.operator->() << std::endl;
+                // DOUT() << result.second << std::endl;
                 return (result.first)->second;
             }
 

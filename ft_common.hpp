@@ -7,9 +7,16 @@
 # include <algorithm>
 # define FT_PRIVATE private
 // TODO: 削除
-# define DOUT() debug_out(__func__, __FILE__, __LINE__)
+# define DSOUT() debug_out(__func__, __FILE__, __LINE__)
+# define DOUT()  debug_err(__func__, __FILE__, __LINE__)
 
 std::ostream&   debug_out(
+    const char *funcname,
+    const char *filename,
+    const int linenumber
+);
+
+std::ostream&   debug_err(
     const char *funcname,
     const char *filename,
     const int linenumber

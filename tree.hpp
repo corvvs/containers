@@ -102,14 +102,14 @@ namespace ft {
                 public:
 
                     // [[getters]]
-                    tree_value_pointer          value() { return tree_value_; }
-                    const tree_value_pointer    value() const { return tree_value_; }
-                    tree_node_pointer&          left() { return left_child_node_; }
-                    tree_node_pointer&          right() { return right_child_node_; }
-                    tree_node_pointer&          parent() { return parent_node_; }
-                    const tree_node_pointer&    left() const { return left_child_node_; }
-                    const tree_node_pointer&    right() const { return right_child_node_; }
-                    const tree_node_pointer&    parent() const { return parent_node_; }
+                    inline tree_value_pointer       value() { return tree_value_; }
+                    inline const tree_value_pointer value() const { return tree_value_; }
+                    inline tree_node_pointer&       left() { return left_child_node_; }
+                    inline tree_node_pointer&       right() { return right_child_node_; }
+                    inline tree_node_pointer&       parent() { return parent_node_; }
+                    inline const tree_node_pointer& left() const { return left_child_node_; }
+                    inline const tree_node_pointer& right() const { return right_child_node_; }
+                    inline const tree_node_pointer& parent() const { return parent_node_; }
 
                     // [[predicates]]
                     inline bool is_black() const { return is_black_; }
@@ -495,7 +495,7 @@ namespace ft {
                     node_pointer    release() {
                         if (node_constructed_ && value_constructed_) {
                             node_pointer    rv = node_ptr_;
-                            DOUT() << *rv << std::endl;
+                            // DOUT() << *rv << std::endl;
                             node_ptr_ = NULL;
                             value_ptr_ = NULL;
                             node_constructed_ = false;
@@ -689,7 +689,7 @@ namespace ft {
                     begin_node_ = end_node();
                 }
             // コンパレータ指定
-            tree(const value_comparator_type& comp):
+            explicit tree(const value_comparator_type& comp):
                 end_node_(node_type()),
                 node_allocator_(node_allocator_type()),
                 size_(0),
@@ -697,21 +697,23 @@ namespace ft {
                     begin_node_ = end_node();
                 }
             // アロケータ指定
-            tree(const value_allocator_type& allocator):
+            explicit tree(const value_allocator_type& allocator):
                 end_node_(node_type()),
                 value_allocator_(allocator),
                 size_(0),
-                value_compare_(value_comparator_type()) {
-                    begin_node_ = end_node();
-                }
+                value_compare_(value_comparator_type())
+            {
+                begin_node_ = end_node();
+            }
             // コンパレータ・アロケータ指定
-            tree(const value_comparator_type& comp, const value_allocator_type& allocator):
+            explicit tree(const value_comparator_type& comp, const value_allocator_type& allocator):
                 end_node_(node_type()),
                 value_allocator_(allocator),
                 size_(0),
-                value_compare_(comp) {
-                    begin_node_ = end_node();
-                }
+                value_compare_(comp)
+            {
+                begin_node_ = end_node();
+            }
             // コピーコンストラクタ
             tree(const self_type& other) {
                 *this = other;
@@ -770,12 +772,15 @@ namespace ft {
 
             // [[ 変更系 ]]
 
-            // すべての要素を削除する(注意: endは破壊しない)。
-            // sizeが0になる。
-            // beginはendと一致する。
+            // すべての要素を削除する(注意: endは破壊しない).
+            // sizeが0になる.
+            // beginはendと一致する.
+            // endの左子はNULLになる.
             void    clear() {
                 destroy_subtree_(root());
                 size_ = 0;
+                begin_node_ = end_node();
+                end_node()->left() = NULL;
             }
 
             // [insert]
@@ -787,11 +792,11 @@ namespace ft {
                 if (place.first == *place.second) {
                     // 挿入できない場合
                     // DOUT() << "failed to insert " << key << std::endl;
-                    return pair<iterator, bool>(iterator(place.first), false);
+                    return make_pair(iterator(place.first), false);
                 }
                 // 挿入できる場合
                 // -> place.second の位置に挿入する。
-                return pair<iterator, bool>(iterator(insert_at_(place, key)), true);
+                return make_pair(iterator(insert_at_(place, key)), true);
             }
 
             // 単一・ヒントあり挿入
@@ -799,19 +804,23 @@ namespace ft {
             // > 挿入が hint の直後の位置に行われた場合、償却定数時間。
             // > そうでなければ、コンテナのサイズの対数。
             iterator    insert(iterator hint, const value_type& key) {
+                // DOUT() << hint.operator->() << std::endl;
                 pair<pointer, pointer*> place = find_equal_(&*hint, key);
+                // DOUT() << place.first << " - " << place.second << std::endl;
                 if (place.first == *place.second) {
                     // 挿入不可
-                    // DOUT() << "failed to insert " << key << std::endl;
+                    // DOUT() << "failed to insert" << std::endl;
                     return iterator(place.first);
                 }
                 // 挿入できる場合
                 // -> place.second の位置に挿入する。
-                // DOUT()
-                //     << "insert: " << key << " with hint: "
-                //     << *place.first << ", " << place.second << std::endl;
-                insert_at_(place, key);
-                return iterator(*place.second);
+                // DOUT() << "inserting" << std::endl;
+                // DOUT() << *place.first << ", " << *place.second << std::endl;
+                // return insert_at_(iterator(*place.second), key);
+                pointer result = insert_at_(place, key);
+                // DOUT() << "inserted" << std::endl;
+                // DOUT() << *place.first << ", " << result << std::endl;
+                return iterator(result);
             }
 
             // 範囲挿入
@@ -1107,14 +1116,13 @@ namespace ft {
                             return pair<pointer, pointer*>(&*hint, &((*hint).left()));
                         }
                     }
-                    DOUT() << "find without hint" << std::endl;
                     return find_equal_(key);
                 } else if (value_compare()(*(hint->value()), key)) {
                     // (2) *hint < key
                     // -> next = hint + 1 として、 next == end or key < *next なら、
                     //    hintとnextの間にkeyがあるべき。
                     iterator    next(hint);
-                    if (&*next != end_node() && value_compare()(key, *(((++next)->value())))) {
+                    if (&*++next != end_node() && value_compare()(key, *((next->value())))) {
                         // この時、hintとnextの関係性は以下のいずれかとなり、
                         // hintとnextのうち少なくとも一方が空き子を持つ。
                         // DOUT() << "found: hint < " << key << " < next" << std::endl;
@@ -1128,7 +1136,6 @@ namespace ft {
                             return pair<pointer, pointer*>(&*hint, &((*hint).right()));
                         }
                     }
-                    DOUT() << "find without hint" << std::endl;
                     return find_equal_(key);
                 }
                 // (3) *hint == key
@@ -1197,7 +1204,7 @@ namespace ft {
             // 単一削除
             void        erase(iterator position) {
                 swap_down_(position);
-                DOUT() << "erasing: " << *position << std::endl;
+                // DOUT() << "erasing: " << *position << std::endl;
 
                 // ここまで来たということは、positionは子を持たない。
                 pointer target = &(*position);
@@ -1227,7 +1234,8 @@ namespace ft {
             // key に一致するものがあれば削除。
             // 削除した場合は1, しなかった場合は0を返す。
             // -> 単にfindでerase(iterator)に投げるだけ
-            size_type   erase(const value_type& key) {
+            template <class Key>
+            size_type   erase_by_key(const Key& key) {
                 iterator it = find(key);
                 if (it == end()) {
                     return 0;
@@ -1267,32 +1275,32 @@ namespace ft {
 
             // 挿入後リバランス
             void    rebalance_after_insertion_(pointer node) {
-                DOUT() << "rebalance from: " << *node << std::endl;
+                // DOUT() << "rebalance from: " << *node << std::endl;
                 // 0. Nが通常ノードでないか、黒ノードの場合
                 // -> なにもしない
                 if (node == NULL) {
-                    DOUT() << "do nothing; is NULL" << std::endl;
+                    // DOUT() << "do nothing; is NULL" << std::endl;
                     return;
                 }
                 if (node == end_node()) {
-                    DOUT() << "do nothing; is end" << std::endl;
+                    // DOUT() << "do nothing; is end" << std::endl;
                     return;
                 }
                 if (node->is_black()) {
-                    DOUT() << "do nothing; is black" << std::endl;
+                    // DOUT() << "do nothing; is black" << std::endl;
                     return;
                 }
                 // 1. Nが根ノードの場合
                 // -> 色変して終わり
                 if (node == root()) {
-                    DOUT() << "flip and exit; is root" << std::endl;
+                    // DOUT() << "flip and exit; is root" << std::endl;
                     node->flip_color();
                     return;
                 }
                 // 2. Nの親が黒ノードの場合
                 // -> なにもしなくてよい
                 if (node->parent()->is_black()) {
-                    DOUT() << "do nothing; parent is black" << std::endl;
+                    // DOUT() << "do nothing; parent is black" << std::endl;
                     return;
                 }
                 // 3. Nの親が赤ノードの場合
@@ -1300,7 +1308,7 @@ namespace ft {
                     // 曲がっている場合(シス)
                     // -> Nの親の親とNの親で回転させる(トランスにする)
                     // https://ja.wikipedia.org/wiki/%E3%82%B7%E3%82%B9_(%E5%8C%96%E5%AD%A6)
-                    DOUT() << "cis -> trans" << std::endl;
+                    // DOUT() << "cis -> trans" << std::endl;
                     pointer parent = node->parent();
                     rotate_(parent, node);
                     node = parent;
@@ -1334,7 +1342,7 @@ namespace ft {
                     // Mは根である
                     // -> Case 1.
                     // なにもしない
-                    DOUT() << "Case 1. do nothing" << std::endl;
+                    // DOUT() << "Case 1. do nothing" << std::endl;
                     return;
                 }
                 // nm は NULL である可能性がある。
@@ -1351,7 +1359,7 @@ namespace ft {
                     // Case 3. BBBB
                     // PSXYすべて黒
                     // -> Sを赤に色変し。Pを基準にしてもう一度黒リバランスを行う
-                    DOUT() << "Case 3. flip ns and rebalance recursively" << std::endl;
+                    // DOUT() << "Case 3. flip ns and rebalance recursively" << std::endl;
                     ns->flip_color();
                     rebalance_after_erasure_(np->parent(), np);
                     return;
@@ -1364,7 +1372,7 @@ namespace ft {
                     // Case 2. BRBB
                     // PXYが黒, Sが赤
                     // BSBB
-                    DOUT() << "Case 2." << std::endl;
+                    // DOUT() << "Case 2." << std::endl;
                     rotate_flip_(np, ns);
                     // np = nm->parent();
                     ns = np->counter_child(nm);
@@ -1379,7 +1387,7 @@ namespace ft {
                     // Case 4. RBBB
                     // SXYが黒, Pが赤
                     // RBBB
-                    DOUT() << "Case 4." << std::endl;
+                    // DOUT() << "Case 4." << std::endl;
                     np->flip_color();
                     ns->flip_color();
                     return;
@@ -1391,7 +1399,7 @@ namespace ft {
                     // SYが黒, Xが赤
                     // ?BRB
                     // -> Case 5.
-                    DOUT() << "Case 5." << std::endl;
+                    // DOUT() << "Case 5." << std::endl;
                     rotate_flip_(ns, nx);
                     ns = np->counter_child(nm);
                     nx = ns->cis_child();
@@ -1399,7 +1407,7 @@ namespace ft {
                 }
                 // Case 6. ?B?R
                 // ?B?R
-                DOUT() << "Case 6." << std::endl;
+                // DOUT() << "Case 6." << std::endl;
                 rotate_swap_(np, ns);
                 ny->flip_color();
             }

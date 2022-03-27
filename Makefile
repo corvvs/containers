@@ -43,9 +43,17 @@ NAMES_TREE		:=	$(NAME_TREE_STL) $(NAME_TREE_FT)
 SRCS_TREE		:=	main_tree.cpp $(SRCS_COMMON)
 OBJS_TREE		:=	$(SRCS_TREE:.cpp=.o)
 
-NAMES			:=	$(NAMES_VECTOR) $(NAMES_STACK) $(NAMES_PAIR) $(NAMES_TREE)
+# map
+HPPS_MAP		:=	map.hpp
+NAME_MAP_STL	:=	exe_map_stl
+NAME_MAP_FT		:=	exe_map_ft
+NAMES_MAP		:=	$(NAME_MAP_STL) $(NAME_MAP_FT)
+SRCS_MAP		:=	main_map.cpp $(SRCS_COMMON)
+OBJS_MAP		:=	$(SRCS_MAP:.cpp=.o)
 
-OBJS			:=	$(OBJS_VECTOR) $(OBJS_STACK) $(OBJS_PAIR) $(OBJS_TREE)
+NAMES			:=	$(NAMES_VECTOR) $(NAMES_STACK) $(NAMES_PAIR) $(NAMES_TREE) $(NAMES_MAP)
+
+OBJS			:=	$(OBJS_VECTOR) $(OBJS_STACK) $(OBJS_PAIR) $(OBJS_TREE) $(OBJS_MAP)
 
 .PHONY			:	all
 all				:	stack_stl
@@ -142,3 +150,24 @@ tree_diff		:	tree tree_stl
 
 $(NAMES_TREE)	:	$(OBJS_TREE)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_TREE)
+
+.PHONY			:	tree_clean tree_stl tree_ft
+
+map_clean	:
+	$(RM) $(OBJS_MAP)
+
+map_stl		:
+	$(MAKE) map_clean
+	$(MAKE) USE_STL=1 $(NAME_MAP_STL)
+
+map			:
+	$(MAKE) map_clean
+	$(MAKE) $(NAME_MAP_FT)
+
+map_diff	:	map map_stl
+	time ./$(NAME_MAP_STL) 2> err2 > outs1
+	time ./$(NAME_MAP_FT) 2> err2 > outs2
+	diff outs1 outs2 || :
+
+$(NAMES_MAP)	:	$(OBJS_MAP)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_MAP)
