@@ -436,7 +436,7 @@ namespace ft {
                         *this = other;
                     }
                     ~TreeNodeHolder() {
-                        destroy();
+                        destroy_();
                     }
 
                     // TODO: これでよい？
@@ -506,7 +506,7 @@ namespace ft {
 
                 FT_PRIVATE:
                     // ノード, value を保持している場合、それらを破壊する
-                    void    destroy() {
+                    void    destroy_() {
                         if (node_ptr_) {
                             if (node_constructed_) {
                                 node_alloc_.destroy(node_ptr_);
@@ -787,7 +787,7 @@ namespace ft {
             // 単一・ヒントなし挿入
             pair<iterator, bool>    insert(const value_type& key) {
                 pair<pointer, pointer*> place = find_equal_(key);
-                if (place.first == *place.second) {
+                if (place.second == NULL) {
                     // 挿入できない場合
                     // DOUT() << "failed to insert " << key << std::endl;
                     return make_pair(iterator(place.first), false);
@@ -805,7 +805,7 @@ namespace ft {
                 // DOUT() << hint.operator->() << std::endl;
                 pair<pointer, pointer*> place = find_equal_(&*hint, key);
                 // DOUT() << place.first << " - " << place.second << std::endl;
-                if (place.first == *place.second) {
+                if (place.second == NULL) {
                     // 挿入不可
                     // DOUT() << "failed to insert" << std::endl;
                     return iterator(place.first);
@@ -1087,7 +1087,9 @@ namespace ft {
                         break;
                     }
                 }
-                return pair<pointer, pointer*>(target, &target);
+                pointer     target_parent = target->parent();
+                pointer**   target_ptr = &(target->is_left_child() ? target_parent->left() : target_parent->right());
+                return pair<pointer, pointer*>(target, target_ptr);
             }
 
             // ヒントありfind_equal
