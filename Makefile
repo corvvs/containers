@@ -199,7 +199,7 @@ $(NAMES_MAP)	:	$(OBJS_MAP)
 .PHONY			:	set_clean set_stl set_ft
 
 set_clean	:
-	$(RM) $(OBJS_MAP)
+	$(RM) $(OBJS_SET)
 
 set_stl		:
 	$(MAKE) set_clean

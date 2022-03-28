@@ -40,7 +40,6 @@ namespace fill {
         DSOUT();
         SetClass<int, std::greater<int> >::iterator it = m.begin();
         for (int i = 0; i < n / 10; ++i) {
-            *it = 1;
             std::cout << *(it++) << " ";
         }
         std::cout << std::endl;
@@ -162,8 +161,6 @@ namespace fill {
         --it;
         DSOUT() << (m.begin() == m.end());
         DSOUT() << *(m.begin()) << std::endl;
-        DSOUT() << *it << std::endl;
-        *it = 1000;
         DSOUT() << *it << std::endl;
         DSOUT() << *(m.begin()) << std::endl;
         ++it;
@@ -333,15 +330,6 @@ namespace fill {
         DSOUT() << m.empty() << std::endl;
         DSOUT() << m.size() << std::endl;
         DSOUT() << (m.begin() == m.end()) << std::endl;
-        for (int i = 0; i < n; ++i) {
-            set_type::iterator  it = m.find(rand() % n);
-            if (it != m.end()) {
-                *it = rand();
-            }
-        }
-        DSOUT() << m.empty() << std::endl;
-        DSOUT() << m.size() << std::endl;
-        DSOUT() << (m.begin() == m.end()) << std::endl;
     }
 
     void    find_constant(int n) {
@@ -368,13 +356,17 @@ namespace fill {
         SPRINT("equal_range") << "(" << n << ")";
         set_type    m;
         for (int i = 0; i < n; ++i) {
-            m.insert(rand() % n);
+            int k = rand() % n;
+            DSOUT() << "insert: " << k << std::endl;
+            m.insert(k);
         }
         DSOUT() << m.empty() << std::endl;
         DSOUT() << m.size() << std::endl;
         DSOUT() << (m.begin() == m.end()) << std::endl;
         for (int i = 0; i < n * 5; ++i) {
-            NS::pair<set_type::iterator, set_type::iterator>    range = m.equal_range(rand() % n);
+            int k = rand() % n;
+            DSOUT() << "test for: " << k << std::endl;
+            NS::pair<set_type::iterator, set_type::iterator>    range = m.equal_range(k);
             if (range.first == range.second) {
                 // not found
                 if (range.first == m.end()) {
@@ -396,7 +388,9 @@ namespace fill {
         SPRINT("lower_bound") << "(" << n << ")";
         set_type    m;
         for (int i = 0; i < n; ++i) {
-            m.insert(rand() % n);
+            int k = rand() % n;
+            DSOUT() << "insert: " << k << std::endl;
+            m.insert(k);
         }
         DSOUT() << m.empty() << std::endl;
         DSOUT() << m.size() << std::endl;

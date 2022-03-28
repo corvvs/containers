@@ -787,7 +787,8 @@ namespace ft {
             // 単一・ヒントなし挿入
             pair<iterator, bool>    insert(const value_type& key) {
                 pair<pointer, pointer*> place = find_equal_(key);
-                if (place.second == NULL) {
+                // std::cout << "place.second: " << place.second << std::endl;
+                if (place.first == *(place.second)) {
                     // 挿入できない場合
                     // DOUT() << "failed to insert " << key << std::endl;
                     return make_pair(iterator(place.first), false);
@@ -1087,8 +1088,12 @@ namespace ft {
                         break;
                     }
                 }
+                // std::cout << "target: " << target << std::endl;
                 pointer     target_parent = target->parent();
-                pointer**   target_ptr = &(target->is_left_child() ? target_parent->left() : target_parent->right());
+                // std::cout << "target_parent: " << target_parent << std::endl;
+                pointer*    target_ptr = &(target->is_left_child() ? target_parent->left() : target_parent->right());
+                // std::cout << "target_ptr: " << target_ptr << std::endl;
+                // std::cout << "*target_ptr: " << *target_ptr << std::endl;
                 return pair<pointer, pointer*>(target, target_ptr);
             }
 
