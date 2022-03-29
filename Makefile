@@ -1,5 +1,5 @@
 CXX				:=	c++
-CXXFLAGS		:=	-Wall -Wextra -Werror -std=c++98 --pedantic -I./ -g -fsanitize=address
+CXXFLAGS		:=	-Wall -Wextra -Werror -std=c++98 --pedantic -I./include -g -fsanitize=address
 ifdef USE_STL
 	CXXFLAGS	+=	-D USE_STL=1
 endif
@@ -9,13 +9,14 @@ endif
 
 
 SRCS_COMMON		:=	sprint.cpp ft_common.cpp test_common.cpp IntWrapper.cpp
+SRCS_COMMON		:=	$(addprefix src/, $(SRCS_COMMON))
 
 # vector
 HPPS_VECTOR		:=	vector.hpp
 NAME_VECTOR_STL	:=	exe_vector_stl
 NAME_VECTOR_FT	:=	exe_vector_ft
 NAMES_VECTOR	:=	$(NAME_VECTOR_STL) $(NAME_VECTOR_FT)
-SRCS_VECTOR		:=	main_vector.cpp $(SRCS_COMMON)
+SRCS_VECTOR		:=	src/main_vector.cpp $(SRCS_COMMON)
 OBJS_VECTOR		:=	$(SRCS_VECTOR:.cpp=.o)
 
 # stack
@@ -23,7 +24,7 @@ HPPS_STACK		:=	stack.hpp
 NAME_STACK_STL	:=	exe_stack_stl
 NAME_STACK_FT	:=	exe_stack_ft
 NAMES_STACK		:=	$(NAME_STACK_STL) $(NAME_STACK_FT)
-SRCS_STACK		:=	main_stack.cpp $(SRCS_COMMON)
+SRCS_STACK		:=	src/main_stack.cpp $(SRCS_COMMON)
 OBJS_STACK		:=	$(SRCS_STACK:.cpp=.o)
 
 # pair
@@ -31,7 +32,7 @@ HPPS_PAIR		:=	pair.hpp
 NAME_PAIR_STL	:=	exe_pair_stl
 NAME_PAIR_FT	:=	exe_pair_ft
 NAMES_PAIR		:=	$(NAME_PAIR_STL) $(NAME_PAIR_FT)
-SRCS_PAIR		:=	main_pair.cpp $(SRCS_COMMON)
+SRCS_PAIR		:=	src/main_pair.cpp $(SRCS_COMMON)
 OBJS_PAIR		:=	$(SRCS_PAIR:.cpp=.o)
 
 
@@ -40,7 +41,7 @@ HPPS_TREE		:=	tree.hpp
 NAME_TREE_STL	:=	exe_tree_stl
 NAME_TREE_FT	:=	exe_tree_ft
 NAMES_TREE		:=	$(NAME_TREE_STL) $(NAME_TREE_FT)
-SRCS_TREE		:=	main_tree.cpp $(SRCS_COMMON)
+SRCS_TREE		:=	src/main_tree.cpp $(SRCS_COMMON)
 OBJS_TREE		:=	$(SRCS_TREE:.cpp=.o)
 
 # map
@@ -48,7 +49,7 @@ HPPS_MAP		:=	map.hpp
 NAME_MAP_STL	:=	exe_map_stl
 NAME_MAP_FT		:=	exe_map_ft
 NAMES_MAP		:=	$(NAME_MAP_STL) $(NAME_MAP_FT)
-SRCS_MAP		:=	main_map.cpp $(SRCS_COMMON)
+SRCS_MAP		:=	src/main_map.cpp $(SRCS_COMMON)
 OBJS_MAP		:=	$(SRCS_MAP:.cpp=.o)
 
 # set
@@ -56,14 +57,14 @@ HPPS_SET		:=	set.hpp
 NAME_SET_STL	:=	exe_set_stl
 NAME_SET_FT		:=	exe_set_ft
 NAMES_SET		:=	$(NAME_SET_STL) $(NAME_SET_FT)
-SRCS_SET		:=	main_set.cpp $(SRCS_COMMON)
+SRCS_SET		:=	src/main_set.cpp $(SRCS_COMMON)
 OBJS_SET		:=	$(SRCS_SET:.cpp=.o)
 
 # main
 NAME_MAIN_STL	:=	exe_main_stl
 NAME_MAIN_FT	:=	exe_main_ft
 NAMES_MAIN		:=	$(NAME_MAIN_STL) $(NAME_MAIN_FT)
-SRCS_MAIN		:=	main.cpp $(SRCS_COMMON)
+SRCS_MAIN		:=	src/main.cpp $(SRCS_COMMON)
 OBJS_MAIN		:=	$(SRCS_MAIN:.cpp=.o)
 
 NAMES			:=	$(NAMES_VECTOR) $(NAMES_STACK) $(NAMES_PAIR) \
