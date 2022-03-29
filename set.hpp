@@ -29,86 +29,12 @@ namespace ft {
             // 内部tree
             typedef ft::tree<value_type, key_compare, allocator_type>
                                                                 base;
-            class const_iterator;
-
-            // [[(variable) iterator]]
-            class iterator {
-                FT_PRIVATE:
-                    typedef typename base::node_type        node_type;
-                    typedef typename base::iterator         tree_iterator;
-                    typedef typename base::const_iterator   tree_const_iterator;
-                    typedef iterator                        iterator_type;
-                    typedef const_iterator                  const_iterator_type;
-
-                    tree_iterator                           tree_it_;
-
-                public:
-                    typedef std::bidirectional_iterator_tag
-                                                            iterator_category;
-                    typedef set::value_type                 value_type;
-                    typedef typename base::iterator::difference_type
-                                                            difference_type;
-                    typedef value_type&                     reference;
-                    typedef value_type*                     pointer;
-
-                    iterator() {}
-                    explicit iterator(tree_const_iterator tit)
-                        : tree_it_(tit) {}
-                    iterator(const iterator_type& other) {
-                        *this = other;
-                    }
-                    iterator(const_iterator_type variable)
-                        : tree_it_(variable.tree_iter()) {}
-                    virtual ~iterator() {}
-
-                    tree_const_iterator tree_iter() const {
-                        return tree_it_;
-                    }
-
-                    reference   operator*() const {
-                        return *(tree_it_->value());
-                    }
-                    pointer     operator->() const {
-                        return tree_it_->value();
-                    }
-
-                    iterator&   operator++() {
-                        ++tree_it_;
-                        return *this;
-                    }
-
-                    iterator    operator++(int) {
-                        iterator    it = *this;
-                        ++*this;
-                        return it;
-                    }
-
-                    iterator&   operator--() {
-                        --tree_it_;
-                        return *this;
-                    }
-
-                    iterator    operator--(int) {
-                        iterator    it = *this;
-                        --*this;
-                        return it;
-                    }
-
-                    bool        operator==(const iterator& rhs) const {
-                        return operator->() == rhs.operator->();
-                    }
-                    bool        operator!=(const iterator& rhs) const {
-                        return !(*this == rhs);
-                    }
-            };
-
             class const_iterator {
                 FT_PRIVATE:
                     typedef typename base::node_type    node_type;
                     typedef typename base::iterator     tree_iterator;
                     typedef typename base::const_iterator
                                                         tree_const_iterator;
-                    typedef iterator                    iterator_type;
                     typedef const_iterator              const_iterator_type;
 
                     tree_const_iterator                 tree_it_;
@@ -119,8 +45,8 @@ namespace ft {
                     typedef set::value_type             value_type;
                     typedef typename base::iterator::difference_type
                                                         difference_type;
-                    typedef value_type&                 reference;
-                    typedef value_type*                 pointer;
+                    typedef const value_type&           reference;
+                    typedef const value_type*           pointer;
 
                     const_iterator() {}
                     explicit const_iterator(tree_const_iterator tit)
@@ -128,8 +54,6 @@ namespace ft {
                     const_iterator(const const_iterator_type& other) {
                         *this = other;
                     }
-                    const_iterator(iterator_type variable)
-                        : tree_it_(variable.tree_iter()) {}
                     virtual ~const_iterator() {}
 
                     tree_const_iterator tree_iter() const {
@@ -172,6 +96,7 @@ namespace ft {
                         return !(*this == rhs);
                     }
             };
+            typedef const_iterator  iterator;
 
         // [[インナークラス群]]
 
@@ -264,16 +189,14 @@ namespace ft {
             template <class InputIterator>
             void                    insert(InputIterator first, InputIterator last)
             {
+                typename base::const_iterator  e = tree_.end();
                 for (; first != last; ++first) {
-                    tree_.insert(tree_.end(), *first);
+                    tree_.insert(e, *first);
                 }
             }
 
             // [[削除]]
 
-            void        erase(iterator position) {
-                tree_.erase(position.tree_iter());
-            }
             void        erase(const_iterator position) {
                 tree_.erase(position.tree_iter());
             }

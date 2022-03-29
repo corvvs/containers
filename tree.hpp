@@ -787,7 +787,6 @@ namespace ft {
             // 単一・ヒントなし挿入
             pair<iterator, bool>    insert(const value_type& key) {
                 pair<pointer, pointer*> place = find_equal_(key);
-                // std::cout << "place.second: " << place.second << std::endl;
                 if (place.first == *(place.second)) {
                     // 挿入できない場合
                     // DOUT() << "failed to insert " << key << std::endl;
@@ -803,9 +802,7 @@ namespace ft {
             // > 挿入が hint の直後の位置に行われた場合、償却定数時間。
             // > そうでなければ、コンテナのサイズの対数。
             iterator    insert(iterator hint, const value_type& key) {
-                // DOUT() << hint.operator->() << std::endl;
                 pair<pointer, pointer*> place = find_equal_(&*hint, key);
-                // DOUT() << place.first << " - " << place.second << std::endl;
                 if (place.second == NULL) {
                     // 挿入不可
                     // DOUT() << "failed to insert" << std::endl;
@@ -813,12 +810,7 @@ namespace ft {
                 }
                 // 挿入できる場合
                 // -> place.second の位置に挿入する。
-                // DOUT() << "inserting" << std::endl;
-                // DOUT() << *place.first << ", " << *place.second << std::endl;
-                // return insert_at_(iterator(*place.second), key);
                 pointer result = insert_at_(place, key);
-                // DOUT() << "inserted" << std::endl;
-                // DOUT() << *place.first << ", " << result << std::endl;
                 return iterator(result);
             }
 

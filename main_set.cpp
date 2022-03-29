@@ -330,6 +330,7 @@ namespace fill {
         DSOUT() << m.empty() << std::endl;
         DSOUT() << m.size() << std::endl;
         DSOUT() << (m.begin() == m.end()) << std::endl;
+        // *(m.begin()) = 1;
     }
 
     void    find_constant(int n) {
@@ -437,33 +438,175 @@ namespace fill {
             }
         }
     }
+
+    void    fill_test() {
+        fill::constructor_default(100);
+        fill::constructor_comparator(100);
+        fill::constructor_comparator_allocator(100);
+        fill::constructor_iterator(100);
+        fill::constructor_copy(100);
+        fill::oprator_assignation(100);
+        fill::get_allocator();
+        fill::key_comp();
+        fill::value_comp();
+        fill::begin_end_variable();
+        fill::clear(100);
+        fill::swap(100);
+        fill::insert_value(100);
+        fill::insert_value_with_hint(100);
+        fill::insert_value_with_range(100);
+        fill::erase_by_position(100);
+        fill::erase_by_key(100);
+        fill::erase_by_range(100);
+        fill::find_variable(100);
+        fill::find_constant(100);
+        fill::equal_range(100);
+        fill::lower_bound(100);
+        fill::upper_bound(100);
+    }
+}
+
+namespace logic {
+    typedef std::string     Key;
+    typedef SetClass<Key>   set_type;
+
+    template <class T>
+    struct size_compare {
+        bool    operator()(const T& lhs, const T& rhs) const {
+            return lhs.size() < rhs.size();
+        }
+    };
+
+    // - 特殊な comparatorを 使用できること
+    // - comparatorにより挿入済みと判定された場合は挿入を行わないこと
+    void    specify_comparator() {
+        SPRINT("specify_comparator");
+        // SetClass<Key>                   m; // これはコンパイルできない
+        SetClass<Key, size_compare<Key> >     m;
+        m.insert("apple");
+        DSOUT() << *(m.begin()) << std::endl;
+        DSOUT() << m.size() << std::endl;
+        m.insert("hello");
+        DSOUT() << *(m.begin()) << std::endl;
+        DSOUT() << m.size() << std::endl;
+        m.insert("42");
+        DSOUT() << *(m.begin()) << std::endl;
+        DSOUT() << m.size() << std::endl;
+    }
+
+    // - 内部にポインタを持つオブジェクトを持てること
+    // - clear後にinsertしても状態が整合すること
+    void    destroy_and_create() {
+        SPRINT("destroy_and_create");
+        SetClass< std::list<int> >  m;
+        int n = 10;
+        for (int i = 0; i < n; ++i) {
+            std::list<int>  lst;
+            for (int j = 0; j < n; ++j) {
+                lst.push_back(rand());
+            }
+            m.insert(lst);
+        }
+        DSOUT() << m.size() << std::endl;
+        {
+            SetClass< std::list<int> >  mm;
+            int n = 10;
+            for (int i = 0; i < n; ++i) {
+                std::list<int>  lst;
+                for (int j = 0; j < n; ++j) {
+                    lst.push_back(rand());
+                }
+                mm.insert(lst);
+            }
+            DSOUT() << (m == mm) << std::endl;
+            m = mm;
+            DSOUT() << (m == mm) << std::endl;
+        }
+        DSOUT() << m.size() << std::endl;
+        m.clear();
+        for (int i = 0; i < n; ++i) {
+            std::list<int>  lst;
+            for (int j = 0; j < n; ++j) {
+                lst.push_back(rand());
+            }
+            m.insert(lst);
+        }
+        DSOUT() << m.size() << std::endl;
+    }
+}
+
+namespace performance {
+    void    insertion(int n, int m) {
+        SetClass<int>   s;
+        for (int i = 0; i < n; ++i) {
+            s.insert(rand());
+        }
+        {
+            SPRINT("performance::insertion") << "(" << n << ")";
+            for (int i = 0; i < m; ++i) {
+                s.insert(rand());
+            }
+        }
+    }
+
+    void    hint_aided_insertion(int n, int m) {
+        SetClass<int>   s;
+        for (int i = 0; i < n; ++i) {
+            s.insert(i);
+        }
+        {
+            SPRINT("performance::hint_aided_insertion") << "(" << n << ")";
+            for (int i = 0; i < m; ++i) {
+                s.insert(s.end(), s.size());
+            }
+        }
+    }
+
+    void    copy(int n) {
+        SetClass<int>   s;
+        for (int i = 0; i < n; ++i) {
+            s.insert(rand());
+        }
+        {
+            SPRINT("performance::copy") << "(" << n << ")";
+            SetClass<int>   ss((s));
+        }
+    }
+
+    void    ranged_insertion(int n) {
+        SetClass<int>   s;
+        for (int i = 0; i < n; ++i) {
+            s.insert(rand());
+        }
+        {
+            SPRINT("performance::ranged_insertion") << "(" << n << ")";
+            SetClass<int>   ss;
+            ss.insert(s.begin(), s.end());
+        }
+    }
 }
 
 int main()
 {
-    fill::constructor_default(100);
-    fill::constructor_comparator(100);
-    fill::constructor_comparator_allocator(100);
-    fill::constructor_iterator(100);
-    fill::constructor_copy(100);
-    fill::oprator_assignation(100);
-    fill::get_allocator();
-    fill::key_comp();
-    fill::value_comp();
-    fill::begin_end_variable();
-    fill::clear(100);
-    fill::swap(100);
-    fill::insert_value(100);
-    fill::insert_value_with_hint(100);
-    fill::insert_value_with_range(100);
-    fill::erase_by_position(100);
-    fill::erase_by_key(100);
-    fill::erase_by_range(100);
-    fill::find_variable(100);
-    fill::find_constant(100);
-    fill::equal_range(100);
-    fill::lower_bound(100);
-    fill::upper_bound(100);
+    // fill::fill_test();
+    // logic::specify_comparator();
+    // logic::destroy_and_create();
+    // performance::insertion(1000, 100);
+    // performance::insertion(10000, 100);
+    // performance::insertion(100000, 100);
+    // performance::insertion(1000000, 100);
+    // performance::hint_aided_insertion(1000, 100);
+    // performance::hint_aided_insertion(10000, 100);
+    // performance::hint_aided_insertion(100000, 100);
+    // performance::hint_aided_insertion(1000000, 100);
+    performance::copy(1000);
+    performance::copy(10000);
+    performance::copy(100000);
+    performance::copy(1000000);
+    performance::ranged_insertion(1000);
+    performance::ranged_insertion(10000);
+    performance::ranged_insertion(100000);
+    performance::ranged_insertion(1000000);
     ft::sprint::list();
 
 }

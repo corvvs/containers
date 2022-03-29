@@ -123,8 +123,8 @@ namespace ft {
                     typedef map::value_type             value_type;
                     typedef typename base::iterator::difference_type
                                                         difference_type;
-                    typedef value_type&                 reference;
-                    typedef value_type*                 pointer;
+                    typedef const value_type&           reference;
+                    typedef const value_type*           pointer;
 
                     const_iterator() {}
                     explicit const_iterator(tree_const_iterator tit)

@@ -1,4 +1,4 @@
-CXX				:=	clang++
+CXX				:=	c++
 CXXFLAGS		:=	-Wall -Wextra -Werror -std=c++98 --pedantic -I./ -g -fsanitize=address
 ifdef USE_STL
 	CXXFLAGS	+=	-D USE_STL=1
