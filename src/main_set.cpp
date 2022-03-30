@@ -440,29 +440,29 @@ namespace fill {
     }
 
     void    fill_test() {
-        fill::constructor_default(100);
-        fill::constructor_comparator(100);
-        fill::constructor_comparator_allocator(100);
-        fill::constructor_iterator(100);
-        fill::constructor_copy(100);
-        fill::oprator_assignation(100);
-        fill::get_allocator();
-        fill::key_comp();
-        fill::value_comp();
-        fill::begin_end_variable();
-        fill::clear(100);
-        fill::swap(100);
-        fill::insert_value(100);
-        fill::insert_value_with_hint(100);
-        fill::insert_value_with_range(100);
-        fill::erase_by_position(100);
-        fill::erase_by_key(100);
-        fill::erase_by_range(100);
-        fill::find_variable(100);
-        fill::find_constant(100);
-        fill::equal_range(100);
-        fill::lower_bound(100);
-        fill::upper_bound(100);
+        constructor_default(100);
+        constructor_comparator(100);
+        constructor_comparator_allocator(100);
+        constructor_iterator(100);
+        constructor_copy(100);
+        oprator_assignation(100);
+        get_allocator();
+        key_comp();
+        value_comp();
+        begin_end_variable();
+        clear(100);
+        swap(100);
+        insert_value(100);
+        insert_value_with_hint(100);
+        insert_value_with_range(100);
+        erase_by_position(100);
+        erase_by_key(100);
+        erase_by_range(100);
+        find_variable(100);
+        find_constant(100);
+        equal_range(100);
+        lower_bound(100);
+        upper_bound(100);
     }
 }
 
@@ -533,6 +533,110 @@ namespace logic {
         }
         DSOUT() << m.size() << std::endl;
     }
+
+    // [いろんなものを載せてみるコーナー]
+
+    // setにsetをのせる
+    void    set_on_set() {
+        SPRINT("set_on_set");
+        typedef SetClass< SetClass< int > > set_type;
+        set_type    s;
+        for (int i = 0; i < 10; ++i) {
+            set_type::key_type  t;
+            for (int j = 0; j < 10; ++j) {
+                t.insert(rand());
+            }
+            s.insert(t);
+        }
+        for (set_type::const_iterator it = s.begin(); it != s.end(); ++it) {
+            DSOUT() << "[";
+            for (set_type::key_type::const_iterator iit = it->begin(); iit != it->end(); ++iit) {
+                std::cout << *iit << ", ";
+            }
+            std::cout << "]" << std::endl;
+        }
+    }
+
+    // setにvectorをのせる
+    void    vector_on_set() {
+        SPRINT("vector_on_set");
+        typedef SetClass< VectorClass< int > > set_type;
+        set_type    s;
+        for (int i = 0; i < 10; ++i) {
+            set_type::key_type  t;
+            for (int j = 0; j < 10; ++j) {
+                t.push_back(rand());
+            }
+            s.insert(t);
+        }
+        for (set_type::const_iterator it = s.begin(); it != s.end(); ++it) {
+            DSOUT() << "[";
+            for (set_type::key_type::const_iterator iit = it->begin(); iit != it->end(); ++iit) {
+                std::cout << *iit << ", ";
+            }
+            std::cout << "]" << std::endl;
+        }
+    }
+
+    // // setにreferenceをのせる -> コンパイルエラーになるはず
+    // void    ref_on_set() {
+    //     SetClass< int& >    s;
+    // }
+
+    // setにポインタをのせる
+    void    pointer_on_set() {
+        SPRINT("pointer_on_set");
+        SetClass< int* >    s;
+        {
+            int i = 0;
+            int j = 0;
+            s.insert(&i);
+            s.insert(&j);
+        }
+        DSOUT() << s.size() << std::endl;
+    }
+
+    // setにconstをのせる
+    void    const_on_set() {
+        SPRINT("const_on_set");
+        SetClass< const int >    s;
+        {
+            s.insert(1);
+            s.insert(2);
+        }
+        DSOUT() << s.size() << std::endl;
+    }
+
+    // setにvolatileをのせる -> コンパイルエラー
+    // void    volatile_on_set() {
+    //     SPRINT("volatile_on_set");
+    //     SetClass< volatile int >    s;
+    //     {
+    //         s.insert(1);
+    //         s.insert(2);
+    //     }
+    //     DSOUT() << s.size() << std::endl;
+    // }
+
+    // void    set_iterator_on_set() { // -> コンパイルエラー(setのイテレータは不等式が定義されないため)
+    //     SPRINT("set_iterator_on_set");
+    //     SetClass<int>   m;
+    //     SetClass< SetClass<int>::iterator >    s;
+    //     {
+    //         s.insert(m.begin());
+    //         s.insert(m.end());
+    //     }
+    //     DSOUT() << s.size() << std::endl;
+    // }
+
+    void    test() {
+        specify_comparator();
+        destroy_and_create();
+        set_on_set();
+        vector_on_set();
+        pointer_on_set();
+        const_on_set();
+    }
 }
 
 namespace performance {
@@ -584,29 +688,79 @@ namespace performance {
             ss.insert(s.begin(), s.end());
         }
     }
+
+    // でかい(=compareに時間がかかる)キーを使った処理
+    void    heavy_key(int n, int m) {
+        typedef SetClass< VectorClass< int > > set_type;
+        set_type::const_iterator    it;
+        set_type    s;
+        {
+            SPRINT("performance::heavy_key initialize") << "(" << n << ", " << m << ")";
+            for (int i = 0; i < n; ++i) {
+                set_type::key_type  t;
+                for (int j = 0; j < m; ++j) {
+                    t.push_back(rand());
+                }
+                s.insert(t);
+            }
+            DSOUT() << *(s.begin()->begin()) << std::endl;
+            it = s.begin();
+            for (int i = 0; i < n / 2; ++i, ++it);
+        }
+        {
+            SPRINT("performance::heavy_key find") << "(" << n << ", " << m << ")";
+            for (int i = 0; i < n; ++i) {
+                set_type::const_iterator result = s.find(*it);
+                DSOUT() << result->back() << std::endl;
+            }
+        }
+        {
+            SPRINT("performance::heavy_key erasure") << "(" << n << ", " << m << ")";
+            while (s.size() > 0) {
+                if (rand() % 2 == 0) {
+                    s.erase(s.begin());
+                } else {
+                    set_type::const_iterator    it = s.end();
+                    --it;
+                    s.erase(it);
+                }
+            }
+        }
+    }
+
+    void    test() {
+        insertion(1000, 100);
+        insertion(10000, 100);
+        insertion(100000, 100);
+        insertion(1000000, 100);
+        hint_aided_insertion(1000, 100);
+        hint_aided_insertion(10000, 100);
+        hint_aided_insertion(100000, 100);
+        hint_aided_insertion(1000000, 100);
+        copy(1000);
+        copy(10000);
+        copy(100000);
+        copy(1000000);
+        ranged_insertion(1000);
+        ranged_insertion(10000);
+        ranged_insertion(100000);
+        ranged_insertion(1000000);
+        heavy_key(100, 10);
+        heavy_key(1000, 10);
+        heavy_key(10000, 10);
+        heavy_key(100, 100);
+        heavy_key(1000, 100);
+        heavy_key(10000, 100);
+        heavy_key(100, 1000);
+        heavy_key(1000, 1000);
+        heavy_key(10000, 1000);        
+    }
 }
 
 int main()
 {
-    // fill::fill_test();
-    // logic::specify_comparator();
-    // logic::destroy_and_create();
-    // performance::insertion(1000, 100);
-    // performance::insertion(10000, 100);
-    // performance::insertion(100000, 100);
-    // performance::insertion(1000000, 100);
-    // performance::hint_aided_insertion(1000, 100);
-    // performance::hint_aided_insertion(10000, 100);
-    // performance::hint_aided_insertion(100000, 100);
-    // performance::hint_aided_insertion(1000000, 100);
-    performance::copy(1000);
-    performance::copy(10000);
-    performance::copy(100000);
-    performance::copy(1000000);
-    performance::ranged_insertion(1000);
-    performance::ranged_insertion(10000);
-    performance::ranged_insertion(100000);
-    performance::ranged_insertion(1000000);
+    fill::fill_test();
+    logic::test();
+    performance::test();
     ft::sprint::list();
-
 }

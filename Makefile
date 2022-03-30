@@ -80,16 +80,19 @@ NAMES			:=	$(NAMES_VECTOR) $(NAMES_STACK) $(NAMES_PAIR) \
 OBJS			:=	$(OBJS_VECTOR) $(OBJS_STACK) $(OBJS_PAIR) \
 					$(OBJS_TREE) $(OBJS_MAP) $(OBJS_SET) $(OBJS_MAIN)
 
-.PHONY			:	all
+.PHONY			:	all run
 all				:	$(NAMES)
 
-run				:	stack_diff vector_diff map_diff set_diff
+run				:	meta_diff stack_diff vector_diff map_diff set_diff main_diff
 
-.PHONY			:	clean fclean
+.PHONY			:	clean fclean re
 clean			:
 	$(RM) $(OBJS)
+
 fclean			:	clean
 	$(RM) $(NAMES)
+
+re				:	fclean all
 
 # [[vector]]
 .PHONY			:	vector_clean vector_stl vector
@@ -116,7 +119,7 @@ $(NAMES_VECTOR)	:	$(OBJS_VECTOR)
 # [[stack]]
 .PHONY			:	stack_clean stack_stl stack_ft
 
-stack_clean	:
+stack_clean		:
 	$(RM) $(OBJS_STACK)
 
 stack_stl		:
@@ -139,7 +142,7 @@ $(NAMES_STACK)	:	$(OBJS_STACK)
 # [[pair]]
 .PHONY			:	pair_clean pair_stl pair_ft
 
-pair_clean	:
+pair_clean		:
 	$(RM) $(OBJS_PAIR)
 
 pair_stl		:
@@ -161,7 +164,7 @@ $(NAMES_PAIR)	:	$(OBJS_PAIR)
 # [[tree]]
 .PHONY			:	tree_clean tree_stl tree_ft
 
-tree_clean	:
+tree_clean		:
 	$(RM) $(OBJS_TREE)
 
 tree_stl		:
@@ -183,18 +186,18 @@ $(NAMES_TREE)	:	$(OBJS_TREE)
 # [[map]]
 .PHONY			:	map_clean map_stl map_ft
 
-map_clean	:
+map_clean		:
 	$(RM) $(OBJS_MAP)
 
-map_stl		:
+map_stl			:
 	$(MAKE) map_clean
 	$(MAKE) USE_STL=1 $(NAME_MAP_STL)
 
-map			:
+map				:
 	$(MAKE) map_clean
 	$(MAKE) $(NAME_MAP_FT)
 
-map_diff	:	map map_stl
+map_diff		:	map map_stl
 	time ./$(NAME_MAP_STL) 2> err2 > out_map_1
 	time ./$(NAME_MAP_FT) 2> err2 > out_map_2
 	diff out_map_1 out_map_2 || :
@@ -206,18 +209,18 @@ $(NAMES_MAP)	:	$(OBJS_MAP)
 # [[set]]
 .PHONY			:	set_clean set_stl set_ft
 
-set_clean	:
+set_clean		:
 	$(RM) $(OBJS_SET)
 
-set_stl		:
+set_stl			:
 	$(MAKE) set_clean
 	$(MAKE) USE_STL=1 $(NAME_SET_STL)
 
-set			:
+set				:
 	$(MAKE) set_clean
 	$(MAKE) $(NAME_SET_FT)
 
-set_diff	:	set set_stl
+set_diff		:	set set_stl
 	time ./$(NAME_SET_STL) 2> err2 > out_set_1
 	time ./$(NAME_SET_FT) 2> err2 > out_set_2
 	diff out_set_1 out_set_2 || :
@@ -228,10 +231,10 @@ $(NAMES_SET)	:	$(OBJS_SET)
 # [[main(subject)]]
 .PHONY			:	main_clean main_stl main_ft
 
-main_clean	:
+main_clean		:
 	$(RM) $(OBJS_MAP)
 
-main_stl	:
+main_stl		:
 	$(MAKE) main_clean
 	$(MAKE) USE_STL=1 $(NAME_MAIN_STL)
 
@@ -239,7 +242,7 @@ main			:
 	$(MAKE) main_clean
 	$(MAKE) $(NAME_MAIN_FT)
 
-main_diff	:	main main_stl
+main_diff		:	main main_stl
 	time ./$(NAME_MAIN_STL) 100 2> err2 > out_main_1
 	time ./$(NAME_MAIN_FT) 100 2> err2 > out_main_2
 	diff out_main_1 out_main_2 || :
@@ -251,10 +254,10 @@ $(NAMES_MAIN)	:	$(OBJS_MAIN)
 # [[meta]]
 .PHONY			:	meta_clean meta_stl meta_ft
 
-meta_clean	:
+meta_clean		:
 	$(RM) $(OBJS_META)
 
-meta_stl	:
+meta_stl		:
 	$(MAKE) meta_clean
 	$(MAKE) USE_STL=1 $(NAME_META_STL)
 
@@ -262,10 +265,11 @@ meta			:
 	$(MAKE) meta_clean
 	$(MAKE) $(NAME_META_FT)
 
-meta_diff	:	meta meta_stl
+meta_diff		:	meta meta_stl
 	time ./$(NAME_META_STL) 100 2> err2 > out_meta_1
 	time ./$(NAME_META_FT) 100 2> err2 > out_meta_2
 	diff out_meta_1 out_meta_2 || :
 
 $(NAMES_META)	:	$(OBJS_META)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_META)
+

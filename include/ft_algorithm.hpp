@@ -170,18 +170,6 @@ namespace ft {
 
     // [[lexicographical_compare]]
 
-    template <class InputIterator1, class InputIterator2>
-    bool    lexicographical_compare(
-        InputIterator1 first1, InputIterator1 last1,
-        InputIterator2 first2, InputIterator2 last2
-    ) {
-        return lexicographical_compare(
-            first1, last1,
-            first2, last2,
-            std::less< typename ft::iterator_traits<InputIterator1>::value_type >()
-        );
-    }
-
     template <class InputIterator1, class InputIterator2, class Compare>
     bool    lexicographical_compare(
         InputIterator1 first1, InputIterator1 last1,
@@ -197,6 +185,18 @@ namespace ft {
             }
         }
         return first1 == last1 && first2 != last2;
+    }
+
+    template <class InputIterator1, class InputIterator2>
+    bool    lexicographical_compare(
+        InputIterator1 first1, InputIterator1 last1,
+        InputIterator2 first2, InputIterator2 last2
+    ) {
+        return ft::lexicographical_compare(
+            first1, last1,
+            first2, last2,
+            std::less< typename ft::iterator_traits<InputIterator1>::value_type >()
+        );
     }
 }
 
