@@ -6,15 +6,19 @@ namespace ft {
     class IntWrapper {
         public:
             IntWrapper();
-            IntWrapper(int i);
+            explicit IntWrapper(int i);
             IntWrapper(const IntWrapper& other);
             ~IntWrapper();
             IntWrapper& operator=(const IntWrapper& rhs);
 
             int get_int() const;
+            static void set_limit(int n);
+
+            static int  limit;
 
         private:
             int *i_;
+            static int  instantiated_;
     };
 
 }

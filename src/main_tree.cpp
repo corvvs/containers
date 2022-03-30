@@ -9,7 +9,7 @@ void    insert_and_erase_random(int n) {
     for (int i = 0; i < 10 * n; ++i) {
         int j = rand() % ns.size();
         int k = rand() % ns.size();
-        std::swap(ns[j], ns[k]);
+        ft::swap(ns[j], ns[k]);
     }
     TreeClass<int>  tree;
     for (int i = 0; i < n; ++i) {

@@ -41,11 +41,56 @@ namespace ft {
         typedef std::random_access_iterator_tag  iterator_category;
     };
 
+    // [iterator_category predicates]
+    template <class T>
+    struct has_iterator_category {
+        private:
+            struct __two {
+                char __lx; char __lxx;
+            };
+            template <class To>
+            static __two __test(...);
+            template <class To>
+            static char __test(typename To::iterator_category* = nullptr);
+        public:
+            static const bool value = sizeof(__test<T>(nullptr)) == 1;
+    };
+
+    template <class T, class To, bool = has_iterator_category<iterator_traits<T> >::value>
+    struct has_iterator_category_convertible_to
+        : is_convertible<typename iterator_traits<T>::iterator_category, To> {};
+
+    template <class T, class To>
+    struct has_iterator_category_convertible_to<T, To, false> : false_type {};
+
+    template <class T>
+    struct is_input_iterator:
+        public has_iterator_category_convertible_to<T, std::input_iterator_tag> {};
+
+    template <class T>
+    struct is_forward_iterator:
+        public has_iterator_category_convertible_to<T, std::forward_iterator_tag> {};
+
+    template <class T>
+    struct is_bidirectional_iterator:
+        public has_iterator_category_convertible_to<T, std::bidirectional_iterator_tag> {};
+
+    template <class T>
+    struct is_random_access_iterator:
+        public has_iterator_category_convertible_to<T, std::random_access_iterator_tag> {};
+
     // [[reverse_iterator]]
 
     template <class NormalIter>
     class reverse_iterator {
+        protected:
+            // 元のイテレータを保持する(composition)
+
+            NormalIter  current;
+
         public:
+            // iterator_traits は元のイテレータを受け継ぐ
+
             typedef NormalIter                                                  iterator_type;
             typedef typename ft::iterator_traits<NormalIter>::difference_type   difference_type;
             typedef typename ft::iterator_traits<NormalIter>::value_type        value_type;
@@ -53,27 +98,23 @@ namespace ft {
             typedef typename ft::iterator_traits<NormalIter>::reference         reference;
             typedef typename ft::iterator_traits<NormalIter>::iterator_category iterator_category;
         
-        protected:
-            NormalIter  current_;
-
-        public:
-            reverse_iterator(): current_(NormalIter()) {}
-            reverse_iterator(NormalIter iter): current_(iter) {}
+            reverse_iterator(): current(NormalIter()) {}
+            explicit reverse_iterator(NormalIter iter): current(iter) {}
             reverse_iterator(const reverse_iterator<NormalIter>& other) {
                 *this = other;
             }
             virtual ~reverse_iterator() {}
 
-            iterator_type       base() const { return current_; }
+            iterator_type       base() const { return current; }
 
             reverse_iterator&   operator=(const reverse_iterator& rhs) {
-                current_ = rhs.current_;
+                current = rhs.current;
                 return *this;
             }
 
             // 通常イテレータと異なり, mutableバージョンはない。
             reference           operator*() const {
-                NormalIter  rv = current_;
+                NormalIter  rv = current;
                 return *(--rv);
             }
 
@@ -82,7 +123,7 @@ namespace ft {
             }
 
             reverse_iterator&   operator++() {
-                --current_;
+                --current;
                 return *this;
             }
 
@@ -93,7 +134,7 @@ namespace ft {
             }
 
             reverse_iterator&   operator--() {
-                ++current_;
+                ++current;
                 return *this;
             }
 
@@ -104,21 +145,21 @@ namespace ft {
             }
 
             reverse_iterator&  operator+=(difference_type n) {
-                current_ -= n;
+                current -= n;
                 return *this;
             }
 
             reverse_iterator&    operator-=(difference_type n) {
-                current_ += n;
+                current += n;
                 return *this;
             }
 
             reverse_iterator    operator+(difference_type n) const {
-                return reverse_iterator(current_ - n);
+                return reverse_iterator(current - n);
             }
 
             reverse_iterator    operator-(difference_type n) const {
-                return reverse_iterator(current_ + n);
+                return reverse_iterator(current + n);
             }
 
             reference           operator[](difference_type n) const {

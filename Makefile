@@ -67,6 +67,13 @@ NAMES_MAIN		:=	$(NAME_MAIN_STL) $(NAME_MAIN_FT)
 SRCS_MAIN		:=	src/main.cpp $(SRCS_COMMON)
 OBJS_MAIN		:=	$(SRCS_MAIN:.cpp=.o)
 
+# meta function
+NAME_META_STL	:=	exe_meta_stl
+NAME_META_FT	:=	exe_meta_ft
+NAMES_META		:=	$(NAME_META_STL) $(NAME_META_FT)
+SRCS_META		:=	src/main_meta.cpp $(SRCS_COMMON)
+OBJS_META		:=	$(SRCS_META:.cpp=.o)
+
 NAMES			:=	$(NAMES_VECTOR) $(NAMES_STACK) $(NAMES_PAIR) \
 					$(NAMES_TREE) $(NAMES_MAP) $(NAMES_SET) $(NAMES_MAIN)
 
@@ -218,7 +225,7 @@ set_diff	:	set set_stl
 $(NAMES_SET)	:	$(OBJS_SET)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_SET)
 
-# [[set]]
+# [[main(subject)]]
 .PHONY			:	main_clean main_stl main_ft
 
 main_clean	:
@@ -240,3 +247,25 @@ main_diff	:	main main_stl
 $(NAMES_MAIN)	:	$(OBJS_MAIN)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_MAIN)
 
+
+# [[meta]]
+.PHONY			:	meta_clean meta_stl meta_ft
+
+meta_clean	:
+	$(RM) $(OBJS_META)
+
+meta_stl	:
+	$(MAKE) meta_clean
+	$(MAKE) USE_STL=1 $(NAME_META_STL)
+
+meta			:
+	$(MAKE) meta_clean
+	$(MAKE) $(NAME_META_FT)
+
+meta_diff	:	meta meta_stl
+	time ./$(NAME_META_STL) 100 2> err2 > outs1
+	time ./$(NAME_META_FT) 100 2> err2 > outs2
+	diff outs1 outs2 || :
+
+$(NAMES_META)	:	$(OBJS_META)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_META)

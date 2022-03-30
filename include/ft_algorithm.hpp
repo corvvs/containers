@@ -7,33 +7,36 @@
 
 namespace ft {
 
-    // template <class T>
-    // struct equal_to {
-    //     bool    operator()(const T& x, const T& y) const {
-    //         return x == y;
-    //     }
-    //     typedef T       first_argument_type;
-    //     typedef T       second_argument_type;
-    //     typedef bool    result_type;
-    // };
-    
     // [[equal, 内部関数]]
 
-    template <class Iterator1, class Iterator2>
-    // compあり, ランダムアクセスイテレータが与えられた場合のequal
-    // -> compありに転送
+    template <class Iterator1, class Iterator2, class Compare>
+    // compあり, 一般イテレータが与えられた場合のequal
     bool    equal_(
         Iterator1 first1, Iterator1 last1,
         Iterator2 first2, Iterator2 last2,
-        std::random_access_iterator_tag r1,
-        std::random_access_iterator_tag r2
+        Compare comp
     ) {
-        return equal_(
-            first1, last1,
-            first2, last2,
-            r1, r2,
-            std::equal_to< typename ft::iterator_traits<Iterator1>::value_type >()
-        );
+        for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
+            if (!comp(*first1, *first2)) {
+                return false;
+            }
+        }
+        return first1 == last1 && first2 == last2;
+    }    
+
+    template <class Iterator1, class Iterator2, class Compare>
+    // compあり, 一般イテレータが与えられた場合のequal
+    bool    equal_(
+        Iterator1 first1, Iterator1 last1,
+        Iterator2 first2,
+        Compare comp
+    ) {
+        for (; first1 != last1; ++first1, ++first2) {
+            if (!comp(*first1, *first2)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     template <class Iterator1, class Iterator2, class Compare>
@@ -58,13 +61,13 @@ namespace ft {
     }
 
     template <class Iterator1, class Iterator2>
-    // compなし, 一般イテレータが与えられた場合のequal
-    // -> compありに転送
+    // compあり, ランダムアクセスイテレータが与えられた場合のequal
+    // -> ランダムアクセスタグあり, compありに転送
     bool    equal_(
         Iterator1 first1, Iterator1 last1,
         Iterator2 first2, Iterator2 last2,
-        std::input_iterator_tag r1,
-        std::input_iterator_tag r2
+        std::random_access_iterator_tag r1,
+        std::random_access_iterator_tag r2
     ) {
         return equal_(
             first1, last1,
@@ -74,25 +77,27 @@ namespace ft {
         );
     }
 
-    template <class Iterator1, class Iterator2, class Compare>
-    // compあり, 一般イテレータが与えられた場合のequal
+    template <class Iterator1, class Iterator2>
+    // compなし, 一般イテレータが与えられた場合のequal
+    // -> イテレータタグなし, compありに転送
     bool    equal_(
         Iterator1 first1, Iterator1 last1,
         Iterator2 first2, Iterator2 last2,
-        std::input_iterator_tag,
-        std::input_iterator_tag,
-        Compare comp
+        std::input_iterator_tag r1,
+        std::input_iterator_tag r2
     ) {
-        for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
-            if (!comp(*first1, *first2)) {
-                return false;
-            }
-        }
-        return first1 == last1 && first2 == last2;
-    }    
+        (void)r1;
+        (void)r2;
+        return equal_(
+            first1, last1,
+            first2, last2,
+            std::equal_to< typename ft::iterator_traits<Iterator1>::value_type >()
+        );
+    }
 
     template <class Iterator1, class Iterator2, class Compare>
     // compあり, 一般イテレータが与えられた場合のequal
+    // -> イテレータタグなし, compありに転送
     bool    equal_(
         Iterator1 first1, Iterator1 last1,
         Iterator2 first2,
@@ -100,12 +105,9 @@ namespace ft {
         std::input_iterator_tag,
         Compare comp
     ) {
-        for (; first1 != last1; ++first1, ++first2) {
-            if (!comp(*first1, *first2)) {
-                return false;
-            }
-        }
-        return true;
+        return equal_(
+            first1, last1, first2, comp
+        );
     }
 
     // [[equal, インターフェース]]

@@ -24,6 +24,7 @@ namespace ft {
             typedef typename allocator_type::const_reference        const_reference;
             typedef typename allocator_type::pointer                pointer;
             typedef typename allocator_type::const_pointer          const_pointer;
+
             typedef T*                                              iterator;
             typedef const iterator                                  const_iterator;
             typedef typename ft::reverse_iterator<iterator>         reverse_iterator;
@@ -32,19 +33,23 @@ namespace ft {
             // [コンストラクタ]
             // デフォルト
             vector()
-                : capacity_(0), size_(0), allocator_(std::allocator<value_type>()), storage_(NULL) {
-            }
+                : capacity_(0), size_(0), allocator_(allocator_type()), storage_(NULL) {}
 
             // アロケータ指定
             explicit vector(const allocator_type& alloc)
-                : capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {
+                : capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {}
+
+            // 要素数
+            explicit vector(size_type count)
+                : capacity_(0), size_(0), allocator_(allocator_type()), storage_(NULL) {
+                resize(count);
             }
 
-            // 要素数, (初期値(コピーされる), アロケータ)
-            explicit vector(
-                    size_type count,
-                    const_reference value = value_type(),
-                    const allocator_type& alloc = allocator_type()
+            // 要素数, 初期値(コピーされる), (アロケータ)
+            vector(
+                size_type count,
+                const_reference value,
+                const allocator_type& alloc = allocator_type()
             ): capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {
                 resize(count, value);
             }
@@ -52,8 +57,8 @@ namespace ft {
             // レンジイテレータ, (アロケータ)
             template< class InputIt >
             vector(InputIt first, InputIt last,
-                    const allocator_type& alloc = allocator_type(),
-                    typename ft::disable_if< ft::is_integral<InputIt>::value >::type* = NULL
+                const allocator_type& alloc = allocator_type(),
+                typename ft::disable_if< ft::is_integral<InputIt>::value >::type* = NULL
             ): capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {
                 // 第４引数はdisable_ifのためのものなので、ノータッチ
                 insert(end(), first, last);
@@ -98,7 +103,6 @@ namespace ft {
                 typename ft::disable_if< ft::is_integral<InputIt>::value >::type* = NULL
             ) {
                 vector<value_type, allocator_type>  new_one(first, last, allocator_);
-                // DOUT() << "new_one: " << &new_one << std::endl;
                 if (is_reallocation_needed_(new_one.size())) {
                     swap(new_one);
                 } else {
@@ -117,25 +121,25 @@ namespace ft {
             // 境界チェック付きで、指定された位置 pos の要素への参照を返します。
             // pos がコンテナの範囲内でなければ std::out_of_range 型の例外が投げられます。
             // cf. [] は境界チェックをしない。
-            reference       at( size_type pos ) {
+            reference       at(size_type pos) {
                 if (size_ <= pos) {
-                    throw std::out_of_range("oor");
+                    throw std::out_of_range("vector");
                 }
                 return (*this)[pos];
             }
-            const_reference at( size_type pos ) const {
+            const_reference at(size_type pos) const {
                 if (size_ <= pos) {
-                    throw std::out_of_range("oor");
+                    throw std::out_of_range("vector");
                 }
                 return (*this)[pos];
             }
 
             // [[]]
             // 指定された位置 pos の要素を指す参照を返します。 境界チェックは行われません。 
-            inline reference       operator[]( size_type pos ) {
+            inline reference       operator[](size_type pos) {
                 return storage_[pos];
             }
-            inline const_reference operator[]( size_type pos ) const {
+            inline const_reference operator[](size_type pos) const {
                 return storage_[pos];
             }
 
@@ -286,7 +290,7 @@ namespace ft {
             inline void clear() {
                 resize(0);
             }
-            
+
             // [insert]
             // pos の前に value を挿入します。
             // returns: 挿入された value を指すイテレータ。
@@ -342,7 +346,7 @@ namespace ft {
                 for (; first != last; ++first) {
                     receiver.push_back(*first);
                 }
-                // TODO: pos == begin() かつ capacity() == 0 の場合はここでswapして終わっていいはず？
+                // pos == begin() かつ capacity() == 0 の場合はここでswapして終わっていいはず？
                 // -> そうすると capacity が食い違う
 
                 size_type   count = receiver.size();
@@ -449,9 +453,22 @@ namespace ft {
             // 現在のサイズが count より大きい場合、最初の count 個の要素にコンテナが縮小されます。
             // 現在のサイズが count より小さい場合、 value のコピーで初期化された要素が追加されます。
             // より小さなサイズに変更しても vector の容量は縮小されません。 これは、 pop_back() を複数回呼び出すことで同等の効果を得た場合に無効化されるイテレータは削除されたもののみであるのに対し、容量の変更はすべてのイテレータを無効化するためです。 
-            void resize(size_type count, value_type value = value_type()) {
+            void resize(size_type count) {
                 const size_type   current_size = size();
-                // DOUT() << "size_ = " << current_size << ", count = " << count << std::endl;
+                if (current_size > count) {
+                    // 現在のサイズが count より大きい場合、最初の count 個の要素にコンテナが縮小されます。
+                    // If n is less than or equal to the size of the container,
+                    // the function never throws exceptions (no-throw guarantee).
+                    destroy_from_(begin() + count, end());
+                    size_ = count;
+                } else if (current_size < count) {
+                    // -> value ありに移譲
+                    resize(count, value_type());
+                }
+            }
+
+            void resize(size_type count, value_type value) {
+                const size_type   current_size = size();
                 if (current_size > count) {
                     // 現在のサイズが count より大きい場合、最初の count 個の要素にコンテナが縮小されます。
                     // If n is less than or equal to the size of the container,
@@ -529,7 +546,6 @@ namespace ft {
                         c *= 2;
                     }
                 }
-                // DOUT() << c << " for " << n << std::endl;
                 return c;
             }
 
@@ -551,9 +567,7 @@ namespace ft {
                 // ASSERTION: size() + n <= capacity
                 size_type i = size();
                 for (iterator it = from; it != to; ++it) {
-                    // DOUT() << this << " construct at " << i << ", storage: " << storage_ << std::endl;
                     allocator_.construct(&storage_[i], *it);
-                    // DOUT() << this << " constructed." << std::endl;
                     ++i;
                 }
                 size_ = i;
@@ -643,7 +657,6 @@ namespace ft {
             void    obliterate_() {
                 clear();
                 if (storage_) {
-                    // DOUT() << "deallocating " << storage_ << " with cap: " << capacity_ << std::endl;
                     allocator_.deallocate(storage_, capacity());
                     storage_ = NULL;
                     size_ = 0;

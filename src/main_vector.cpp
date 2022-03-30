@@ -371,12 +371,195 @@ void    mass_test(const std::string& sub_title, std::size_t n) {
     mass_erase_range<T>(10 * n);
 }
 
+namespace fill {
+    void    constructors() {
+        VectorClass<int> vv((20), 1234);
+
+        {
+            SPRINT("fill::constructors default");
+            VectorClass<int> v;
+            print_stats(v);
+        }
+        {
+            SPRINT("fill::constructors size");
+            VectorClass<int> v((10));
+            print_stats(v);
+        }
+        {
+            SPRINT("fill::constructors allocator");
+            VectorClass<int> v((std::allocator<int>()));
+            print_stats(v);
+        }
+        {
+            SPRINT("fill::constructors size & default value");
+            VectorClass<int> v((10), 999);
+            print_stats(v);
+            DSOUT() << v.at(0) << std::endl;
+        }
+        {
+            SPRINT("fill::constructors size & default value & allocator");
+            VectorClass<int> v((10), 888, std::allocator<int>());
+            print_stats(v);
+            DSOUT() << v.at(0) << std::endl;
+        }
+
+        {
+            SPRINT("fill::constructors range");
+            VectorClass<int> v((vv.begin() + 10), vv.end());
+            print_stats(v);
+            DSOUT() << v.at(0) << std::endl;
+        }
+
+        {
+            SPRINT("fill::constructors range & allocator, and operator=");
+            VectorClass<int> v((vv.begin() + 5), (vv.end() - 5), std::allocator<int>());
+            print_stats(v);
+            DSOUT() << v.at(0) << std::endl;
+            v = vv;
+            print_stats(v);
+            DSOUT() << v.at(0) << std::endl;
+        }
+
+        {
+            SPRINT("fill::constructors copy");
+            VectorClass<int> v((vv));
+            print_stats(v);
+            DSOUT() << v.at(0) << std::endl;
+        }
+    }
+
+    void    assign() {
+        VectorClass<int>    vv(10, 1234);
+        {
+            SPRINT("fill::assign size & value");
+            VectorClass<int>    v;
+            v.assign(10, 20);
+        }
+        {
+            SPRINT("fill::assign range");
+            VectorClass<int>    v;
+            v.assign(vv.begin() + 4, vv.end() - 4);
+        }
+        {
+            SPRINT("fill::assign pointer & pointer");
+            VectorClass<int>    v;
+            v.assign(&vv[1], &vv[5]);
+        }
+    }
+
+    void    at(int n) {
+        SPRINT("fill::at") << "(" << n << ")";
+        VectorClass<int> v;
+        for (int i = 0; i < n; ++i) {
+            v.push_back(i);
+        }
+        DSOUT() << v.at(0) << std::endl;
+        DSOUT() << v.at(n - 1) << std::endl;
+        v.at(n - 1) = -100;
+        DSOUT() << v.at(n - 1) << std::endl;
+        try {
+            DSOUT() << v.at(n) << std::endl;
+        } catch(std::out_of_range& e) {
+            DSOUT() << "exception: " << e.what() << std::endl;
+        }
+    }
+
+    void    assign(int n) {
+        SPRINT("fill::assign") << "(" << n << ")";
+        VectorClass<int> v1(n);
+        VectorClass<int> v2(0);
+        VectorClass<int> v3(0);
+
+        print_stats(v1);
+        print_stats(v2);
+        print_stats(v3);
+        v2 = v1;
+        print_stats(v2);
+        v2 = v3;
+        print_stats(v2);
+    }
+}
+
+namespace logic {
+    void    equal_same_size(int n) {
+        VectorClass<int> v1(n);
+        VectorClass<int> v2(n);
+        v2.end()[-1] += 1;
+        {
+            SPRINT("logic::equal_same_size") << "(" << n << ")";
+            DSOUT() << (v1 == v2) << std::endl;
+        }
+    }
+
+    void    equal_diff_size(int n) {
+        VectorClass<int> v1(n);
+        VectorClass<int> v2(n + 1);
+        {
+            SPRINT("logic::equal_diff_size") << "(" << n << ")";
+            DSOUT() << (v1 == v2) << std::endl;
+        }
+    }
+
+    void    strong_insertion() {
+        // push_back の例外安全性をテストする
+        SPRINT("logic::strong_insertion");
+        VectorClass<ft::IntWrapper> v(2);
+        try {
+            print_stats(v);
+            ft::IntWrapper::set_limit(1);
+            v.push_back(ft::IntWrapper(2));
+        } catch(std::runtime_error& e) {
+            DSOUT() << "exception: " << e.what() << std::endl;
+        }
+        ft::IntWrapper::set_limit(-1);
+        print_stats(v);
+    }
+
+    void    iterator_for_empty_container() {
+        VectorClass<int> v1;
+        VectorClass<int> v2;
+
+        DSOUT() << (v1.begin() == v1.end()) << std::endl;
+        DSOUT() << (v2.begin() == v2.end()) << std::endl;
+        DSOUT() << (v1.end() == v2.end()) << std::endl;
+        v2.push_back(1);
+        DSOUT() << (v1.begin() == v1.end()) << std::endl;
+        DSOUT() << (v2.begin() == v2.end()) << std::endl;
+        DSOUT() << (v1.end() == v2.end()) << std::endl;
+        v2.pop_back();
+        DSOUT() << (v1.begin() == v1.end()) << std::endl;
+        DSOUT() << (v2.begin() == v2.end()) << std::endl;
+        DSOUT() << (v1.end() == v2.end()) << std::endl;
+    }
+}
+
+#include "blank.hpp"
 
 int main() {
-    mass_test<int>("[int]", 1000);
-    mass_test<ft::IntWrapper>("[ft::IntWrapper]", 100);
-    mass_test<std::string>("[std::string]", 100);
-    mass_test<std::vector<int> >("[std::vector<int>]", 20);
-    mass_test<ft::vector<int> >("[ft::vector<int>]", 20);
+    // mass_test<int>("[int]", 1000);
+    // mass_test<ft::IntWrapper>("[ft::IntWrapper]", 100);
+    // mass_test<std::string>("[std::string]", 100);
+    // mass_test<std::vector<int> >("[std::vector<int>]", 20);
+    // mass_test<ft::vector<int> >("[ft::vector<int>]", 20);
+
+    fill::constructors();
+    fill::assign();
+    fill::at(10);
+
+    logic::equal_same_size(100);
+    logic::equal_same_size(1000);
+    logic::equal_same_size(10000);
+    logic::equal_same_size(100000);
+    logic::equal_diff_size(100);
+    logic::equal_diff_size(1000);
+    logic::equal_diff_size(10000);
+    logic::equal_diff_size(100000);
+    logic::iterator_for_empty_container();
+    logic::strong_insertion();
+
+    {
+        VectorClass< ft::blank<int> >   v((0));
+    }
+
     ft::sprint::list();
 }

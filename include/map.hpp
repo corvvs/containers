@@ -367,8 +367,6 @@ namespace ft {
 
             Value&                      operator[](const key_type& x) {
                 ft::pair<iterator, bool> result = insert(ft::make_pair(x, mapped_type()));
-                // DOUT() << result.first.operator->() << std::endl;
-                // DOUT() << result.second << std::endl;
                 return (result.first)->second;
             }
 

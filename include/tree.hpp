@@ -251,11 +251,11 @@ namespace ft {
 
                     // valueだけをswapする。
                     void    swap_value(tree_node& other) {
-                        std::swap(tree_value_, other.tree_value_);
+                        ft::swap(tree_value_, other.tree_value_);
                     }
 
                     void    swap_color(tree_node& other) {
-                        std::swap(is_black_, other.is_black_);
+                        ft::swap(is_black_, other.is_black_);
                     }
 
                     // 2つのノードの位置関係、つまり接続されているエッジを入れ替える。
@@ -266,9 +266,9 @@ namespace ft {
                         // 色をswap
                         swap_color(other);
                         // 出る方のswap
-                        std::swap(parent(), other.parent());
-                        std::swap(left(), other.left());
-                        std::swap(right(), other.right());
+                        ft::swap(parent(), other.parent());
+                        ft::swap(left(), other.left());
+                        ft::swap(right(), other.right());
                         // 入る方
                         pull_in_(other, other_was_left_child);
                         other.pull_in_(*this, this_was_left_child);
@@ -449,12 +449,12 @@ namespace ft {
                     }
 
                     void    swap(self_type& other) {
-                        std::swap(value_constructed_, other.value_constructed_);
-                        std::swap(node_constructed_, other.node_constructed_);
-                        std::swap(node_alloc_, other.node_alloc_);
-                        std::swap(value_alloc_, other.value_alloc_);
-                        std::swap(node_ptr_, other.node_ptr_);
-                        std::swap(value_ptr_, other.value_ptr_);
+                        ft::swap(value_constructed_, other.value_constructed_);
+                        ft::swap(node_constructed_, other.node_constructed_);
+                        ft::swap(node_alloc_, other.node_alloc_);
+                        ft::swap(value_alloc_, other.value_alloc_);
+                        ft::swap(node_ptr_, other.node_ptr_);
+                        ft::swap(value_ptr_, other.value_ptr_);
                     }
 
                     // value構築済みなら、あらかじめ与えておいたアロケータを使い、ノードを構築する
@@ -1167,12 +1167,12 @@ namespace ft {
             // [[swap]]
 
             void    swap(self_type& other) {
-                std::swap(size_, other.size_);
-                std::swap(value_compare_, other.value_compare_);
-                std::swap(node_allocator_, other.node_allocator_);
-                std::swap(value_allocator_, other.value_allocator_);
-                std::swap(end_node_, other.end_node_);
-                std::swap(begin_node_, other.begin_node_);
+                ft::swap(size_, other.size_);
+                ft::swap(value_compare_, other.value_compare_);
+                ft::swap(node_allocator_, other.node_allocator_);
+                ft::swap(value_allocator_, other.value_allocator_);
+                ft::swap(end_node_, other.end_node_);
+                ft::swap(begin_node_, other.begin_node_);
                 // end_node_ はポインタではなく実体として持っているので、
                 // end_node_ 絡みのものを再設定する必要がある。
                 // さらに、 this だけでなく other の分もやってあげる必要がある。
