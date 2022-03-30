@@ -47,12 +47,14 @@ namespace ft {
                     typedef iterator                                iterator_type;
                     typedef const_iterator                          const_iterator_type;
 
+                protected:
                     tree_iterator                                   tree_it_;
 
                 public:
-                    typedef std::bidirectional_iterator_tag              iterator_category;
+                    typedef std::bidirectional_iterator_tag         iterator_category;
                     typedef map::value_type                         value_type;
-                    typedef typename base::iterator::difference_type         difference_type;
+                    typedef typename base::iterator::difference_type
+                                                                    difference_type;
                     typedef value_type&                             reference;
                     typedef value_type*                             pointer;
 
@@ -65,6 +67,10 @@ namespace ft {
                     iterator(const_iterator_type variable)
                         : tree_it_(variable.tree_iter()) {}
                     virtual ~iterator() {}
+                    iterator&   operator=(const iterator& rhs) {
+                        tree_it_ = rhs.tree_it_;
+                        return *this;
+                    }
 
                     tree_const_iterator tree_iter() const {
                         return tree_it_;
@@ -116,6 +122,7 @@ namespace ft {
                     typedef iterator                    iterator_type;
                     typedef const_iterator              const_iterator_type;
 
+                protected:
                     tree_const_iterator                 tree_it_;
 
                 public:
@@ -135,6 +142,10 @@ namespace ft {
                     const_iterator(iterator_type variable)
                         : tree_it_(variable.tree_iter()) {}
                     virtual ~const_iterator() {}
+                    const_iterator&   operator=(const const_iterator& rhs) {
+                        tree_it_ = rhs.tree_it_;
+                        return *this;
+                    }
 
                     tree_const_iterator tree_iter() const {
                         return tree_it_;
@@ -465,6 +476,7 @@ namespace ft {
     ) {
         lhs.swap(rhs);
     }
+
 }
 
 #endif

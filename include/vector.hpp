@@ -5,6 +5,7 @@
 # include "ft_meta_functions.hpp"
 # include "ft_algorithm.hpp"
 # include "ft_iterator.hpp"
+# include "iterator_wrapper.hpp"
 # include <memory>
 # include <iostream>
 # include <iterator>
@@ -12,21 +13,23 @@
 # include <stdexcept>
 
 namespace ft {
+
     template<class T, class Allocator = std::allocator<T> >
     class vector {
         public:
 
             typedef T                                               value_type;
             typedef Allocator                                       allocator_type;
+            typedef value_type&                                     reference;
+            typedef const value_type&                               const_reference;
             typedef typename allocator_type::size_type              size_type;
             typedef typename allocator_type::difference_type        difference_type;
-            typedef typename allocator_type::reference              reference;
-            typedef typename allocator_type::const_reference        const_reference;
             typedef typename allocator_type::pointer                pointer;
             typedef typename allocator_type::const_pointer          const_pointer;
 
-            typedef T*                                              iterator;
-            typedef const iterator                                  const_iterator;
+            typedef ft::iterator_wrapper<pointer>              iterator;
+            typedef ft::iterator_wrapper<const_pointer>        const_iterator;
+
             typedef typename ft::reverse_iterator<iterator>         reverse_iterator;
             typedef typename ft::reverse_iterator<const_iterator>   const_reverse_iterator;
 
@@ -294,14 +297,14 @@ namespace ft {
             // [insert]
             // pos の前に value を挿入します。
             // returns: 挿入された value を指すイテレータ。
-            iterator insert(const_iterator pos, const value_type& value) {
+            iterator insert(iterator pos, const value_type& value) {
                 size_type    n = distance_(begin(), pos);
-                insert(pos, 1, value);
+                insert(pos, static_cast<size_type>(1), value);
                 return begin() + n;
             }
             // os の前に value のコピーを count 個挿入します。
             // returns: 挿入された最初の要素を指すイテレータ、または count==0 の場合は pos。
-            void insert(const_iterator pos, size_type count, const value_type& value) {
+            void insert(iterator pos, size_type count, const value_type& value) {
                 size_type   recommended_cap = recommended_capacity_(size() + count);
                 bool        needed_realloc = recommended_cap > capacity();
                 bool        do_append = pos == end();
@@ -339,7 +342,13 @@ namespace ft {
             template< class InputIt >
             void insert(
                 iterator pos, InputIt first, InputIt last,
-                typename ft::disable_if< ft::is_integral<InputIt>::value >::type* = NULL
+                typename ft::enable_if<
+                    !ft::is_integral<InputIt>::value
+                    &&
+                    ft::is_input_iterator<InputIt>::value
+                    &&
+                    !ft::is_forward_iterator<InputIt>::value
+                >::type* = NULL
             ) {
                 // サイズを知るために一旦新しいvectorで受ける
                 vector<value_type, allocator_type>  receiver(allocator_);
@@ -382,12 +391,58 @@ namespace ft {
                 }
             }
 
+            template< class InputIt >
+            void insert(
+                iterator pos, InputIt first, InputIt last,
+                typename ft::enable_if<
+                    !ft::is_integral<InputIt>::value
+                    &&
+                    ft::is_forward_iterator<InputIt>::value
+                >::type* = NULL
+            ) {
+                size_type   count = std::distance(first, last);
+                // サイズがわかるので、再確保の有無を計算
+                size_type   recommended_cap = recommended_capacity_(size() + count);
+                bool        needed_realloc = recommended_cap > capacity();
+                bool        do_append = pos == end();
+                if (!needed_realloc) {
+                    if (do_append) {
+                        // 再確保不要 & 末尾に追加
+                        size_type i = size();
+                        for (; first != last; ++i, ++first) {
+                            allocator_.construct(&storage_[i], *first);
+                        }
+                        size_ = i;
+                    } else {
+                        // 再確保不要 & 末尾でない
+                        size_type   p = distance_(begin(), pos);
+                        size_type   old_size = size();
+                        // 既存要素の移動
+                        mass_moveright_within_capacity_(pos, count);
+                        // 新規要素の代入
+                        for (size_type i = 0; i < count; ++i, ++first) {
+                            substitute_to_(i + p, *first, old_size);
+                        }
+                    }
+                } else {
+                    // 再確保が必要
+                    vector<value_type, allocator_type> new_one(allocator_);
+                    new_one.reserve(recommended_cap);
+                    new_one.append_within_capacity_(begin(), pos);
+                    for (size_type i = 0; i < count; ++i, ++first) {
+                        new_one.push_back_within_capacity_(*first);
+                    }
+                    new_one.append_within_capacity_(pos, end());
+                    swap(new_one);
+                }
+            }
+
             // [erase]
             // コンテナから指定された要素を削除します。 
             // 1) pos の指す要素を削除します。
             // 削除された最後の要素の次を指すイテレータ。
             // pos が最後の要素を参照する場合は、 end() イテレータが返されます。
-            iterator erase(const_iterator pos) {
+            iterator erase(iterator pos) {
                 if (pos == end()) {
                     // pos を逆参照できない
                 }
@@ -401,8 +456,10 @@ namespace ft {
             // 削除された最後の要素の次を指すイテレータ。
             // 削除前に last==end() であった場合は、更新後の end() イテレータが返されます。
             // [first, last) が空範囲の場合は、 last が返されます。 
-            iterator erase(const_iterator first, const_iterator last) {
-                if (is_interval_empty_(first, last)) { return last; }
+            iterator erase(iterator first, iterator last) {
+                if (is_interval_empty_(first, last)) {
+                    return last;
+                }
                 size_type   i = distance_(begin(), first);
                 size_type   count = distance_(first, last);
                 mass_moveleft_within_capacity_(last, count);
@@ -566,9 +623,8 @@ namespace ft {
                 // size_type   n = to - from;
                 // ASSERTION: size() + n <= capacity
                 size_type i = size();
-                for (iterator it = from; it != to; ++it) {
+                for (const_iterator it = from; it != to; ++i, ++it) {
                     allocator_.construct(&storage_[i], *it);
-                    ++i;
                 }
                 size_ = i;
             }
@@ -585,7 +641,7 @@ namespace ft {
             // 再確保が起きない前提。つまり、
             // ASSERTION: size_ + d <= capacity()
             // (pos == end() の状況でこの関数を使うことは想定されていないが、対応しておく)
-            void    mass_moveright_within_capacity_(const_iterator pos, size_type d) {
+            void    mass_moveright_within_capacity_(iterator pos, size_type d) {
                 if (d == 0) { return; }
                 if (!is_interval_empty_(pos, end())) {
                     // 区間が空でない場合
@@ -598,7 +654,9 @@ namespace ft {
                     for (size_type i = border; i < old_size; ++i) {
                         allocator_.construct(&storage_[i + d], storage_[i]);
                     }
-                    std::copy_backward(pos, begin() + border, begin() + border + d);
+                    std::copy_backward(
+                        pos, begin() + border,
+                        begin() + border + d);
                 }
                 size_ += d;
             }
@@ -609,11 +667,13 @@ namespace ft {
             // また移動先は利用可能範囲を外れない前提。つまり、
             // ASSERTION: begin() + d <= pos
             // (pos == end() の状況でこの関数を使うことは想定されていないが、対応しておく)
-            void    mass_moveleft_within_capacity_(const_iterator pos, size_type d) {
+            void    mass_moveleft_within_capacity_(iterator pos, size_type d) {
                 if (d == 0) { return; }
                 if (!is_interval_empty_(pos, end())) {
                     // 区間が空でない場合
-                    std::copy(pos, end(), pos - d);
+                    std::copy(
+                        pos, end(),
+                        pos - d);
                 }
                 reverse_iterator to = rbegin() + d;
                 for (reverse_iterator it = rbegin(); it != to; ++it) {
@@ -641,7 +701,7 @@ namespace ft {
             // [from, to) の要素を後ろからdestroyする
             // 削除した後は何もしないことに注意(たとえばsizeも変えない)
             // allocator.destroyがno-throwならno-throw
-            void    destroy_from_(const_iterator from, const_iterator to) {
+            void    destroy_from_(iterator from, iterator to) {
                 if (is_interval_empty_(from, to)) { return; }
                 iterator it = to - 1;
                 while (true) {
@@ -727,6 +787,88 @@ namespace ft {
     template< class T, class Alloc >
     void swap( ft::vector<T,Alloc>& lhs, ft::vector<T,Alloc>& rhs ) {
         lhs.swap(rhs);
+    }
+
+
+    template <class _Iter1>
+    bool operator==(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter1>& __y)
+    {
+        return __x.base() == __y.base();
+    }
+    template <class _Iter1>
+    bool operator!=(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter1>& __y)
+    {
+        return !(__x == __y);
+    }
+
+    template <class _Iter1, class _Iter2>
+    bool operator==(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y)
+    {
+        return __x.base() == __y.base();
+    }
+    template <class _Iter1, class _Iter2>
+    bool operator!=(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y)
+    {
+        return !(__x == __y);
+    }
+
+    template <class _Iter1>
+    bool operator<(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter1>& __y)
+    {
+        return __x.base() < __y.base();
+    }
+    template <class _Iter1>
+    bool operator>(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter1>& __y)
+    {
+        return (__y < __x);
+    }
+    template <class _Iter1>
+    bool operator>=(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter1>& __y)
+    {
+        return !(__x < __y);
+    }
+    template <class _Iter1>
+    bool operator<=(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter1>& __y)
+    {
+        return !(__y < __x);
+    }
+
+    template <class _Iter1, class _Iter2>
+    bool operator<(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y)
+    {
+        return __x.base() < __y.base();
+    }
+    template <class _Iter1, class _Iter2>
+    bool operator>(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y)
+    {
+        return (__y < __x);
+    }
+    template <class _Iter1, class _Iter2>
+    bool operator>=(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y)
+    {
+        return !(__x < __y);
+    }
+    template <class _Iter1, class _Iter2>
+    bool operator<=(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y)
+    {
+        return !(__y < __x);
+    }
+
+    template <class _Iter1, class _Iter2>
+    typename ft::iterator_wrapper<_Iter1>::difference_type
+    operator-(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y) _NOEXCEPT
+    {
+        return __x.operator->() - __y.operator->();
+    }
+
+
+    template <class It>
+    ft::iterator_wrapper<It>    operator+(
+        typename ft::iterator_wrapper<It>::difference_type n,
+        const ft::iterator_wrapper<It>& x
+    ) {
+        x += n;
+        return x;
     }
 }
 #endif

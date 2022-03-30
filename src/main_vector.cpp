@@ -180,13 +180,13 @@ void    mass_range_allocation(VC(T)::size_type n) {
 }
 
 template <class T>
-void    mass_insertion_1(VC(T)::size_type n) {
+void    mass_insertion_1(int n) {
     srand(n);
     VC(T) vi;
     vi.push_back(random_value_generator<T>());
     {
         SPRINT("mass_insertion_1") << "(" << n << ")";
-        for (VC(T)::size_type i = 1; i <= n; ++i) {
+        for (int i = 1; i <= n; ++i) {
             VC(T)::size_type  at = VC(T)::size_type(double(rand()) / RAND_MAX * (vi.size() - 1)) + 1;
             VC(T)::iterator itd = vi.insert(vi.begin() + at, random_value_generator<T>());
             std::cout << "inserted at " << itd - vi.begin() << std::endl;
@@ -197,13 +197,13 @@ void    mass_insertion_1(VC(T)::size_type n) {
 }
 
 template <class T>
-void    mass_insertion_n(VC(T)::size_type n) {
+void    mass_insertion_n(int n) {
     srand(n);
     VC(T) vi;
     vi.push_back(random_value_generator<T>());
     {
         SPRINT("mass_insertion_n") << "(" << n << ")";
-        for (VC(T)::size_type i = 1; i <= n; ++i) {
+        for (int i = 1; i <= n; ++i) {
             vi.insert(vi.begin() + 1, i, random_value_generator<T>());
         }
     }
@@ -536,11 +536,11 @@ namespace logic {
 #include "blank.hpp"
 
 int main() {
-    // mass_test<int>("[int]", 1000);
-    // mass_test<ft::IntWrapper>("[ft::IntWrapper]", 100);
-    // mass_test<std::string>("[std::string]", 100);
-    // mass_test<std::vector<int> >("[std::vector<int>]", 20);
-    // mass_test<ft::vector<int> >("[ft::vector<int>]", 20);
+    mass_test<int>("[int]", 100);
+    mass_test<ft::IntWrapper>("[ft::IntWrapper]", 100);
+    mass_test<std::string>("[std::string]", 100);
+    mass_test<std::vector<int> >("[std::vector<int>]", 20);
+    mass_test<ft::vector<int> >("[ft::vector<int>]", 20);
 
     fill::constructors();
     fill::assign();

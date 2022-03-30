@@ -106,9 +106,9 @@ vector			:
 	$(MAKE) $(NAME_VECTOR_FT)
 
 vector_diff		:	vector vector_stl
-	time ./$(NAME_VECTOR_STL) > outv1
-	time ./$(NAME_VECTOR_FT) 2> err2 > outv2
-	diff outv1 outv2 || :
+	time ./$(NAME_VECTOR_STL) > out_vector_1
+	time ./$(NAME_VECTOR_FT) 2> err2 > out_vector_2
+	diff out_vector_1 out_vector_2 || :
 
 $(NAMES_VECTOR)	:	$(OBJS_VECTOR)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_VECTOR)
@@ -128,9 +128,9 @@ stack			:
 	$(MAKE) $(NAME_STACK_FT)
 
 stack_diff		:	stack stack_stl
-	time ./$(NAME_STACK_STL) > outs1
-	time ./$(NAME_STACK_FT) 2> err2 > outs2
-	diff outs1 outs2 || :
+	time ./$(NAME_STACK_STL) > out_stack_1
+	time ./$(NAME_STACK_FT) 2> err2 > out_stack_2
+	diff out_stack_1 out_stack_2 || :
 
 $(NAMES_STACK)	:	$(OBJS_STACK)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_STACK)
@@ -151,9 +151,9 @@ pair			:
 	$(MAKE) $(NAME_PAIR_FT)
 
 pair_diff		:	pair pair_stl
-	time ./$(NAME_PAIR_STL) > outs1
-	time ./$(NAME_PAIR_FT) 2> err2 > outs2
-	diff outs1 outs2 || :
+	time ./$(NAME_PAIR_STL) > out_pair_1
+	time ./$(NAME_PAIR_FT) 2> err2 > out_pair_2
+	diff out_pair_1 out_pair_2 || :
 
 $(NAMES_PAIR)	:	$(OBJS_PAIR)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_PAIR)
@@ -173,9 +173,9 @@ tree			:
 	$(MAKE) $(NAME_TREE_FT)
 
 tree_diff		:	tree tree_stl
-	time ./$(NAME_TREE_STL) 2> err2 > outs1
-	time ./$(NAME_TREE_FT) 2> err2 > outs2
-	diff outs1 outs2 || :
+	time ./$(NAME_TREE_STL) 2> err2 > out_tree_1
+	time ./$(NAME_TREE_FT) 2> err2 > out_tree_2
+	diff out_tree_1 out_tree_2 || :
 
 $(NAMES_TREE)	:	$(OBJS_TREE)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_TREE)
@@ -195,9 +195,9 @@ map			:
 	$(MAKE) $(NAME_MAP_FT)
 
 map_diff	:	map map_stl
-	time ./$(NAME_MAP_STL) 2> err2 > outs1
-	time ./$(NAME_MAP_FT) 2> err2 > outs2
-	diff outs1 outs2 || :
+	time ./$(NAME_MAP_STL) 2> err2 > out_map_1
+	time ./$(NAME_MAP_FT) 2> err2 > out_map_2
+	diff out_map_1 out_map_2 || :
 
 $(NAMES_MAP)	:	$(OBJS_MAP)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_MAP)
@@ -218,9 +218,9 @@ set			:
 	$(MAKE) $(NAME_SET_FT)
 
 set_diff	:	set set_stl
-	time ./$(NAME_SET_STL) 2> err2 > outs1
-	time ./$(NAME_SET_FT) 2> err2 > outs2
-	diff outs1 outs2 || :
+	time ./$(NAME_SET_STL) 2> err2 > out_set_1
+	time ./$(NAME_SET_FT) 2> err2 > out_set_2
+	diff out_set_1 out_set_2 || :
 
 $(NAMES_SET)	:	$(OBJS_SET)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_SET)
@@ -240,9 +240,9 @@ main			:
 	$(MAKE) $(NAME_MAIN_FT)
 
 main_diff	:	main main_stl
-	time ./$(NAME_MAIN_STL) 100 2> err2 > outs1
-	time ./$(NAME_MAIN_FT) 100 2> err2 > outs2
-	diff outs1 outs2 || :
+	time ./$(NAME_MAIN_STL) 100 2> err2 > out_main_1
+	time ./$(NAME_MAIN_FT) 100 2> err2 > out_main_2
+	diff out_main_1 out_main_2 || :
 
 $(NAMES_MAIN)	:	$(OBJS_MAIN)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_MAIN)
@@ -263,9 +263,9 @@ meta			:
 	$(MAKE) $(NAME_META_FT)
 
 meta_diff	:	meta meta_stl
-	time ./$(NAME_META_STL) 100 2> err2 > outs1
-	time ./$(NAME_META_FT) 100 2> err2 > outs2
-	diff outs1 outs2 || :
+	time ./$(NAME_META_STL) 100 2> err2 > out_meta_1
+	time ./$(NAME_META_FT) 100 2> err2 > out_meta_2
+	diff out_meta_1 out_meta_2 || :
 
 $(NAMES_META)	:	$(OBJS_META)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_META)

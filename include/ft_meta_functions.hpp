@@ -125,19 +125,20 @@ namespace ft {
     };
 
     // [is_convertible]
+    struct yes_type {
+        char    m[8];
+    };
+    typedef char no_type;
     namespace is_convertible__ {
-        struct yes_type {
-            char    m[2];
-        };
-        typedef char no_type;
         template <class From, class To>
-        struct is_convertible_base
-        {
-            static no_type  f(...);
-            static yes_type f(To);
-            static From     v;
-
-            static const bool value = sizeof(f(v)) == sizeof(yes_type);
+        struct is_convertible_base {
+            private:
+                static no_type      f(...);
+                static yes_type     f(To);
+                // declvalがないので
+                static From         v;
+            public:
+                static const bool   value = sizeof(f(v)) == sizeof(yes_type);
         };
     }
 

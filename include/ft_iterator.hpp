@@ -10,8 +10,73 @@ namespace ft {
 
     // 普通のイテレータ
 
+    template <class T>
+    class has_difference_type {
+        private: 
+            template <class U>
+            static ft::yes_type f(typename U::difference_type* = NULL);
+            template <class U>
+            static ft::no_type  f(...);
+        public:
+            static const bool   value = sizeof(f<T>(NULL)) == sizeof(ft::yes_type);
+    };
+
+    template <class T>
+    class has_value_type {
+        private: 
+            template <class U>
+            static ft::yes_type f(typename U::value_type* = NULL);
+            template <class U>
+            static ft::no_type  f(...);
+        public:
+            static const bool   value = sizeof(f<T>(NULL)) == sizeof(ft::yes_type);
+    };
+
+    template <class T>
+    class has_pointer {
+        private: 
+            template <class U>
+            static ft::yes_type f(typename U::pointer* = NULL);
+            template <class U>
+            static ft::no_type  f(...);
+        public:
+            static const bool   value = sizeof(f<T>(NULL)) == sizeof(ft::yes_type);
+    };
+
+    template <class T>
+    class has_reference {
+        private: 
+            template <class U>
+            static ft::yes_type f(typename U::reference* = NULL);
+            template <class U>
+            static ft::no_type  f(...);
+        public:
+            static const bool   value = sizeof(f<T>(NULL)) == sizeof(ft::yes_type);
+    };
+
+    template <class T>
+    class has_iterator_category {
+        private: 
+            template <class U>
+            static ft::yes_type f(typename U::iterator_category* = NULL);
+            template <class U>
+            static ft::no_type  f(...);
+        public:
+            static const bool   value = sizeof(f<T>(NULL)) == sizeof(ft::yes_type);
+    };
+
+
+    template <class Iterator,
+        bool = has_iterator_category<Iterator>::value
+            && has_value_type<Iterator>::value
+            && has_pointer<Iterator>::value
+            && has_difference_type<Iterator>::value
+            // これを入れるとおかしなことになる
+            // && has_reference<Iterator>::value
+    > struct iterator_traits;
+
     template <class Iterator>
-    struct iterator_traits {
+    struct iterator_traits<Iterator, true> {
         typedef typename Iterator::difference_type   difference_type;
         typedef typename Iterator::value_type        value_type;
         typedef typename Iterator::pointer           pointer;
@@ -22,43 +87,35 @@ namespace ft {
     // ポインタもイテレータの一種とみなす
 
     template <class T>
-    struct iterator_traits<T*> {
-        typedef ptrdiff_t                   difference_type; // ポインタの差はptr_diff_t
-        typedef T                           value_type;
-        typedef T*                          pointer;
-        typedef T&                          reference;
-        typedef std::random_access_iterator_tag  iterator_category; // ポインタはランダムアクセス可
+    struct iterator_traits<T*, false> {
+        typedef ptrdiff_t                       difference_type; // ポインタの差はptr_diff_t
+        typedef T                               value_type;
+        typedef T*                              pointer;
+        typedef T&                              reference;
+        typedef std::random_access_iterator_tag iterator_category; // ポインタはランダムアクセス可
     };
 
     // constポインタ
 
     template <class T>
-    struct iterator_traits<const T*> {
-        typedef ptrdiff_t                   difference_type;
-        typedef T                           value_type;
-        typedef const T*                    pointer;
-        typedef const T&                    reference;
-        typedef std::random_access_iterator_tag  iterator_category;
+    struct iterator_traits<const T*, false> {
+        typedef ptrdiff_t                       difference_type;
+        typedef T                               value_type;
+        typedef const T*                        pointer;
+        typedef const T&                        reference;
+        typedef std::random_access_iterator_tag iterator_category;
     };
+
+    template <>
+    struct iterator_traits<class Iterator, false> {};
+
 
     // [iterator_category predicates]
-    template <class T>
-    struct has_iterator_category {
-        private:
-            struct __two {
-                char __lx; char __lxx;
-            };
-            template <class To>
-            static __two __test(...);
-            template <class To>
-            static char __test(typename To::iterator_category* = nullptr);
-        public:
-            static const bool value = sizeof(__test<T>(nullptr)) == 1;
-    };
 
-    template <class T, class To, bool = has_iterator_category<iterator_traits<T> >::value>
-    struct has_iterator_category_convertible_to
-        : is_convertible<typename iterator_traits<T>::iterator_category, To> {};
+    template <class T, class To,
+        bool = has_iterator_category<iterator_traits<T> >::value>
+    struct has_iterator_category_convertible_to:
+        public integral_constant<bool, is_convertible<typename iterator_traits<T>::iterator_category, To>::value> {};
 
     template <class T, class To>
     struct has_iterator_category_convertible_to<T, To, false> : false_type {};
