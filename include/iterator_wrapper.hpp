@@ -84,10 +84,10 @@ namespace ft {
                 return base_[__n];
             }
 
-            bool        operator==(const iterator_wrapper& rhs) const {
+            inline bool operator==(const iterator_wrapper& rhs) const {
                 return base_ == rhs.base_;
             }
-            bool        operator!=(const iterator_wrapper& rhs) const {
+            inline bool operator!=(const iterator_wrapper& rhs) const {
                 return !(*this == rhs);
             }
     };

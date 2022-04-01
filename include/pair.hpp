@@ -49,7 +49,7 @@ namespace ft {
     }
 
     template <class First, class Second>
-    bool operator==(
+    inline bool operator==(
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs
     ) {
@@ -57,7 +57,7 @@ namespace ft {
     }
 
     template <class First, class Second>
-    bool operator!=(
+    inline bool operator!=(
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs
     ) {
@@ -65,7 +65,7 @@ namespace ft {
     }
 
     template <class First, class Second>
-    bool operator<(
+    inline bool operator<(
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs
     ) {
@@ -76,7 +76,7 @@ namespace ft {
     }
 
     template <class First, class Second>
-    bool operator>(
+    inline bool operator>(
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs
     ) {
@@ -84,7 +84,7 @@ namespace ft {
     }
 
     template <class First, class Second>
-    bool operator<=(
+    inline bool operator<=(
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs
     ) {
@@ -92,7 +92,7 @@ namespace ft {
     }
 
     template <class First, class Second>
-    bool operator>=(
+    inline bool operator>=(
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs
     ) {

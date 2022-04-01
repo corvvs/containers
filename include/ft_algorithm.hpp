@@ -11,7 +11,7 @@ namespace ft {
 
     template <class Iterator1, class Iterator2, class Compare>
     // compあり, 一般イテレータが与えられた場合のequal
-    bool    equal_(
+    inline bool equal_(
         Iterator1 first1, Iterator1 last1,
         Iterator2 first2, Iterator2 last2,
         Compare comp
@@ -26,7 +26,7 @@ namespace ft {
 
     template <class Iterator1, class Iterator2, class Compare>
     // compあり, 一般イテレータが与えられた場合のequal
-    bool    equal_(
+    inline bool equal_(
         Iterator1 first1, Iterator1 last1,
         Iterator2 first2,
         Compare comp
@@ -43,7 +43,7 @@ namespace ft {
     // compあり, ランダムアクセスイテレータが与えられた場合のequal
     // -> distanceでサイズを算出。サイスが異なるなら問答無用でfalseを返す。
     // -> last2なし版に転送
-    bool    equal_(
+    inline bool equal_(
         Iterator1 first1, Iterator1 last1,
         Iterator2 first2, Iterator2 last2,
         std::random_access_iterator_tag,
@@ -63,7 +63,7 @@ namespace ft {
     template <class Iterator1, class Iterator2>
     // compあり, ランダムアクセスイテレータが与えられた場合のequal
     // -> ランダムアクセスタグあり, compありに転送
-    bool    equal_(
+    inline bool equal_(
         Iterator1 first1, Iterator1 last1,
         Iterator2 first2, Iterator2 last2,
         std::random_access_iterator_tag r1,
@@ -80,7 +80,7 @@ namespace ft {
     template <class Iterator1, class Iterator2>
     // compなし, 一般イテレータが与えられた場合のequal
     // -> イテレータタグなし, compありに転送
-    bool    equal_(
+    inline bool equal_(
         Iterator1 first1, Iterator1 last1,
         Iterator2 first2, Iterator2 last2,
         std::input_iterator_tag r1,
@@ -98,7 +98,7 @@ namespace ft {
     template <class Iterator1, class Iterator2, class Compare>
     // compあり, 一般イテレータが与えられた場合のequal
     // -> イテレータタグなし, compありに転送
-    bool    equal_(
+    inline bool equal_(
         Iterator1 first1, Iterator1 last1,
         Iterator2 first2,
         std::input_iterator_tag,
@@ -114,7 +114,7 @@ namespace ft {
 
     // last2あり
     template <class InputIterator1, class InputIterator2>
-    bool    equal(
+    inline bool equal(
         InputIterator1 first1, InputIterator1 last1,
         InputIterator2 first2, InputIterator2 last2
     ) {
@@ -127,7 +127,7 @@ namespace ft {
     }
 
     template <class InputIterator1, class InputIterator2, class Compare>
-    bool    equal(
+    inline bool equal(
         InputIterator1 first1, InputIterator1 last1,
         InputIterator2 first2, InputIterator2 last2,
         Compare comp
@@ -144,7 +144,7 @@ namespace ft {
     // last2なし
 
     template <class InputIterator1, class InputIterator2>
-    bool    equal(
+    inline bool equal(
         InputIterator1 first1, InputIterator1 last1,
         InputIterator2 first2
     ) {
@@ -156,7 +156,7 @@ namespace ft {
     }
 
     template <class InputIterator1, class InputIterator2, class Compare>
-    bool    equal(
+    inline bool equal(
         InputIterator1 first1, InputIterator1 last1,
         InputIterator2 first2,
         Compare comp
@@ -171,7 +171,7 @@ namespace ft {
     // [[lexicographical_compare]]
 
     template <class InputIterator1, class InputIterator2, class Compare>
-    bool    lexicographical_compare(
+    inline bool lexicographical_compare(
         InputIterator1 first1, InputIterator1 last1,
         InputIterator2 first2, InputIterator2 last2,
         Compare comp
@@ -188,7 +188,7 @@ namespace ft {
     }
 
     template <class InputIterator1, class InputIterator2>
-    bool    lexicographical_compare(
+    inline bool lexicographical_compare(
         InputIterator1 first1, InputIterator1 last1,
         InputIterator2 first2, InputIterator2 last2
     ) {

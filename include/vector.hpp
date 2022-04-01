@@ -117,7 +117,7 @@ namespace ft {
 
             // [get_allocator]
             // 関連付けられているアロケータを返します 
-            allocator_type get_allocator() const {
+            inline allocator_type get_allocator() const {
                 return allocator_type(allocator_);
             }
 
@@ -162,13 +162,13 @@ namespace ft {
             // コンテナの最後の要素への参照を返します。
             // 空のコンテナに対する back の呼び出しは未定義です。 
             // cf. コンテナ c に対して、式は return c.back(); は { auto tmp = c.end(); --tmp; return *tmp; } と同等です。 
-            reference back() {
+            inline reference back() {
                 if (empty()) {
                     // 空
                 }
                 return (*this)[size_ - 1];
             }
-            const_reference back() const {
+            inline const_reference back() const {
                 if (empty()) {
                     // 空
                 }
@@ -178,28 +178,28 @@ namespace ft {
             // [begin]
             // コンテナの最初の要素を指すイテレータを返します。
             // コンテナが空の場合は、返されたイテレータは end() と等しくなります。 
-            iterator begin() {
+            inline iterator begin() {
                 if (size_ > 0) {
                     return iterator(storage_);
                 } else {
                     return end();
                 }
             }
-            const_iterator begin() const {
+            inline const_iterator begin() const {
                 return const_iterator(storage_);
             }
 
             // [end]
             // コンテナの最後の要素の次の要素を指すイテレータを返します。
             // この要素はプレースホルダとしての役割を持ちます。この要素にアクセスを試みると未定義動作になります。
-            iterator end() {
+            inline iterator end() {
                 if (size_ > 0) {
                     return begin() + size_;
                 } else {
                     return iterator(storage_);
                 }
             }
-            const_iterator end() const {
+            inline const_iterator end() const {
                 if (size_ > 0) {
                     return begin() + size_;
                 } else {
@@ -416,7 +416,7 @@ namespace ft {
             // 1) pos の指す要素を削除します。
             // 削除された最後の要素の次を指すイテレータ。
             // pos が最後の要素を参照する場合は、 end() イテレータが返されます。
-            iterator erase(iterator pos) {
+            inline iterator erase(iterator pos) {
                 if (pos == end()) {
                     // pos を逆参照できない
                 }
@@ -702,7 +702,7 @@ namespace ft {
     // [比較演算子]
     // lhs と rhs の内容が等しいかどうか調べます。 つまり、それらが同じ個数の要素を持ち、 lhs 内のそれぞれの要素が rhs 内の同じ位置の要素と等しいかどうか比較します。
     template< class T, class Alloc >
-    bool operator==(
+    inline bool operator==(
         const ft::vector<T,Alloc>& lhs,
         const ft::vector<T,Alloc>& rhs
     ) {
@@ -710,7 +710,7 @@ namespace ft {
     }
 
     template< class T, class Alloc >
-    bool operator!=(
+    inline bool operator!=(
         const ft::vector<T,Alloc>& lhs,
         const ft::vector<T,Alloc>& rhs
     ) {
@@ -720,7 +720,7 @@ namespace ft {
     // lhs と rhs の内容を辞書的に比較します。 比較は std::lexicographical_compare と同等の関数によって行われます。 
     // lhs の内容が rhs の内容より辞書的に小さい場合は true、そうでなければ false。
     template< class T, class Alloc >
-    bool operator<(
+    inline bool operator<(
         const ft::vector<T,Alloc>& lhs,
         const ft::vector<T,Alloc>& rhs
     ) {
@@ -729,7 +729,7 @@ namespace ft {
     }
 
     template< class T, class Alloc >
-    bool operator<=(
+    inline bool operator<=(
         const ft::vector<T,Alloc>& lhs,
         const ft::vector<T,Alloc>& rhs
     ) {
@@ -737,7 +737,7 @@ namespace ft {
     }
 
     template< class T, class Alloc >
-    bool operator>(
+    inline bool operator>(
         const ft::vector<T,Alloc>& lhs,
         const ft::vector<T,Alloc>& rhs
     ) {
@@ -746,7 +746,7 @@ namespace ft {
     }
 
     template< class T, class Alloc >
-    bool operator>=(
+    inline bool operator>=(
         const ft::vector<T,Alloc>& lhs,
         const ft::vector<T,Alloc>& rhs
     ) {
@@ -754,14 +754,14 @@ namespace ft {
     }
 
     template <class Iter>
-    bool operator==(
+    inline bool operator==(
         const ft::iterator_wrapper<Iter>& x,
         const ft::iterator_wrapper<Iter>& y
     ) {
         return x.base() == y.base();
     }
     template <class Iter>
-    bool operator!=(
+    inline bool operator!=(
         const ft::iterator_wrapper<Iter>& x,
         const ft::iterator_wrapper<Iter>& y
     ) {
@@ -769,14 +769,14 @@ namespace ft {
     }
 
     template <class Iter1, class Iter2>
-    bool operator==(
+    inline bool operator==(
         const ft::iterator_wrapper<Iter1>& x,
         const ft::iterator_wrapper<Iter2>& y
     ) {
         return x.base() == y.base();
     }
     template <class Iter1, class Iter2>
-    bool operator!=(
+    inline bool operator!=(
         const ft::iterator_wrapper<Iter1>& x,
         const ft::iterator_wrapper<Iter2>& y
     ) {
@@ -784,28 +784,28 @@ namespace ft {
     }
 
     template <class Iter>
-    bool operator<(
+    inline bool operator<(
         const ft::iterator_wrapper<Iter>& x,
         const ft::iterator_wrapper<Iter>& y
     ) {
         return x.base() < y.base();
     }
     template <class Iter>
-    bool operator>(
+    inline bool operator>(
         const ft::iterator_wrapper<Iter>& x,
         const ft::iterator_wrapper<Iter>& y
     ) {
         return (y < x);
     }
     template <class Iter>
-    bool operator>=(
+    inline bool operator>=(
         const ft::iterator_wrapper<Iter>& x,
         const ft::iterator_wrapper<Iter>& y
     ) {
         return !(x < y);
     }
     template <class Iter>
-    bool operator<=(
+    inline bool operator<=(
         const ft::iterator_wrapper<Iter>& x,
         const ft::iterator_wrapper<Iter>& y
     ) {
@@ -813,28 +813,28 @@ namespace ft {
     }
 
     template <class Iter1, class Iter2>
-    bool operator<(
+    inline bool operator<(
         const ft::iterator_wrapper<Iter1>& x,
         const ft::iterator_wrapper<Iter2>& y
     ) {
         return x.base() < y.base();
     }
     template <class Iter1, class Iter2>
-    bool operator>(
+    inline bool operator>(
         const ft::iterator_wrapper<Iter1>& x,
         const ft::iterator_wrapper<Iter2>& y
     ) {
         return (y < x);
     }
     template <class Iter1, class Iter2>
-    bool operator>=(
+    inline bool operator>=(
         const ft::iterator_wrapper<Iter1>& x,
         const ft::iterator_wrapper<Iter2>& y
     ) {
         return !(x < y);
     }
     template <class Iter1, class Iter2>
-    bool operator<=(
+    inline bool operator<=(
         const ft::iterator_wrapper<Iter1>& x,
         const ft::iterator_wrapper<Iter2>& y
     ) {

@@ -226,37 +226,37 @@ namespace ft {
 }
 
 template <class It1, class It2>
-bool    operator==(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
+inline bool operator==(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
 {
     return x.base() == y.base();
 }
 
 template <class It1, class It2>
-bool    operator!=(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
+inline bool operator!=(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
 {
     return x.base() != y.base();
 }
 
 template <class It1, class It2>
-bool    operator<(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
+inline bool operator<(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
 {
     return x.base() < y.base();
 }
 
 template <class It1, class It2>
-bool    operator>(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
+inline bool operator>(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
 {
     return x.base() > y.base();
 }
 
 template <class It1, class It2>
-bool    operator<=(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
+inline bool operator<=(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
 {
     return x.base() <= y.base();
 }
 
 template <class It1, class It2>
-bool    operator>=(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
+inline bool operator>=(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
 {
     return x.base() >= y.base();
 }

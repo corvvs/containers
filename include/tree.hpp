@@ -213,7 +213,7 @@ namespace ft {
 
                     // 「シス子」、つまり
                     // 自分が左子なら右子、自分が右子なら左子を返す。
-                    tree_node_pointer    cis_child() const {
+                    inline tree_node_pointer    cis_child() const {
                         if (is_left_child()) { return right(); }
                         if (is_right_child()) { return left(); }
                         return NULL;
@@ -221,7 +221,7 @@ namespace ft {
 
                     // 「トランス子」、つまり
                     // 自分が左子なら左子、自分が右子なら右子を返す。
-                    tree_node_pointer    trans_child() const {
+                    inline tree_node_pointer    trans_child() const {
                         if (is_left_child()) { return left(); }
                         if (is_right_child()) { return right(); }
                         return NULL;
@@ -229,28 +229,28 @@ namespace ft {
 
                     // childがthisの子である場合、childと逆の子を返す
                     // そうでない場合 NULL を返す
-                    tree_node_pointer   counter_child(const tree_node_pointer& child) const {
+                    inline tree_node_pointer   counter_child(const tree_node_pointer& child) const {
                         if (left() == child) { return right(); }
                         if (right() == child) { return left(); }
                         return NULL;
                     }
 
                     // 自分がトランス子かどうかを返す。
-                    bool                is_trans_child() const {
+                    inline bool                is_trans_child() const {
                         return !is_end_() && is_left_child() == parent()->is_left_child();
                     }
 
                     // 自分がシス子かどうかを返す。
-                    bool                is_cis_child() const {
+                    inline bool                is_cis_child() const {
                         return !is_end_() && is_left_child() != parent()->is_left_child();
                     }
 
                     // valueだけをswapする。
-                    void    swap_value(tree_node& other) {
+                    inline void    swap_value(tree_node& other) {
                         ft::swap(tree_value_, other.tree_value_);
                     }
 
-                    void    swap_color(tree_node& other) {
+                    inline void    swap_color(tree_node& other) {
                         ft::swap(is_black_, other.is_black_);
                     }
 
@@ -271,7 +271,7 @@ namespace ft {
                     }
 
                     // child を自身の左子として配置する
-                    void    place_into_left_(tree_node_pointer child) {
+                    inline void    place_into_left_(tree_node_pointer child) {
                         this->left() = child;
                         if (child != NULL) {
                             child->parent() = this;
@@ -279,7 +279,7 @@ namespace ft {
                     }
 
                     // child を自身の右子として配置する
-                    void    place_into_right_(tree_node_pointer child) {
+                    inline void    place_into_right_(tree_node_pointer child) {
                         this->right() = child;
                         if (child != NULL) {
                             child->parent() = this;
@@ -479,7 +479,7 @@ namespace ft {
                     }
 
                     // valueの構築が必要ない場合、value構築フラグだけを立てる
-                    void    construct_blank_value() {
+                    inline void    construct_blank_value() {
                         if (node_constructed_) {
                             value_constructed_ = true;
                         }
@@ -581,10 +581,10 @@ namespace ft {
                         return it;
                     }
 
-                    bool                operator==(const iterator_type& rhs) const {
+                    inline bool         operator==(const iterator_type& rhs) const {
                         return ptr_ == rhs.ptr_;
                     }
-                    bool                operator!=(const iterator_type& rhs) const {
+                    inline bool         operator!=(const iterator_type& rhs) const {
                         return !(*this == rhs);
                     }
             };
@@ -1442,14 +1442,14 @@ namespace ft {
             }
 
             // 回転と色反転を同時に行う
-            static void    rotate_flip_(pointer parent, pointer node) {
+            inline static void    rotate_flip_(pointer parent, pointer node) {
                 node->flip_color();
                 parent->flip_color();
                 rotate_(parent, node);
             }
 
             // 回転と色交換を同時に行う
-            static void    rotate_swap_(pointer parent, pointer node) {
+            inline static void    rotate_swap_(pointer parent, pointer node) {
                 parent->swap_color(*node);
                 rotate_(parent, node);
             }

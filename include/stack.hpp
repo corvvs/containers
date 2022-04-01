@@ -59,7 +59,7 @@ namespace ft {
 
     // [比較演算子]
     template< class T, class Container >
-    bool operator==(
+    inline bool operator==(
         const ft::stack<T, Container>& lhs,
         const ft::stack<T, Container>& rhs
     ) {
@@ -67,7 +67,7 @@ namespace ft {
     }
 
     template< class T, class Container >
-    bool operator!=(
+    inline bool operator!=(
         const ft::stack<T, Container>& lhs,
         const ft::stack<T, Container>& rhs
     ) {
@@ -75,7 +75,7 @@ namespace ft {
     }
 
     template< class T, class Container >
-    bool operator<(
+    inline bool operator<(
         const ft::stack<T, Container>& lhs,
         const ft::stack<T, Container>& rhs
     ) {
@@ -83,7 +83,7 @@ namespace ft {
     }
 
     template< class T, class Container >
-    bool operator<=(
+    inline bool operator<=(
         const ft::stack<T, Container>& lhs,
         const ft::stack<T, Container>& rhs
     ) {
@@ -91,7 +91,7 @@ namespace ft {
     }
 
     template< class T, class Container >
-    bool operator>(
+    inline bool operator>(
         const ft::stack<T, Container>& lhs,
         const ft::stack<T, Container>& rhs
     ) {
@@ -99,7 +99,7 @@ namespace ft {
     }
 
     template< class T, class Container >
-    bool operator>=(
+    inline bool operator>=(
         const ft::stack<T, Container>& lhs,
         const ft::stack<T, Container>& rhs
     ) {
