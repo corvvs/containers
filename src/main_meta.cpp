@@ -129,7 +129,6 @@ int main() {
         std::cout << "[std::vector<int>::iterator]" << std::endl;
         std::cout << "std::__has_iterator_category: " << std::__has_iterator_category< Iter >::value  << std::endl;
         std::cout << "ft::has_iterator_category: " << ft::has_iterator_category< Iter >::value  << std::endl;
-        std::cout << "std::__is_cpp17_random_access_iterator: " << std::__is_cpp17_random_access_iterator< Iter >::value  << std::endl;
         std::cout << "ft::is_random_access_iterator: " << ft::is_random_access_iterator< Iter >::value  << std::endl;
         std::cout << "ft::has_iterator_category_convertible_to: " << ft::has_iterator_category_convertible_to< Iter, std::random_access_iterator_tag >::value  << std::endl;
         std::cout << "ft::has_iterator_category: " << ft::has_iterator_category< Iter >::value  << std::endl;
@@ -141,7 +140,6 @@ int main() {
         std::cout << "[ft::vector<int>::iterator]" << std::endl;
         std::cout << "std::__has_iterator_category: " << std::__has_iterator_category< Iter >::value  << std::endl;
         std::cout << "ft::has_iterator_category: " << ft::has_iterator_category< Iter >::value  << std::endl;
-        std::cout << "std::__is_cpp17_random_access_iterator: " << std::__is_cpp17_random_access_iterator< Iter >::value  << std::endl;
         std::cout << "ft::is_random_access_iterator: " << ft::is_random_access_iterator< Iter >::value  << std::endl;
         std::cout << "ft::has_iterator_category_convertible_to: " << ft::has_iterator_category_convertible_to< Iter, std::random_access_iterator_tag >::value  << std::endl;
         std::cout << "ft::has_iterator_category: " << ft::has_iterator_category< Iter >::value  << std::endl;
