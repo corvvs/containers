@@ -697,7 +697,7 @@ namespace logic {
             s[&j] = 1;
         }
         DSOUT() << s.size() << std::endl;
-        DSOUT() << s.begin()->second << std::endl; // diffでるかも。でないと思うけど。
+        // DSOUT() << s.begin()->second << std::endl; // diffでるかも。でないと思うけど。 -> -O2 つけると出た
     }
 
     void    pointer_is_val() {

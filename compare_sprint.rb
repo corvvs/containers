@@ -24,11 +24,15 @@ too_slows = 0
   t2 = times2[i][1]
   rate = t1 / t2
   klass = case
-    when rate < 0.1
+    when t1 == 0 || t2 == 0
+      "\e[90m"
+    when [t1, t2].max < 0.1
+      "\e[90m"
+    when rate <= 1.0 / 20
       # :too_slow
       too_slows += 1
       "\e[41m"
-    when rate <= 0.9
+    when rate <= 0.5
       # :slow
       "\e[91m"
     when rate <= 1.0

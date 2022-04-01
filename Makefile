@@ -83,7 +83,7 @@ OBJS			:=	$(OBJS_VECTOR) $(OBJS_STACK) $(OBJS_PAIR) \
 .PHONY			:	all run
 all				:	$(NAMES)
 
-run				:	meta_diff stack_diff vector_diff map_diff set_diff main_diff
+run				:	fclean meta_diff stack_diff vector_diff map_diff set_diff main_diff
 
 .PHONY			:	clean fclean re
 clean			:
