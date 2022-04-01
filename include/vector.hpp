@@ -355,40 +355,10 @@ namespace ft {
                 for (; first != last; ++first) {
                     receiver.push_back(*first);
                 }
-                // pos == begin() かつ capacity() == 0 の場合はここでswapして終わっていいはず？
-                // -> そうすると capacity が食い違う
-
-                size_type   count = receiver.size();
-                // サイズがわかるので、再確保の有無を計算
-                size_type   recommended_cap = recommended_capacity_(size() + count);
-                bool        needed_realloc = recommended_cap > capacity();
-                bool        do_append = pos == end();
-                if (!needed_realloc) {
-                    if (do_append) {
-                        // 再確保不要 & 末尾に追加
-                        append_within_capacity_(receiver.begin(), receiver.end());
-                    } else {
-                        // 再確保不要 & 末尾でない
-                        size_type   p = distance_(begin(), pos);
-                        size_type   old_size = size();
-                        // 既存要素の移動
-                        mass_moveright_within_capacity_(pos, count);
-                        // 新規要素の代入
-                        for (size_type i = 0; i < count; ++i) {
-                            substitute_to_(i + p, receiver[i], old_size);
-                        }
-                    }
-                } else {
-                    // 再確保が必要
-                    vector<value_type, allocator_type> new_one(allocator_);
-                    new_one.reserve(recommended_cap);
-                    new_one.append_within_capacity_(begin(), pos);
-                    for (size_type i = 0; i < count; ++i) {
-                        new_one.push_back_within_capacity_(receiver[i]);
-                    }
-                    new_one.append_within_capacity_(pos, end());
-                    swap(new_one);
-                }
+                // vectorのiteratorは
+                // - 前方向イテレータなので, 自己呼び出しにはならない.
+                // - ランダムアクセスイテレータなので, std::distanceが定数時間で終わる.
+                insert(pos, receiver.begin(), receiver.end());
             }
 
             template< class InputIt >
@@ -401,7 +371,7 @@ namespace ft {
                 >::type* = NULL
             ) {
                 size_type   count = std::distance(first, last);
-                // サイズがわかるので、再確保の有無を計算
+                // サイズはわかるので, 再確保の有無を計算
                 size_type   recommended_cap = recommended_capacity_(size() + count);
                 bool        needed_realloc = recommended_cap > capacity();
                 bool        do_append = pos == end();

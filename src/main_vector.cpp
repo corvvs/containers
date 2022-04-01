@@ -232,6 +232,54 @@ void    mass_insertion_range(VC(T)::size_type n, VC(T)::size_type m) {
 }
 
 template <class T>
+void    mass_insertion_range_inputiter(VC(T)::size_type n) {
+    srand(n);
+    std::stringstream   ss;
+    for (VC(T)::size_type i = 0; i < n; ++i) {
+        ss << random_value_generator<T>() << std::endl;
+    }
+    VC(T) vj;
+    {
+        std::istream_iterator<T> it(ss);
+        std::istream_iterator<T> it_end;
+        vj.reserve(n);
+        SPRINT("mass_insertion_range_inputiter(1: no realloc and append)") << "(" << n << ")";
+        DSOUT() << vj << std::endl;
+        print_stats(vj, false);
+        vj.insert(vj.end(), it, it_end);
+        DSOUT() << vj << std::endl;
+        print_stats(vj, false);
+    }
+    ss.clear();
+    for (VC(T)::size_type i = 0; i < n; ++i) {
+        ss << random_value_generator<T>() << std::endl;
+    }
+    {
+        std::istream_iterator<T> it(ss);
+        std::istream_iterator<T> it_end;
+        vj.reserve(n * 2);
+        SPRINT("mass_insertion_range_inputiter(2: no realloc and insert)") << "(" << n << ")";
+        print_stats(vj, false);
+        vj.insert(vj.begin(), it, it_end);
+        DSOUT() << vj << std::endl;
+        print_stats(vj, false);
+    }
+    ss.clear();
+    for (VC(T)::size_type i = 0; i < n; ++i) {
+        ss << random_value_generator<T>() << std::endl;
+    }
+    {
+        std::istream_iterator<T> it(ss);
+        std::istream_iterator<T> it_end;
+        SPRINT("mass_insertion_range_inputiter(3: realloc)") << "(" << n << ")";
+        print_stats(vj, false);
+        vj.insert(vj.begin(), it, it_end);
+        DSOUT() << vj << std::endl;
+        print_stats(vj, false);
+    }
+}
+
+template <class T>
 void    mass_pop_back(VC(T)::size_type n) {
     srand(n);
     VC(T) vi;
@@ -698,6 +746,16 @@ int main() {
     performance<std::string>("[std::string]", 100);
     performance<std::vector<int> >("[std::vector<int>]", 20);
     performance<ft::vector<int> >("[ft::vector<int>]", 20);
+
+    // 別枠で
+    mass_insertion_range_inputiter<int>(10);
+    mass_insertion_range_inputiter<int>(100);
+    mass_insertion_range_inputiter<int>(1000);
+    mass_insertion_range_inputiter<int>(10000);
+    mass_insertion_range_inputiter<std::string>(10);
+    mass_insertion_range_inputiter<std::string>(100);
+    mass_insertion_range_inputiter<std::string>(1000);
+    mass_insertion_range_inputiter<std::string>(10000);
 
     {
         VectorClass< ft::blank<int> >   v((0));
