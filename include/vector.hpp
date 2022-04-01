@@ -151,10 +151,10 @@ namespace ft {
             // 空のコンテナに対する front の呼び出しは未定義です。
             // cf. コンテナ c に対して、式 c.front() は *c.begin() と同等です。 
             inline reference front() {
-                return *this[0];
+                return *begin();
             }
             inline const_reference front() const {
-                return *this[0];
+                return *begin();
             }
 
             // [back]
@@ -671,9 +671,7 @@ namespace ft {
                 if (d == 0) { return; }
                 if (!is_interval_empty_(pos, end())) {
                     // 区間が空でない場合
-                    std::copy(
-                        pos, end(),
-                        pos - d);
+                    std::copy(pos, end(), pos - d);
                 }
                 reverse_iterator to = rbegin() + d;
                 for (reverse_iterator it = rbegin(); it != to; ++it) {
@@ -781,86 +779,102 @@ namespace ft {
         return !(lhs < rhs);
     }
 
-    // [swap]
-    // ft::vector に対する std::swap アルゴリズムの特殊化。
-    // lhs と rhs の内容を入れ替えます。 lhs.swap(rhs) を呼びます。 
-    template< class T, class Alloc >
-    void swap( ft::vector<T,Alloc>& lhs, ft::vector<T,Alloc>& rhs ) {
-        lhs.swap(rhs);
+    template <class Iter>
+    bool operator==(
+        const ft::iterator_wrapper<Iter>& x,
+        const ft::iterator_wrapper<Iter>& y
+    ) {
+        return x.base() == y.base();
+    }
+    template <class Iter>
+    bool operator!=(
+        const ft::iterator_wrapper<Iter>& x,
+        const ft::iterator_wrapper<Iter>& y
+    ) {
+        return !(x == y);
     }
 
-
-    template <class _Iter1>
-    bool operator==(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter1>& __y)
-    {
-        return __x.base() == __y.base();
+    template <class Iter, class Iter2>
+    bool operator==(
+        const ft::iterator_wrapper<Iter>& x,
+        const ft::iterator_wrapper<Iter>& y
+    ) {
+        return x.base() == y.base();
     }
-    template <class _Iter1>
-    bool operator!=(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter1>& __y)
-    {
-        return !(__x == __y);
-    }
-
-    template <class _Iter1, class _Iter2>
-    bool operator==(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y)
-    {
-        return __x.base() == __y.base();
-    }
-    template <class _Iter1, class _Iter2>
-    bool operator!=(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y)
-    {
-        return !(__x == __y);
+    template <class Iter, class Iter2>
+    bool operator!=(
+        const ft::iterator_wrapper<Iter>& x,
+        const ft::iterator_wrapper<Iter>& y
+    ) {
+        return !(x == y);
     }
 
-    template <class _Iter1>
-    bool operator<(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter1>& __y)
-    {
-        return __x.base() < __y.base();
+    template <class Iter>
+    bool operator<(
+        const ft::iterator_wrapper<Iter>& x,
+        const ft::iterator_wrapper<Iter>& y
+    ) {
+        return x.base() < y.base();
     }
-    template <class _Iter1>
-    bool operator>(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter1>& __y)
-    {
-        return (__y < __x);
+    template <class Iter>
+    bool operator>(
+        const ft::iterator_wrapper<Iter>& x,
+        const ft::iterator_wrapper<Iter>& y
+    ) {
+        return (y < x);
     }
-    template <class _Iter1>
-    bool operator>=(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter1>& __y)
-    {
-        return !(__x < __y);
+    template <class Iter>
+    bool operator>=(
+        const ft::iterator_wrapper<Iter>& x,
+        const ft::iterator_wrapper<Iter>& y
+    ) {
+        return !(x < y);
     }
-    template <class _Iter1>
-    bool operator<=(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter1>& __y)
-    {
-        return !(__y < __x);
-    }
-
-    template <class _Iter1, class _Iter2>
-    bool operator<(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y)
-    {
-        return __x.base() < __y.base();
-    }
-    template <class _Iter1, class _Iter2>
-    bool operator>(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y)
-    {
-        return (__y < __x);
-    }
-    template <class _Iter1, class _Iter2>
-    bool operator>=(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y)
-    {
-        return !(__x < __y);
-    }
-    template <class _Iter1, class _Iter2>
-    bool operator<=(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y)
-    {
-        return !(__y < __x);
+    template <class Iter>
+    bool operator<=(
+        const ft::iterator_wrapper<Iter>& x,
+        const ft::iterator_wrapper<Iter>& y
+    ) {
+        return !(y < x);
     }
 
-    template <class _Iter1, class _Iter2>
-    typename ft::iterator_wrapper<_Iter1>::difference_type
-    operator-(const ft::iterator_wrapper<_Iter1>& __x, const ft::iterator_wrapper<_Iter2>& __y) _NOEXCEPT
-    {
-        return __x.operator->() - __y.operator->();
+    template <class Iter1, class Iter2>
+    bool operator<(
+        const ft::iterator_wrapper<Iter1>& x,
+        const ft::iterator_wrapper<Iter2>& y
+    ) {
+        return x.base() < y.base();
+    }
+    template <class Iter1, class Iter2>
+    bool operator>(
+        const ft::iterator_wrapper<Iter1>& x,
+        const ft::iterator_wrapper<Iter2>& y
+    ) {
+        return (y < x);
+    }
+    template <class Iter1, class Iter2>
+    bool operator>=(
+        const ft::iterator_wrapper<Iter1>& x,
+        const ft::iterator_wrapper<Iter2>& y
+    ) {
+        return !(x < y);
+    }
+    template <class Iter1, class Iter2>
+    bool operator<=(
+        const ft::iterator_wrapper<Iter1>& x,
+        const ft::iterator_wrapper<Iter2>& y
+    ) {
+        return !(y < x);
     }
 
+    template <class Iter1, class Iter2>
+    typename ft::iterator_wrapper<Iter1>::difference_type
+    operator-(
+        const ft::iterator_wrapper<Iter1>& x,
+        const ft::iterator_wrapper<Iter2>& y
+    ) {
+        return x.operator->() - y.operator->();
+    }
 
     template <class It>
     ft::iterator_wrapper<It>    operator+(
@@ -870,5 +884,13 @@ namespace ft {
         x += n;
         return x;
     }
+}
+
+// [swap]
+// ft::vector に対する std::swap アルゴリズムの特殊化。
+// lhs と rhs の内容を入れ替えます。 lhs.swap(rhs) を呼びます。 
+template< class T, class Alloc >
+void swap( ft::vector<T,Alloc>& lhs, ft::vector<T,Alloc>& rhs ) {
+    lhs.swap(rhs);
 }
 #endif

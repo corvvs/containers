@@ -207,7 +207,7 @@ namespace fill {
             DSOUT() << mm.size() << std::endl;
             DSOUT() << (mm.begin() == m.end()) << std::endl;
             DSOUT() << *(mm.begin()) << std::endl;
-            swap(m, mm);
+            std::swap(m, mm);
             DSOUT() << mm.empty() << std::endl;
             DSOUT() << mm.size() << std::endl;
             DSOUT() << (mm.begin() == m.end()) << std::endl;
@@ -439,6 +439,34 @@ namespace fill {
         }
     }
 
+    void    comparation() {
+        SPRINT("comparation");
+        typedef SetClass<int>   st;
+        typedef VectorClass<st> vt;
+        vt    v;
+        int n = 3;
+        for (int i = 0; i < (1 << (n + 2)); ++i) {
+            st  s;
+            for (int j = 0; j < n; ++j) {
+                if ((1 << j) & i) {
+                    s.insert(j);
+                }
+            }
+            v.push_back(s);
+        }
+        for (vt::size_type i = 0; i < v.size(); ++i) {
+            for (vt::size_type j = 0; j < v.size(); ++j) {
+                DSOUT() << "(" << i << " vs " << j << ") "
+                        << "==:" << (v[i] == v[j]) << " "
+                        << "!=:" << (v[i] != v[j]) << " "
+                        << "<:" << (v[i] < v[j]) << " "
+                        << "<=:" << (v[i] <= v[j]) << " "
+                        << ">:" << (v[i] > v[j]) << " "
+                        << ">=:" << (v[i] >= v[j]) << std::endl;
+            }
+        }
+    }
+
     void    fill_test() {
         constructor_default(100);
         constructor_comparator(100);
@@ -463,6 +491,7 @@ namespace fill {
         equal_range(100);
         lower_bound(100);
         upper_bound(100);
+        comparation();
     }
 }
 
@@ -543,17 +572,16 @@ namespace logic {
         set_type    s;
         for (int i = 0; i < 10; ++i) {
             set_type::key_type  t;
-            for (int j = 0; j < 10; ++j) {
-                t.insert(rand());
+            for (int j = 0; j < 4; ++j) {
+                NS::pair<set_type::key_type::iterator, bool> result = t.insert(rand() % 3);
+                DSOUT() << result.second << std::endl;
+                DSOUT() << "inner" << j << ": " << result.second << std::endl;
             }
-            s.insert(t);
+            NS::pair<set_type::iterator, bool> result = s.insert(t);
+            DSOUT() << "outer(" << i << "): " << result.second << std::endl;
         }
         for (set_type::const_iterator it = s.begin(); it != s.end(); ++it) {
-            DSOUT() << "[";
-            for (set_type::key_type::const_iterator iit = it->begin(); iit != it->end(); ++iit) {
-                std::cout << *iit << ", ";
-            }
-            std::cout << "]" << std::endl;
+            DSOUT() << *it << std::endl;
         }
     }
 
@@ -564,17 +592,13 @@ namespace logic {
         set_type    s;
         for (int i = 0; i < 10; ++i) {
             set_type::key_type  t;
-            for (int j = 0; j < 10; ++j) {
-                t.push_back(rand());
+            for (int j = 0; j < 4; ++j) {
+                t.push_back(rand() % 3);
             }
             s.insert(t);
         }
         for (set_type::const_iterator it = s.begin(); it != s.end(); ++it) {
-            DSOUT() << "[";
-            for (set_type::key_type::const_iterator iit = it->begin(); iit != it->end(); ++iit) {
-                std::cout << *iit << ", ";
-            }
-            std::cout << "]" << std::endl;
+            DSOUT() << *it << std::endl;
         }
     }
 
@@ -599,35 +623,32 @@ namespace logic {
     // setにconstをのせる
     void    const_on_set() {
         SPRINT("const_on_set");
-        SetClass< const int >    s;
+        SetClass< const std::string >    s;
         {
-            s.insert(1);
-            s.insert(2);
+            s.insert("1");
+            s.insert("2");
         }
         DSOUT() << s.size() << std::endl;
     }
 
-    // setにvolatileをのせる -> コンパイルエラー
+    // // setにvolatileをのせる -> hmmmmmmmmmmm
     // void    volatile_on_set() {
     //     SPRINT("volatile_on_set");
     //     SetClass< volatile int >    s;
     //     {
-    //         s.insert(1);
-    //         s.insert(2);
+    //         volatile int    i = 1;
+    //         s.insert(i);
     //     }
     //     DSOUT() << s.size() << std::endl;
     // }
 
-    // void    set_iterator_on_set() { // -> コンパイルエラー(setのイテレータは不等式が定義されないため)
-    //     SPRINT("set_iterator_on_set");
-    //     SetClass<int>   m;
-    //     SetClass< SetClass<int>::iterator >    s;
-    //     {
-    //         s.insert(m.begin());
-    //         s.insert(m.end());
-    //     }
-    //     DSOUT() << s.size() << std::endl;
-    // }
+    void    set_iterator_on_set() {
+        SPRINT("set_iterator_on_set");
+        SetClass<int>   m;
+        SetClass< SetClass<int>::iterator >    s;
+        // s.insert(m.begin()); // 値を入れようとするとエラー
+        DSOUT() << s.size() << std::endl;
+    }
 
     void    test() {
         specify_comparator();
@@ -636,6 +657,7 @@ namespace logic {
         vector_on_set();
         pointer_on_set();
         const_on_set();
+        set_iterator_on_set();
     }
 }
 

@@ -148,15 +148,11 @@ namespace fill {
         map_type::iterator  it = m.end();
         --it;
         DSOUT() << (m.begin() == m.end());
-        DSOUT() << m.begin()->first << std::endl;
-        DSOUT() << m.begin()->second << std::endl;
-        DSOUT() << it->first << std::endl;
-        DSOUT() << it->second << std::endl;
+        DSOUT() << *(m.begin()) << std::endl;
+        DSOUT() << *it << std::endl;
         it->second = 1000;
-        DSOUT() << it->first << std::endl;
-        DSOUT() << it->second << std::endl;
-        DSOUT() << m.begin()->first << std::endl;
-        DSOUT() << m.begin()->second << std::endl;
+        DSOUT() << *it << std::endl;
+        DSOUT() << *(m.begin()) << std::endl;
         // it->first = 0; // error: cannot assign to non-static data member 'first' with const-qualified type 'ft::pair<const int, int>::first_type' (aka 'const int')
         ++it;
         DSOUT() << (m.begin() == m.end()) << std::endl;
@@ -197,21 +193,21 @@ namespace fill {
             DSOUT() << m.empty() << std::endl;
             DSOUT() << m.size() << std::endl;
             DSOUT() << (m.begin() == m.end()) << std::endl;
-            DSOUT() << m.begin()->first << ", " << m.begin()->second << std::endl;
+            DSOUT() << *(m.begin()) << std::endl;
             DSOUT() << mm.empty() << std::endl;
             DSOUT() << mm.size() << std::endl;
             DSOUT() << (mm.begin() == m.end()) << std::endl;
-            DSOUT() << mm.begin()->first << ", " << mm.begin()->second << std::endl;
-            swap(m, mm);
+            DSOUT() << *(mm.begin()) << std::endl;
+            std::swap(m, mm);
             DSOUT() << mm.empty() << std::endl;
             DSOUT() << mm.size() << std::endl;
             DSOUT() << (mm.begin() == m.end()) << std::endl;
-            DSOUT() << mm.begin()->first << ", " << mm.begin()->second << std::endl;
+            DSOUT() << *(mm.begin()) << std::endl;
         }
         DSOUT() << m.empty() << std::endl;
         DSOUT() << m.size() << std::endl;
         DSOUT() << (m.begin() == m.end()) << std::endl;
-        DSOUT() << m.begin()->first << ", " << m.begin()->second << std::endl;
+        DSOUT() << *(m.begin()) << std::endl;
     }
 
     void    insert_value(int n) {
@@ -227,7 +223,7 @@ namespace fill {
         DSOUT() << m.empty() << std::endl;
         DSOUT() << m.size() << std::endl;
         DSOUT() << (m.begin() == m.end()) << std::endl;
-        DSOUT() << m.begin()->first << ", " << m.begin()->second << std::endl;
+        DSOUT() << *(m.begin()) << std::endl;
     }
 
     void    insert_value_with_hint(int n) {
@@ -239,12 +235,12 @@ namespace fill {
         map_type::iterator it = m.begin();
         for (int i = 0; i < n; ++i) {
             it = m.insert(it, NS::make_pair(rand(), rand()));
-            DSOUT() << it->first << ", " << it->second << std::endl;
+            DSOUT() << *it << std::endl;
         }
         DSOUT() << m.empty() << std::endl;
         DSOUT() << m.size() << std::endl;
         DSOUT() << (m.begin() == m.end()) << std::endl;
-        DSOUT() << m.begin()->first << ", " << m.begin()->second << std::endl;
+        DSOUT() << *(m.begin()) << std::endl;
     }
 
     void    insert_value_with_range(int n) {
@@ -258,7 +254,7 @@ namespace fill {
         DSOUT() << m.empty() << std::endl;
         DSOUT() << m.size() << std::endl;
         DSOUT() << (m.begin() == m.end()) << std::endl;
-        DSOUT() << m.begin()->first << ", " << m.begin()->second << std::endl;
+        DSOUT() << *(m.begin()) << std::endl;
     }
 
     void    erase_by_position(int n) {
@@ -348,7 +344,7 @@ namespace fill {
         for (int i = 0; i < n; ++i) {
             map_type::const_iterator  it = m.find(rand() % n);
             if (it != m.end()) {
-                DSOUT() << it->first << ", " << it->second << std::endl;
+                DSOUT() << *it << std::endl;
             }
         }
         DSOUT() << m.empty() << std::endl;
@@ -399,13 +395,13 @@ namespace fill {
             if (it == m.end()) {
                 DSOUT() << "found: end" << std::endl;
             } else {
-                DSOUT() << "found: " << key << " -> " << it->first << ", " << it->second << std::endl;
+                DSOUT() << "found: " << key << " -> " << *it << std::endl;
             }
             map_type::const_iterator    cit = m.lower_bound(key);
             if (cit == m.end()) {
                 DSOUT() << "found: end" << std::endl;
             } else {
-                DSOUT() << "found: " << key << " -> " << cit->first << ", " << cit->second << std::endl;
+                DSOUT() << "found: " << key << " -> " << *cit << std::endl;
             }
         }
     }
@@ -425,42 +421,314 @@ namespace fill {
             if (it == m.end()) {
                 DSOUT() << "found: end" << std::endl;
             } else {
-                DSOUT() << "found: " << key << " -> " << it->first << ", " << it->second << std::endl;
+                DSOUT() << "found: " << key << " -> " << *it << std::endl;
             }
             map_type::const_iterator    cit = m.upper_bound(key);
             if (cit == m.end()) {
                 DSOUT() << "found: end" << std::endl;
             } else {
-                DSOUT() << "found: " << key << " -> " << cit->first << ", " << cit->second << std::endl;
+                DSOUT() << "found: " << key << " -> " << *cit << std::endl;
             }
         }
+    }
+
+    void    comparation() {
+        SPRINT("comparation");
+        typedef MapClass<int, int>   st;
+        typedef VectorClass<st> vt;
+        vt    v;
+        int n = 3;
+        for (int i = 0; i < (1 << (n + 2)); ++i) {
+            st  s;
+            for (int j = 0; j < n; ++j) {
+                if ((1 << j) & i) {
+                    s[j] = i % 3;
+                }
+            }
+            v.push_back(s);
+        }
+        for (vt::size_type i = 0; i < v.size(); ++i) {
+            for (vt::size_type j = 0; j < v.size(); ++j) {
+                DSOUT() << "(" << i << " vs " << j << ") "
+                        << "==:" << (v[i] == v[j]) << " "
+                        << "!=:" << (v[i] != v[j]) << " "
+                        << "<:" << (v[i] < v[j]) << " "
+                        << "<=:" << (v[i] <= v[j]) << " "
+                        << ">:" << (v[i] > v[j]) << " "
+                        << ">=:" << (v[i] >= v[j]) << std::endl;
+            }
+        }
+    }
+
+    void    test() {
+        // constructor_default(100);
+        // constructor_comparator(100);
+        // constructor_comparator_allocator(100);
+        // constructor_iterator(100);
+        // constructor_copy(100);
+        // oprator_assignation(100);
+        // get_allocator();
+        // key_comp();
+        // value_comp();
+        // begin_end_variable();
+        // clear(100);
+        // swap(100);
+        // insert_value(100);
+        // insert_value_with_hint(100);
+        // insert_value_with_range(100);
+        // erase_by_position(100);
+        // erase_by_key(100);
+        // erase_by_range(100);
+        // find_variable(100);
+        // find_constant(100);
+        // equal_range(100);
+        // lower_bound(100);
+        // upper_bound(100);
+        comparation();
+    }
+}
+
+namespace logic {
+    typedef std::string             Key;
+    typedef int                     Value;
+    typedef MapClass<Key, Value>    set_type;
+
+    template <class T>
+    struct size_compare {
+        bool    operator()(const T& lhs, const T& rhs) const {
+            return lhs.size() < rhs.size();
+        }
+    };
+
+    // - 特殊な comparatorを 使用できること
+    // - comparatorにより挿入済みと判定された場合は挿入を行わないこと
+    void    specify_comparator() {
+        SPRINT("specify_comparator");
+        MapClass<Key, Value, size_compare<Key> >     m;
+        m.insert(NS::make_pair("apple", 1));
+        DSOUT() << *(m.begin()) << std::endl;
+        DSOUT() << m.size() << std::endl;
+        m.insert(NS::make_pair("hello", 86));
+        DSOUT() << *(m.begin()) << std::endl;
+        DSOUT() << m.size() << std::endl;
+        m.insert(NS::make_pair("42", 42));
+        DSOUT() << *(m.begin()) << std::endl;
+        DSOUT() << m.size() << std::endl;
+    }
+
+    // - 内部にポインタを持つオブジェクトを持てること
+    // - clear後にinsertしても状態が整合すること
+    void    destroy_and_create() {
+        SPRINT("destroy_and_create");
+        MapClass< std::list<int>, int >  m;
+        int n = 10;
+        for (int i = 0; i < n; ++i) {
+            std::list<int>  lst;
+            for (int j = 0; j < n; ++j) {
+                lst.push_back(rand() % 3);
+            }
+            m.insert(NS::make_pair(lst, 1));
+        }
+        DSOUT() << m.size() << std::endl;
+        {
+            MapClass< std::list<int>, int >  mm;
+            int n = 10;
+            for (int i = 0; i < n; ++i) {
+                std::list<int>  lst;
+                for (int j = 0; j < n; ++j) {
+                    lst.push_back(rand() % 3);
+                }
+                mm.insert(NS::make_pair(lst, 2));
+            }
+            DSOUT() << (m == mm) << std::endl;
+            m = mm;
+            DSOUT() << (m == mm) << std::endl;
+        }
+        DSOUT() << m.size() << std::endl;
+        m.clear();
+        for (int i = 0; i < n; ++i) {
+            std::list<int>  lst;
+            for (int j = 0; j < n; ++j) {
+                lst.push_back(rand() % 3);
+            }
+            m.insert(NS::make_pair(lst, 20));
+        }
+        DSOUT() << m.size() << std::endl;
+    }
+
+    // // [いろんなものを載せてみるコーナー]
+
+    // mapにmapをのせる
+    void    map_on_map() {
+        SPRINT("map_on_map");
+        typedef MapClass< MapClass< int, int >, int > map_type;
+        map_type    s;
+        for (int i = 0; i < 10; ++i) {
+            map_type::key_type  t;
+            for (int j = 0; j < 3; ++j) {
+                NS::pair<map_type::key_type::iterator, bool> result = t.insert(NS::make_pair(rand() % 3, j));
+                DSOUT() << "inner(" << j << "): " << (result.second ? "ok" : "FAIL") << std::endl;
+            }
+            DSOUT() << "insert outer(" << i << ") -> " << t << std::endl;
+            NS::pair<map_type::iterator, bool> result = s.insert(NS::make_pair(t, i));
+            DSOUT() << "outer(" << i << "): " << (result.second ? "ok" : "FAIL") << std::endl;
+        }
+        for (map_type::const_iterator it = s.begin(); it != s.end(); ++it) {
+            DSOUT() << *it << std::endl;
+        }
+    }
+
+    // setにmapをのせる
+    void    map_on_set() {
+        SPRINT("map_on_set");
+        typedef SetClass< MapClass< int, int > > set_type;
+        set_type    s;
+        for (int i = 0; i < 10; ++i) {
+            set_type::key_type  t;
+            for (int j = 0; j < 3; ++j) {
+                NS::pair<set_type::key_type::iterator, bool> result = t.insert(NS::make_pair(rand() % 3, j));
+                DSOUT() << "inner(" << j << "): " << (result.second ? "ok" : "FAIL") << std::endl;
+            }
+            NS::pair<set_type::iterator, bool> result = s.insert(t);
+            DSOUT() << "outer(" << i << "): " << (result.second ? "ok" : "FAIL") << std::endl;
+        }
+        for (set_type::const_iterator it = s.begin(); it != s.end(); ++it) {
+            DSOUT () << *it << std::endl;
+        }
+    }
+
+    // mapにsetをのせる
+    void    set_on_map() {
+        SPRINT("set_on_map");
+        typedef MapClass< SetClass< int >, int > map_type;
+        map_type    s;
+        for (int i = 0; i < 10; ++i) {
+            map_type::key_type  t;
+            for (int j = 0; j < 3; ++j) {
+                NS::pair<map_type::key_type::iterator, bool> result = t.insert(rand() % 3);
+                DSOUT() << "inner(" << j << "): " << (result.second ? "ok" : "FAIL") << std::endl;
+            }
+            NS::pair<map_type::iterator, bool> result = s.insert(NS::make_pair(t, i));
+            DSOUT() << "outer(" << i << "): " << (result.second ? "ok" : "FAIL") << std::endl;
+        }
+        for (map_type::const_iterator it = s.begin(); it != s.end(); ++it) {
+            DSOUT() << *it << std::endl;
+        }
+    }
+
+    // mapにvectorをのせる
+    void    vector_on_map() {
+        SPRINT("vector_on_map");
+        typedef MapClass< VectorClass< int >, int > map_type;
+        map_type    s;
+        for (int i = 0; i < 10; ++i) {
+            map_type::key_type  t;
+            for (int j = 0; j < 4; ++j) {
+                t.push_back(rand() % 2);
+            }
+            s.insert(NS::make_pair(t, i));
+        }
+        for (map_type::const_iterator it = s.begin(); it != s.end(); ++it) {
+            DSOUT() << *it << std::endl;
+        }
+    }
+
+    // mapにreferenceをのせる
+    // setだと無理だけどmapはいけてしまう・・・
+    void    ref_is_key() {
+        SPRINT("ref_is_key");
+        MapClass< int&, int >    s;
+        // s[1] = 2; // これは無理
+        DSOUT() << s.size() << std::endl;
+    }
+    void    ref_is_val() {
+        SPRINT("ref_is_val");
+        MapClass< int, int& >    s;
+        // s[1] = 2; // ftではコンパイルできない。stlではコンパイルできるが実行時に死ぬ。
+        // 「ftではコンパイルできない」のはおそらく以下のような理由:
+        // ↑を正しくコンパイルするためには引数が"1個"のstd::allocator::constructが使える必要がある。
+        // が, C++03までは引数が"2個"で固定で, C++11から"1個以上"になった.
+        // (C++11以降ではコンパイルだけできるが、実行時に結局 T& という型の値をデフォルト構築することになるので, その時に死ぬ)
+        DSOUT() << s.size() << std::endl;
+        DSOUT() << s.count(1) << std::endl;
+    }
+
+    void    pointer_is_key() {
+        SPRINT("pointer_is_key");
+        MapClass< int*, int  >  s;
+        {
+            int i = 0;
+            int j = 0;
+            s[&i] = 0;
+            s[&j] = 1;
+        }
+        DSOUT() << s.size() << std::endl;
+        DSOUT() << s.begin()->second << std::endl; // diffでるかも。でないと思うけど。
+    }
+
+    void    pointer_is_val() {
+        SPRINT("pointer_is_val");
+        MapClass< int, int*  >  s;
+        {
+            int i = 0;
+            int j = 0;
+            s[0] = &i;
+            s[1] = &j;
+        }
+        DSOUT() << s.size() << std::endl;
+        DSOUT() << s.begin()->first << std::endl;
+    }
+
+    void    const_is_key() {
+        SPRINT("const_is_key");
+        MapClass< const int, int >  s;
+        {
+            s[1] = 2;
+            DSOUT() << s.begin()->first << ", " << s.begin()->second << std::endl;
+            s.erase(s.begin());
+        }
+        DSOUT() << s.size() << std::endl;
+    }
+
+    void    const_is_val() {
+        SPRINT("const_is_val");
+        MapClass< int, const int >  s;
+        {
+            // s[1] = 2; // これは再代入になるのでコンパイルエラー
+            s.insert(NS::make_pair(1, 2));
+            DSOUT() << s.begin()->first << ", " << s.begin()->second << std::endl;
+            s.erase(s.begin());
+        }
+        DSOUT() << s.size() << std::endl;
+    }
+
+    void    map_iterator_on_map() {
+        SPRINT("map_iterator_on_map");
+        MapClass<int, int>   m;
+        MapClass< MapClass<int, int>::iterator, int >   s;
+        // s[m.begin()] = 1; // 値を入れようとするとエラー
+        DSOUT() << s.size() << std::endl;
+    }
+
+    void    test() {
+        specify_comparator();
+        destroy_and_create();
+        map_on_map();
+        map_on_set();
+        set_on_map();
+        vector_on_map();
+        ref_is_key();
+        ref_is_val();
+        pointer_is_key();
+        pointer_is_val();
+        const_is_key();
+        const_is_val();
     }
 }
 
 int main()
 {
-    fill::constructor_default(100);
-    fill::constructor_comparator(100);
-    fill::constructor_comparator_allocator(100);
-    fill::constructor_iterator(100);
-    fill::constructor_copy(100);
-    fill::oprator_assignation(100);
-    fill::get_allocator();
-    fill::key_comp();
-    fill::value_comp();
-    fill::begin_end_variable();
-    fill::clear(100);
-    fill::swap(100);
-    fill::insert_value(100);
-    fill::insert_value_with_hint(100);
-    fill::insert_value_with_range(100);
-    fill::erase_by_position(100);
-    fill::erase_by_key(100);
-    fill::erase_by_range(100);
-    fill::find_variable(100);
-    fill::find_constant(100);
-    fill::equal_range(100);
-    fill::lower_bound(100);
-    fill::upper_bound(100);
+    fill::test();
+    logic::test();
     ft::sprint::list();
 }

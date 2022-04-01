@@ -88,7 +88,7 @@ namespace ft {
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs
     ) {
-        return ((lhs < rhs) || (lhs == rhs));
+        return !(lhs > rhs);
     }
 
     template <class First, class Second>
@@ -96,8 +96,13 @@ namespace ft {
         const ft::pair<First, Second>& lhs,
         const ft::pair<First, Second>& rhs
     ) {
-        return (rhs <= lhs);
+        return !(lhs < rhs);
     }
+}
+
+template <class First, class Second>
+void    swap(ft::pair<First, Second>& x, ft::pair<First, Second>& y) {
+    x.swap(y);
 }
 
 #endif

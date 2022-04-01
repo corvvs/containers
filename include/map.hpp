@@ -422,7 +422,7 @@ namespace ft {
         // ランダムアクセスイテレータを持つコンテナなら equal 側でサイズ比較をするが、
         // map はそうではないので, 自前でサイズ比較をやる.
         return lhs.size() == rhs.size()
-            && equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+            && ft::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 
     template <class Key, class Value, class KeyComparator, class PairAllocator>
@@ -441,7 +441,7 @@ namespace ft {
         const ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
     ) {
         // lhs の内容が rhs の内容より辞書的に小さいまたは等しい場合は true、そうでなければ false。
-        return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), lhs.value_comp());
+        return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 
     template <class Key, class Value, class KeyComparator, class PairAllocator>
@@ -468,15 +468,14 @@ namespace ft {
     ) {
         return !(lhs < rhs);
     }
+}
 
-    template <class Key, class Value, class KeyComparator, class PairAllocator>
-    void swap(
-        ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
-        ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
-    ) {
-        lhs.swap(rhs);
-    }
-
+template <class Key, class Value, class KeyComparator, class PairAllocator>
+void swap(
+    ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
+    ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
+) {
+    lhs.swap(rhs);
 }
 
 #endif

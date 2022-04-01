@@ -12,7 +12,10 @@ unsigned long    get_ut(void)
 }
 
 ft::sprint::sprint(const std::string title)
-    : title_(title), time_origin_(get_ut()) {}
+    : title_(title) {
+        std::cout << ">> sprint start: " << title_ << std::endl;
+        time_origin_ = get_ut();
+    }
 
 ft::sprint::sprint(const ft::sprint& other) {
     *this = other;
@@ -29,6 +32,7 @@ ft::sprint::~sprint() {
     std::string t = title_ + tail_.str();
     chronicle.push_back(t);
     durations.push_back(dt_ms);
+    std::cout << "<< sprint end: " << title_ << std::endl;
 }
 std::stringstream&  ft::sprint::get_tail() {
     return tail_;
@@ -49,6 +53,7 @@ void    ft::sprint::list() {
     }
     std::cout << std::left;
     for (std::size_t i = 0; i < n; ++i) {
+        std::cout << "[c] ";
         if (durations[i] >= 0) {
             std::cout << std::setw(w + 1) << chronicle[i];
             std::cout << std::setw(0) << ": ";

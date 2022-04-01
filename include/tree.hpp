@@ -852,18 +852,14 @@ namespace ft {
             // node_ptr が指し示すノードを破壊する
             void    destroy_node_(pointer node_ptr) {
                 if (node_ptr == NULL) { return; }
-                // DOUT() << *node_ptr << ": destroying node"  << std::endl;
                 if (node_ptr != end_node() && node_ptr->value()) {
-                    // DOUT() << *node_ptr << ": destroying value" << std::endl;
                     value_allocator_type&   va = get_allocator();
                     va.destroy(node_ptr->value());
                     va.deallocate(node_ptr->value(), 1);
                 }
                 node_allocator_type&    na = get_node_allocator();
                 na.destroy(node_ptr);
-                // DOUT() << "DESTROYED: " << node_ptr << std::endl;
                 na.deallocate(node_ptr, 1);
-                // DOUT() << "DEALLOCATED: " << node_ptr << std::endl;
             }
 
             // node_ptr を根とする部分木を再帰的に破壊する。
@@ -1064,28 +1060,25 @@ namespace ft {
                 }
                 while (true) {
                     if (value_compare()(key, *target->value())) {
-                        // key < target
+                        // DSOUT() << "key < target" << std::endl;
                         if (target->left() == NULL) {
                             return pair<pointer, pointer*>(target, &target->left());
                         }
                         target = target->left();
                     } else if (value_compare()(*target->value(), key)) {
-                        // target < key
+                        // DSOUT() << "target < key" << std::endl;
                         if (target->right() == NULL) {
                             return pair<pointer, pointer*>(target, &target->right());
                         }
                         target = target->right();
                     } else {
-                        // key == target
+                        // DSOUT() << "key == target" << std::endl;
                         break;
                     }
                 }
-                // std::cout << "target: " << target << std::endl;
+                // keyと同じものが見つかった。
                 pointer     target_parent = target->parent();
-                // std::cout << "target_parent: " << target_parent << std::endl;
                 pointer*    target_ptr = &(target->is_left_child() ? target_parent->left() : target_parent->right());
-                // std::cout << "target_ptr: " << target_ptr << std::endl;
-                // std::cout << "*target_ptr: " << *target_ptr << std::endl;
                 return pair<pointer, pointer*>(target, target_ptr);
             }
 
@@ -1122,7 +1115,6 @@ namespace ft {
                     if (&*++next != end_node() && value_compare()(key, *((next->value())))) {
                         // この時、hintとnextの関係性は以下のいずれかとなり、
                         // hintとnextのうち少なくとも一方が空き子を持つ。
-                        // DOUT() << "found: hint < " << key << " < next" << std::endl;
                         if (next->left() == NULL) {
                             // 1. hintの右部分木の最小値がnext
                             //   -> nextは左子を持たない。(持つならそれがhintとnextの間に入る)
@@ -1201,7 +1193,6 @@ namespace ft {
             // 単一削除
             void        erase(iterator position) {
                 swap_down_(position);
-                // DOUT() << "erasing: " << *position << std::endl;
 
                 // ここまで来たということは、positionは子を持たない。
                 pointer target = &(*position);
@@ -1333,19 +1324,14 @@ namespace ft {
 
             // 削除後リバランス
             void    rebalance_after_erasure_(pointer np, pointer nm) {
-                // DOUT() << "nm: " << nm << std::endl;
-                // DOUT() << "np: " << np << ", " << *np << std::endl;
                 if (nm == root()) {
                     // Mは根である
-                    // -> Case 1.
-                    // なにもしない
                     // DOUT() << "Case 1. do nothing" << std::endl;
                     return;
                 }
                 // nm は NULL である可能性がある。
                 // 正しい赤黒木であれば、ns != NULL のはず。
                 pointer ns = np->counter_child(nm);
-                // DOUT() << "ns: " << ns << ", " << *ns << std::endl;
                 pointer nx = ns->cis_child();
                 pointer ny = ns->trans_child();
                 if (np->is_black() &&

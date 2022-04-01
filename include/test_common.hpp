@@ -6,6 +6,7 @@
 # include <cstdlib>
 # include "ft_common.hpp"
 # include "vector.hpp"
+# include "noncopyable.hpp"
 # include <vector>
 # include <deque>
 # include <list>
@@ -50,10 +51,48 @@ std::vector<int>    random_value_generator();
 template<>
 ft::vector<int>     random_value_generator();
 
-template <class T>
-std::ostream& operator<<(std::ostream& stream, std::vector<T>& value) {
+// [[ << overloads ]]
+// [declarations]
+
+template <class T, class Allocator>
+std::ostream& operator<<(
+    std::ostream& stream,
+    const std::vector<T, Allocator>& value
+);
+
+template <class T, class Allocator>
+std::ostream& operator<<(
+    std::ostream& stream,
+    const ft::vector<T, Allocator>& value
+);
+
+template <class Key, class KeyComparator, class KeyAllocator>
+std::ostream& operator<<(
+    std::ostream& stream,
+    const NS::set<Key, KeyComparator, KeyAllocator>& value
+);
+
+template <class Key, class Value, class KeyComparator, class PairAllocator>
+std::ostream& operator<<(
+    std::ostream& stream,
+    const NS::map<Key, Value, KeyComparator, PairAllocator>& value
+);
+
+template <class First, class Second>
+std::ostream& operator<<(
+    std::ostream& stream,
+    const NS::pair<First, Second>& value
+);
+
+// [implementations]
+
+template <class T, class Allocator>
+std::ostream& operator<<(
+    std::ostream& stream,
+    const std::vector<T, Allocator>& value
+) {
     stream << "[";
-    for (typename std::vector<T>::iterator it = value.begin(); it != value.end(); ++it) {
+    for (typename std::vector<T, Allocator>::const_iterator it = value.begin(); it != value.end(); ++it) {
         if (it != value.begin()) {
             stream << ", ";
         }
@@ -63,16 +102,63 @@ std::ostream& operator<<(std::ostream& stream, std::vector<T>& value) {
     return stream;
 }
 
-template <class T>
-std::ostream& operator<<(std::ostream& stream, ft::vector<T>& value) {
+template <class T, class Allocator>
+std::ostream& operator<<(
+    std::ostream& stream,
+    const ft::vector<T, Allocator>& value
+) {
     stream << "[";
-    for (typename ft::vector<T>::iterator it = value.begin(); it != value.end(); ++it) {
+    for (typename ft::vector<T, Allocator>::const_iterator it = value.begin(); it != value.end(); ++it) {
         if (it != value.begin()) {
             stream << ", ";
         }
         stream << *it;
     }
     stream << "]";
+    return stream;
+}
+
+template <class Key, class KeyComparator, class KeyAllocator>
+std::ostream& operator<<(
+    std::ostream& stream,
+    const NS::set<Key, KeyComparator, KeyAllocator>& value
+) {
+    typedef NS::set<Key, KeyComparator, KeyAllocator>   c_type;
+    stream << "(";
+    for (typename c_type::const_iterator it = value.begin(); it != value.end(); ++it) {
+        if (it != value.begin()) {
+            stream << ", ";
+        }
+        stream << *it;
+    }
+    stream << ")";
+    return stream;
+}
+
+
+template <class Key, class Value, class KeyComparator, class PairAllocator>
+std::ostream& operator<<(
+    std::ostream& stream,
+    const NS::map<Key, Value, KeyComparator, PairAllocator>& value
+) {
+    typedef NS::map<Key, Value, KeyComparator, PairAllocator>   c_type;
+    stream << "{";
+    for (typename c_type::const_iterator it = value.begin(); it != value.end(); ++it) {
+        if (it != value.begin()) {
+            stream << ", ";
+        }
+        stream << "(" << it->first << " => " << it->second << ")";
+    }
+    stream << "}";
+    return stream;
+}
+
+template <class First, class Second>
+std::ostream& operator<<(
+    std::ostream& stream,
+    const NS::pair<First, Second>& value
+) {
+    stream << "(" << value.first << ", " << value.second << ")";
     return stream;
 }
 

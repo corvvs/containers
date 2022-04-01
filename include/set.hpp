@@ -269,7 +269,7 @@ namespace ft {
         const ft::set<Key, KeyComparator, KeyAllocator>& rhs
     ) {
         // lhs の内容が rhs の内容より辞書的に小さいまたは等しい場合は true、そうでなければ false。
-        return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), lhs.value_comp());
+        return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 
     template <class Key, class KeyComparator, class KeyAllocator>
@@ -297,13 +297,14 @@ namespace ft {
         return !(lhs < rhs);
     }
 
-    template <class Key, class KeyComparator, class KeyAllocator>
-    void swap(
-        ft::set<Key, KeyComparator, KeyAllocator>& lhs,
-        ft::set<Key, KeyComparator, KeyAllocator>& rhs
-    ) {
-        lhs.swap(rhs);
-    }
+}
+
+template <class Key, class KeyComparator, class KeyAllocator>
+void swap(
+    ft::set<Key, KeyComparator, KeyAllocator>& lhs,
+    ft::set<Key, KeyComparator, KeyAllocator>& rhs
+) {
+    lhs.swap(rhs);
 }
 
 #endif

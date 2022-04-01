@@ -3,6 +3,7 @@
 template <class T, class Container>
 void    print_elements(StackClass<T, Container> st) {
     StackClass<T, Container> receiver;
+    
     std::cout << "[";
     while (!st.empty()) {
         std::cout << st.top();
@@ -70,11 +71,11 @@ void    mass_assign(unsigned long n) {
 }
 
 template <class T, class Container>
-void    mass_test(const std::string& sub_title) {
+void    performance(const std::string& sub_title) {
     ft::sprint::insert_comment(sub_title);
-    mass_push_and_pop<T, Container>(1000000);
-    mass_copy<T, Container>(1000000);
-    mass_assign<T, Container>(1000000);
+    mass_push_and_pop<T, Container>(100000);
+    mass_copy<T, Container>(100000);
+    mass_assign<T, Container>(100000);
 }
 
 #define TP(T, C) T, C<T>
@@ -82,10 +83,10 @@ void    mass_test(const std::string& sub_title) {
 template <class T>
 void    run_mass_test(const std::string& main_title) {
     ft::sprint::insert_comment(main_title);
-    mass_test<TP(T, ft::vector)>(">> ft::vector");
-    mass_test<TP(T, std::vector)>(">> std::vector");
-    mass_test<TP(T, std::deque)>(">> std::deque");
-    mass_test<TP(T, std::list)>(">> std::list");
+    performance<TP(T, ft::vector)>(">> ft::vector");
+    performance<TP(T, std::vector)>(">> std::vector");
+    performance<TP(T, std::deque)>(">> std::deque");
+    performance<TP(T, std::list)>(">> std::list");
 }
 
 int main() {

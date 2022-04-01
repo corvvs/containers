@@ -56,54 +56,63 @@ namespace ft {
         protected:
             Container  c;
     };
+
+    // [比較演算子]
+    template< class T, class Container >
+    bool operator==(
+        const ft::stack<T, Container>& lhs,
+        const ft::stack<T, Container>& rhs
+    ) {
+        return lhs.c == rhs.c;
+    }
+
+    template< class T, class Container >
+    bool operator!=(
+        const ft::stack<T, Container>& lhs,
+        const ft::stack<T, Container>& rhs
+    ) {
+        return lhs.c != rhs.c;
+    }
+
+    template< class T, class Container >
+    bool operator<(
+        const ft::stack<T, Container>& lhs,
+        const ft::stack<T, Container>& rhs
+    ) {
+        return lhs.c < rhs.c;
+    }
+
+    template< class T, class Container >
+    bool operator<=(
+        const ft::stack<T, Container>& lhs,
+        const ft::stack<T, Container>& rhs
+    ) {
+        return lhs.c <= rhs.c;
+    }
+
+    template< class T, class Container >
+    bool operator>(
+        const ft::stack<T, Container>& lhs,
+        const ft::stack<T, Container>& rhs
+    ) {
+        return lhs.c > rhs.c;
+    }
+
+    template< class T, class Container >
+    bool operator>=(
+        const ft::stack<T, Container>& lhs,
+        const ft::stack<T, Container>& rhs
+    ) {
+        return lhs.c >= rhs.c;
+    }
 }
 
-// [比較演算子]
 template< class T, class Container >
-bool operator==(
-    const ft::stack<T, Container>& lhs,
-    const ft::stack<T, Container>& rhs
+void swap(
+    ft::stack<T, Container>& lhs,
+    ft::stack<T, Container>& rhs
 ) {
-    return lhs.c == rhs.c;
+    lhs.swap(rhs);
 }
 
-template< class T, class Container >
-bool operator!=(
-    const ft::stack<T, Container>& lhs,
-    const ft::stack<T, Container>& rhs
-) {
-    return lhs.c != rhs.c;
-}
-
-template< class T, class Container >
-bool operator<(
-    const ft::stack<T, Container>& lhs,
-    const ft::stack<T, Container>& rhs
-) {
-    return lhs.c < rhs.c;
-}
-
-template< class T, class Container >
-bool operator<=(
-    const ft::stack<T, Container>& lhs,
-    const ft::stack<T, Container>& rhs
-) {
-    return lhs.c <= rhs.c;
-}
-
-template< class T, class Container >
-bool operator>(
-    const ft::stack<T, Container>& lhs,
-    const ft::stack<T, Container>& rhs
-) {
-    return lhs.c > rhs.c;
-}
-
-template< class T, class Container >
-bool operator>=(
-    const ft::stack<T, Container>& lhs,
-    const ft::stack<T, Container>& rhs
-) {
-    return lhs.c >= rhs.c;
-}
 #endif

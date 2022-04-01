@@ -18,6 +18,9 @@ namespace ft {
             blank(const T& v): value_(v) {
                 std::cout << "given()" << std::endl;
             }
+            blank(const blank& other) {
+                *this = other;
+            }
             ~blank() {}
             blank&  operator=(const blank& other) {
                 value_ = other.value_;

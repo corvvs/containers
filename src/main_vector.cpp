@@ -354,7 +354,7 @@ void    mass_compare(VC(T)::size_type n) {
 }
 
 template <class T>
-void    mass_test(const std::string& sub_title, std::size_t n) {
+void    performance(const std::string& sub_title, std::size_t n) {
     ft::sprint::insert_comment(sub_title);
     mass_assign<T>(100 * n);
     mass_assign_range<T>(30 * n);
@@ -369,6 +369,7 @@ void    mass_test(const std::string& sub_title, std::size_t n) {
     mass_resize<T>(100 * n);
     mass_erase_1<T>(100 * n);
     mass_erase_range<T>(10 * n);
+    swap<T>();
 }
 
 namespace fill {
@@ -391,13 +392,13 @@ namespace fill {
             print_stats(v);
         }
         {
-            SPRINT("fill::constructors size & default value");
+            SPRINT("fill::constructors size & def-val");
             VectorClass<int> v((10), 999);
             print_stats(v);
             DSOUT() << v.at(0) << std::endl;
         }
         {
-            SPRINT("fill::constructors size & default value & allocator");
+            SPRINT("fill::constructors size & def-val & allocator");
             VectorClass<int> v((10), 888, std::allocator<int>());
             print_stats(v);
             DSOUT() << v.at(0) << std::endl;
@@ -411,7 +412,7 @@ namespace fill {
         }
 
         {
-            SPRINT("fill::constructors range & allocator, and operator=");
+            SPRINT("fill::constructors range & allocator, and op=");
             VectorClass<int> v((vv.begin() + 5), (vv.end() - 5), std::allocator<int>());
             print_stats(v);
             DSOUT() << v.at(0) << std::endl;
@@ -478,6 +479,146 @@ namespace fill {
         v2 = v3;
         print_stats(v2);
     }
+
+    void    front_back() {
+        SPRINT("fill::front_back");
+        VectorClass<int> v;
+        for (int i = 0; i < 10; ++i) {
+            v.push_back(i);
+            DSOUT() << (v.front() == v.front()) << " "
+                    << (v.front() == v.back()) << " "
+                    << (v.back() == v.front()) << " "
+                    << (v.back() == v.back()) << " "
+                    << (v.front() == v[0]) << " "
+                    << (v.front() == v.at(0)) << " "
+                    << (v.back() == v[i]) << " "
+                    << (v.back() == v.at(i)) << std::endl;
+        }
+    }
+
+    void    sizing() {
+        SPRINT("fill::sizing");
+        VectorClass<std::string> v;
+        print_stats(v, false);
+        v.reserve(5);
+        print_stats(v, false);
+        v.reserve(10);
+        print_stats(v, false);
+        v.reserve(1);
+        print_stats(v, false);
+        v.reserve(0);
+        print_stats(v, false);
+        v.resize(1);
+        print_stats(v, false);
+        v.resize(2);
+        print_stats(v, false);
+        v.resize(10);
+        print_stats(v, false);
+        v.resize(11);
+        print_stats(v, false);
+        v.resize(0);
+        print_stats(v, false);
+        v.resize(10000000);
+        print_stats(v, false);
+        v.resize(0);
+        print_stats(v, false);
+        v.resize(10000000);
+        print_stats(v, false);
+        v.resize(0);
+        print_stats(v, false);
+    }
+
+    void    sizing_with_values() {
+        SPRINT("fill::sizing_with_values");
+        VectorClass<std::string> v;
+        print_stats(v, false);
+        v.resize(1);
+        print_stats(v, false);
+        v.resize(10, "hello");
+        print_stats(v, false);
+        v.resize(20, "world");
+        print_stats(v, false);
+        v.resize(15, "42");
+        print_stats(v, false);
+        v.resize(5, "24");
+        print_stats(v, false);
+        v.resize(25);
+        print_stats(v, false);
+        v.resize(30, "ok");
+        print_stats(v, false);
+        DSOUT();
+        for (VectorClass<std::string>::iterator it = v.begin(); it != v.end(); ++it) {
+            std::cout << *it << ",";
+        }
+        std::cout << std::endl;
+    }
+
+    void    comparation() {
+        SPRINT("comparation");
+        typedef VectorClass<int>    it;
+        typedef VectorClass<it>     vt;
+        vt    v;
+        int n = 3;
+        for (int i = 0; i < (1 << (n + 2)); ++i) {
+            it  s;
+            for (int j = 0; j < n; ++j) {
+                if ((1 << j) & i) {
+                    s.push_back(j);
+                }
+            }
+            v.push_back(s);
+        }
+        for (vt::size_type i = 0; i < v.size(); ++i) {
+            for (vt::size_type j = 0; j < v.size(); ++j) {
+                DSOUT() << "(" << i << " vs " << j << ") "
+                        << "==:" << (v[i] == v[j]) << " "
+                        << "!=:" << (v[i] != v[j]) << " "
+                        << "<:" << (v[i] < v[j]) << " "
+                        << "<=:" << (v[i] <= v[j]) << " "
+                        << ">:" << (v[i] > v[j]) << " "
+                        << ">=:" << (v[i] >= v[j]) << std::endl;
+            }
+        }
+    }
+
+    namespace iterator {
+        void    comparation() {
+            SPRINT("iterator::comparation");
+            typedef VectorClass<int>            ct;
+            typedef VectorClass<ct::iterator>   ct2;
+            ct  v;
+            ct2  v2;
+            for (int i = 0; i < 4; ++i) {
+                v.push_back(i);
+            }
+            for (ct::iterator it = v.begin(); it != v.end(); ++it) {
+                v2.push_back(it);
+            }
+            for (ct2::size_type i = 0; i < v2.size(); ++i) {
+                for (ct2::size_type j = 0; j < v2.size(); ++j) {
+                    DSOUT() << "(" << i << " vs " << j << ") "
+                            << "==:" << (v2[i] == v2[j]) << " "
+                            << "!=:" << (v2[i] != v2[j]) << " "
+                            << "<:" << (v2[i] < v2[j]) << " "
+                            << "<=:" << (v2[i] <= v2[j]) << " "
+                            << ">:" << (v2[i] > v2[j]) << " "
+                            << ">=:" << (v2[i] >= v2[j]) << std::endl;
+                }
+            }
+        }
+    }
+
+
+    void    test() {
+        constructors();
+        assign();
+        at(10);
+        front_back();
+        sizing();
+        sizing_with_values();
+        comparation();
+        iterator::comparation();
+    }
 }
 
 namespace logic {
@@ -531,34 +672,43 @@ namespace logic {
         DSOUT() << (v2.begin() == v2.end()) << std::endl;
         DSOUT() << (v1.end() == v2.end()) << std::endl;
     }
+
+    void    test() {
+        equal_same_size(100);
+        equal_same_size(1000);
+        equal_same_size(10000);
+        equal_same_size(100000);
+        equal_diff_size(100);
+        equal_diff_size(1000);
+        equal_diff_size(10000);
+        equal_diff_size(100000);
+        iterator_for_empty_container();
+        strong_insertion();
+    }
 }
 
 #include "blank.hpp"
 
 int main() {
-    mass_test<int>("[int]", 100);
-    mass_test<ft::IntWrapper>("[ft::IntWrapper]", 100);
-    mass_test<std::string>("[std::string]", 100);
-    mass_test<std::vector<int> >("[std::vector<int>]", 20);
-    mass_test<ft::vector<int> >("[ft::vector<int>]", 20);
 
-    fill::constructors();
-    fill::assign();
-    fill::at(10);
-
-    logic::equal_same_size(100);
-    logic::equal_same_size(1000);
-    logic::equal_same_size(10000);
-    logic::equal_same_size(100000);
-    logic::equal_diff_size(100);
-    logic::equal_diff_size(1000);
-    logic::equal_diff_size(10000);
-    logic::equal_diff_size(100000);
-    logic::iterator_for_empty_container();
-    logic::strong_insertion();
+    fill::test();
+    logic::test();
+    performance<int>("[int]", 100);
+    performance<ft::IntWrapper>("[ft::IntWrapper]", 100);
+    performance<std::string>("[std::string]", 100);
+    performance<std::vector<int> >("[std::vector<int>]", 20);
+    performance<ft::vector<int> >("[ft::vector<int>]", 20);
 
     {
         VectorClass< ft::blank<int> >   v((0));
+    }
+    {
+        // VectorClass< ft::noncopyable<int> > v;
+        // ft::noncopyable<T> はコピー・代入禁止クラス.
+        // STLのほうは変数宣言だけはできる.
+        // なにかしようとするとコンパイルエラー.
+        // (ムーブコンストラクタ・ムーブ代入演算子をprivateにしても宣言できる.謎.)
+        // ftのほうは変数宣言もできない.
     }
 
     ft::sprint::list();

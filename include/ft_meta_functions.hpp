@@ -48,7 +48,7 @@ namespace ft {
     > {};
     
     // [enable_if]
-    // 第１引数のpredicateがtrueになる時だけ、第2引数の型をtypeとして持つ型が定義される
+    // 第１引数のpredicateがtrueになる時だけ, 第2引数の型をtypeとして持つ型が定義される
     template <bool, class T = void> struct enable_if            {};
     template <class T>              struct enable_if<true, T>   { typedef T type; };
 
@@ -58,13 +58,7 @@ namespace ft {
     template <class T>              struct disable_if<false, T> { typedef T type; };
 
     // [iterator_tag]
-    // イテレータの階層構造を表現するための空のstruct
-    // 継承してるかしてないかを問題にするので中身がいらない
-    // struct input_iterator_tag                                               {};
-    // struct output_iterator_tag                                              {};
-    // struct forward_iterator_tag       : public input_iterator_tag           {};
-    // struct bidirectional_iterator_tag : public forward_iterator_tag         {};
-    // struct random_access_iterator_tag : public bidirectional_iterator_tag   {};
+    // これはstdのを使わないと意味がない.
 
     template <class>
     struct type_void { typedef void type; };
@@ -72,11 +66,6 @@ namespace ft {
     // [type_identity]
     template<class T>
     struct type_identity { typedef T type; };
-
-    // template <class From, class To>
-    // struct rebind_pointer {
-    //     typedef typename pointer_traits<From>::template rebind<To>        type;
-    // };
 
     // [remove_const]
     template <class T>
@@ -135,7 +124,7 @@ namespace ft {
             private:
                 static no_type      f(...);
                 static yes_type     f(To);
-                // declvalがないので
+                // declvalがないので値の箱だけ用意
                 static From         v;
             public:
                 static const bool   value = sizeof(f(v)) == sizeof(yes_type);

@@ -50,7 +50,11 @@ namespace is_convertible {
         VICE_VERSA(int, int&);
         VICE_VERSA(int, const int&);
         VICE_VERSA(const int, int&);
+        VICE_VERSA(const int*, int*);
+        VICE_VERSA(const int*, void*);
         VICE_VERSA(volatile int, int);
+        VICE_VERSA(volatile int*, int*);
+        VICE_VERSA(volatile int*, void*);
         // 検出限界
         VICE_VERSA(volatile int&, int);
         // 検出限界
