@@ -9,22 +9,22 @@ ft::IntWrapper::IntWrapper() {
 }
 
 ft::IntWrapper::IntWrapper(int i) {
-    i_ = new int;
-    *i_ = i;
-    instantiated_ += 1;
     if (limit >= 0 && limit <= instantiated_) {
         throw std::runtime_error("over instantiation-limit");
     }
+    i_ = new int;
+    *i_ = i;
+    instantiated_ += 1;
 }
 
 ft::IntWrapper::IntWrapper(const IntWrapper& other) {
+    if (limit >= 0 && limit <= instantiated_) {
+        throw std::runtime_error("over instantiation-limit");
+    }
     i_ = new int;
     *i_ = 0;
     *this = other;
     instantiated_ += 1;
-    if (limit >= 0 && limit <= instantiated_) {
-        throw std::runtime_error("over instantiation-limit");
-    }
 }
 
 ft::IntWrapper& ft::IntWrapper::operator=(const IntWrapper& rhs) {
