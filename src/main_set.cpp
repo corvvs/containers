@@ -163,8 +163,7 @@ namespace fill {
         DSOUT() << (m.begin() == m.end());
         DSOUT() << *(m.begin()) << std::endl;
         DSOUT() << *it << std::endl;
-        it++;
-        DSOUT() << *it << std::endl;
+        DSOUT() << *(it++) << std::endl;
         it--;
         DSOUT() << *(m.begin()) << std::endl;
         ++it;

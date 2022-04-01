@@ -51,9 +51,10 @@ void    ft::sprint::list() {
             w = chronicle[i].length();
         }
     }
+    std::string sep(w / 2, '=');
+    std::cout << sep << " sprints " << sep << std::endl;
     std::cout << std::left;
     for (std::size_t i = 0; i < n; ++i) {
-        std::cout << "[c] ";
         if (durations[i] >= 0) {
             std::cout << std::setw(w + 1) << chronicle[i];
             std::cout << std::setw(0) << ": ";

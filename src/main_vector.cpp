@@ -404,6 +404,7 @@ void    mass_compare(VC(T)::size_type n) {
 template <class T>
 void    performance(const std::string& sub_title, std::size_t n) {
     ft::sprint::insert_comment(sub_title);
+    construct_and_reserve<T>();
     mass_assign<T>(100 * n);
     mass_assign_range<T>(30 * n);
     mass_assignation_eq<T>(100 * n);

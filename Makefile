@@ -111,7 +111,12 @@ vector			:
 vector_diff		:	vector vector_stl
 	time ./$(NAME_VECTOR_STL) > out_vector_1
 	time ./$(NAME_VECTOR_FT) 2> err2 > out_vector_2
-	diff out_vector_1 out_vector_2 || :
+	sed -n -e '1,/= sprints =/p'  out_vector_1 > out1
+	sed -n -e '/= sprints =/,$$p' out_vector_1 > sprint1
+	sed -n -e '1,/= sprints =/p'  out_vector_2 > out2
+	sed -n -e '/= sprints =/,$$p' out_vector_2 > sprint2
+	diff out1 out2
+	ruby compare_sprint.rb sprint1 sprint2
 
 $(NAMES_VECTOR)	:	$(OBJS_VECTOR)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_VECTOR)
@@ -133,7 +138,12 @@ stack			:
 stack_diff		:	stack stack_stl
 	time ./$(NAME_STACK_STL) > out_stack_1
 	time ./$(NAME_STACK_FT) 2> err2 > out_stack_2
-	diff out_stack_1 out_stack_2 || :
+	sed -n -e '1,/= sprints =/p'  out_stack_1 > out1
+	sed -n -e '/= sprints =/,$$p' out_stack_1 > sprint1
+	sed -n -e '1,/= sprints =/p'  out_stack_2 > out2
+	sed -n -e '/= sprints =/,$$p' out_stack_2 > sprint2
+	diff out1 out2
+	ruby compare_sprint.rb sprint1 sprint2
 
 $(NAMES_STACK)	:	$(OBJS_STACK)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_STACK)
@@ -156,7 +166,15 @@ pair			:
 pair_diff		:	pair pair_stl
 	time ./$(NAME_PAIR_STL) > out_pair_1
 	time ./$(NAME_PAIR_FT) 2> err2 > out_pair_2
-	diff out_pair_1 out_pair_2 || :
+	time ./$(NAME_MAP_STL) 2> err2 > out_map_1
+	time ./$(NAME_MAP_FT) 2> err2 > out_map_2
+	diff out_map_1 out_map_2 || :
+	sed -n -e '1,/= sprints =/p'  out_pair_1 > out1
+	sed -n -e '/= sprints =/,$$p' out_pair_1 > sprint1
+	sed -n -e '1,/= sprints =/p'  out_pair_2 > out2
+	sed -n -e '/= sprints =/,$$p' out_pair_2 > sprint2
+	diff out1 out2
+	ruby compare_sprint.rb sprint1 sprint2
 
 $(NAMES_PAIR)	:	$(OBJS_PAIR)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_PAIR)
@@ -200,7 +218,12 @@ map				:
 map_diff		:	map map_stl
 	time ./$(NAME_MAP_STL) 2> err2 > out_map_1
 	time ./$(NAME_MAP_FT) 2> err2 > out_map_2
-	diff out_map_1 out_map_2 || :
+	sed -n -e '1,/= sprints =/p'  out_map_1 > out1
+	sed -n -e '/= sprints =/,$$p' out_map_1 > sprint1
+	sed -n -e '1,/= sprints =/p'  out_map_2 > out2
+	sed -n -e '/= sprints =/,$$p' out_map_2 > sprint2
+	diff out1 out2
+	ruby compare_sprint.rb sprint1 sprint2
 
 $(NAMES_MAP)	:	$(OBJS_MAP)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_MAP)
@@ -223,7 +246,12 @@ set				:
 set_diff		:	set set_stl
 	time ./$(NAME_SET_STL) 2> err2 > out_set_1
 	time ./$(NAME_SET_FT) 2> err2 > out_set_2
-	diff out_set_1 out_set_2 || :
+	sed -n -e '1,/= sprints =/p'  out_set_1 > out1
+	sed -n -e '/= sprints =/,$$p' out_set_1 > sprint1
+	sed -n -e '1,/= sprints =/p'  out_set_2 > out2
+	sed -n -e '/= sprints =/,$$p' out_set_2 > sprint2
+	diff out1 out2
+	ruby compare_sprint.rb sprint1 sprint2
 
 $(NAMES_SET)	:	$(OBJS_SET)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_SET)
@@ -245,7 +273,7 @@ main			:
 main_diff		:	main main_stl
 	time ./$(NAME_MAIN_STL) 100 2> err2 > out_main_1
 	time ./$(NAME_MAIN_FT) 100 2> err2 > out_main_2
-	diff out_main_1 out_main_2 || :
+	diff out_main_1 out_main_2
 
 $(NAMES_MAIN)	:	$(OBJS_MAIN)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_MAIN)
