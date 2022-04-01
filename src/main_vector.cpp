@@ -632,25 +632,50 @@ namespace fill {
     namespace iterator {
         void    comparation() {
             SPRINT("iterator::comparation");
-            typedef VectorClass<int>            ct;
-            typedef VectorClass<ct::iterator>   ct2;
+            typedef VectorClass<int>                ct;
+            typedef VectorClass<ct::iterator>       ct2;
+            typedef VectorClass<ct::const_iterator> ct3;
             ct  v;
             ct2  v2;
+            ct3  v3;
             for (int i = 0; i < 4; ++i) {
                 v.push_back(i);
             }
             for (ct::iterator it = v.begin(); it != v.end(); ++it) {
                 v2.push_back(it);
+                v3.push_back(it);
             }
             for (ct2::size_type i = 0; i < v2.size(); ++i) {
-                for (ct2::size_type j = 0; j < v2.size(); ++j) {
+                for (ct3::size_type j = 0; j < v3.size(); ++j) {
                     DSOUT() << "(" << i << " vs " << j << ") "
                             << "==:" << (v2[i] == v2[j]) << " "
                             << "!=:" << (v2[i] != v2[j]) << " "
-                            << "<:" << (v2[i] < v2[j]) << " "
+                            << "<:"  << (v2[i] <  v2[j]) << " "
                             << "<=:" << (v2[i] <= v2[j]) << " "
-                            << ">:" << (v2[i] > v2[j]) << " "
-                            << ">=:" << (v2[i] >= v2[j]) << std::endl;
+                            << ">:"  << (v2[i] >  v2[j]) << " "
+                            << ">=:" << (v2[i] >= v2[j]) << " "
+                            << "| "
+                            << "==:" << (v3[i] == v3[j]) << " "
+                            << "!=:" << (v3[i] != v3[j]) << " "
+                            << "<:"  << (v3[i] <  v3[j]) << " "
+                            << "<=:" << (v3[i] <= v3[j]) << " "
+                            << ">:"  << (v3[i] >  v3[j]) << " "
+                            << ">=:" << (v3[i] >= v3[j]) << " "
+                            << "| "
+                            << "==:" << (v2[i] == v3[j]) << " "
+                            << "!=:" << (v2[i] != v3[j]) << " "
+                            << "<:"  << (v2[i] <  v3[j]) << " "
+                            << "<=:" << (v2[i] <= v3[j]) << " "
+                            << ">:"  << (v2[i] >  v3[j]) << " "
+                            << ">=:" << (v2[i] >= v3[j]) << " "
+                            << "| "
+                            << "==:" << (v3[j] == v2[i]) << " "
+                            << "!=:" << (v3[j] != v2[i]) << " "
+                            << "<:"  << (v3[j] <  v2[i]) << " "
+                            << "<=:" << (v3[j] <= v2[i]) << " "
+                            << ">:"  << (v3[j] >  v2[i]) << " "
+                            << ">=:" << (v3[j] >= v2[i]) << " "
+                            << std::endl;
                 }
             }
         }
@@ -670,6 +695,29 @@ namespace fill {
 }
 
 namespace logic {
+    void    iterator_op() {
+        typedef VectorClass<int>    vt;
+        vt                          v;
+        v.push_back(1);
+        v.push_back(2);
+        v.push_back(3);
+        vt::iterator                it1 = v.begin();
+        vt::iterator                it2 = v.begin() + 2;
+        vt::difference_type         diff = it1 - it2;
+        DSOUT() << diff << std::endl;
+        diff = it2 - it1;
+        DSOUT() << diff << std::endl;
+        DSOUT() << *it1 << std::endl;
+        DSOUT() << *(it1.operator->()) << std::endl;
+        vt::const_iterator          it3 = it1 + diff;
+        DSOUT() << *it3 << std::endl;
+        DSOUT() << *(it3.operator->()) << std::endl;
+        DSOUT() << *(it1++) << *(++it1) << *(it1--) << *(--it1) << std::endl;
+        it3 = it1;
+        DSOUT() << *(it3++) << *(++it3) << *(it3--) << *(--it3) << std::endl;
+        // it1 = it3; // これはコンパイルエラー
+    }
+
     void    equal_same_size(int n) {
         VectorClass<int> v1(n);
         VectorClass<int> v2(n);
@@ -722,6 +770,7 @@ namespace logic {
     }
 
     void    test() {
+        iterator_op();
         equal_same_size(100);
         equal_same_size(1000);
         equal_same_size(10000);

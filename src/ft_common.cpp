@@ -1,17 +1,15 @@
 #include "ft_common.hpp"
 
 std::ostream&   debug_out(
-    const char *funcname,
     const char *filename,
     const int linenumber
 ) {
-    return (std::cout << "[" << filename << ":" << linenumber << " " << funcname << "] ");
+    return (std::cout << "[" << filename << ":" << linenumber  << "] ");
 }
 
 std::ostream&   debug_err(
-    const char *funcname,
     const char *filename,
     const int linenumber
 ) {
-    return (std::cerr << "[" << filename << ":" << linenumber << " " << funcname << "] ");
+    return (std::cerr << "[" << filename << ":" << linenumber << "] ");
 }

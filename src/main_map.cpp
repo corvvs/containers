@@ -150,6 +150,10 @@ namespace fill {
         DSOUT() << (m.begin() == m.end());
         DSOUT() << *(m.begin()) << std::endl;
         DSOUT() << *it << std::endl;
+        it++;
+        DSOUT() << *it << std::endl;
+        it--;
+        DSOUT() << *it << std::endl;
         it->second = 1000;
         DSOUT() << *it << std::endl;
         DSOUT() << *(m.begin()) << std::endl;
@@ -460,31 +464,62 @@ namespace fill {
         }
     }
 
+    void    iterator_comparation() {
+        SPRINT("iterator_comparation");
+        typedef MapClass<int, int>  st;
+        st                          s;
+        s[1] = 1;
+        s[2] = 2;
+        st::iterator        vit1 = s.begin();
+        st::iterator        vit2 = s.begin();
+        ++vit2;
+        st::const_iterator  cit1 = s.begin();
+        st::const_iterator  cit2 = s.begin();
+        ++cit2;
+        DSOUT() << (vit1 == vit1) << " " << (vit1 != vit1) << std::endl;
+        DSOUT() << (vit1 == vit2) << " " << (vit1 != vit2) << std::endl;
+        DSOUT() << (vit1 == cit1) << " " << (vit1 != cit1) << std::endl;
+        DSOUT() << (vit1 == cit2) << " " << (vit1 != cit2) << std::endl;
+        DSOUT() << (vit2 == vit1) << " " << (vit2 != vit1) << std::endl;
+        DSOUT() << (vit2 == vit2) << " " << (vit2 != vit2) << std::endl;
+        DSOUT() << (vit2 == cit1) << " " << (vit2 != cit1) << std::endl;
+        DSOUT() << (vit2 == cit2) << " " << (vit2 != cit2) << std::endl;
+        DSOUT() << (cit1 == vit1) << " " << (cit1 != vit1) << std::endl;
+        DSOUT() << (cit1 == vit2) << " " << (cit1 != vit2) << std::endl;
+        DSOUT() << (cit1 == cit1) << " " << (cit1 != cit1) << std::endl;
+        DSOUT() << (cit1 == cit2) << " " << (cit1 != cit2) << std::endl;
+        DSOUT() << (cit2 == vit1) << " " << (cit2 != vit1) << std::endl;
+        DSOUT() << (cit2 == vit2) << " " << (cit2 != vit2) << std::endl;
+        DSOUT() << (cit2 == cit1) << " " << (cit2 != cit1) << std::endl;
+        DSOUT() << (cit2 == cit2) << " " << (cit2 != cit2) << std::endl;
+    }
+
     void    test() {
-        // constructor_default(100);
-        // constructor_comparator(100);
-        // constructor_comparator_allocator(100);
-        // constructor_iterator(100);
-        // constructor_copy(100);
-        // oprator_assignation(100);
-        // get_allocator();
-        // key_comp();
-        // value_comp();
-        // begin_end_variable();
-        // clear(100);
-        // swap(100);
-        // insert_value(100);
-        // insert_value_with_hint(100);
-        // insert_value_with_range(100);
-        // erase_by_position(100);
-        // erase_by_key(100);
-        // erase_by_range(100);
-        // find_variable(100);
-        // find_constant(100);
-        // equal_range(100);
-        // lower_bound(100);
-        // upper_bound(100);
+        constructor_default(100);
+        constructor_comparator(100);
+        constructor_comparator_allocator(100);
+        constructor_iterator(100);
+        constructor_copy(100);
+        oprator_assignation(100);
+        get_allocator();
+        key_comp();
+        value_comp();
+        begin_end_variable();
+        clear(100);
+        swap(100);
+        insert_value(100);
+        insert_value_with_hint(100);
+        insert_value_with_range(100);
+        erase_by_position(100);
+        erase_by_key(100);
+        erase_by_range(100);
+        find_variable(100);
+        find_constant(100);
+        equal_range(100);
+        lower_bound(100);
+        upper_bound(100);
         comparation();
+        iterator_comparation();
     }
 }
 

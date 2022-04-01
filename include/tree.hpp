@@ -5,13 +5,11 @@
 # include "ft_meta_functions.hpp"
 # include "pair.hpp"
 # include "ft_iterator.hpp"
-# include "ft_common.hpp"
 # include <memory>
 # include <iostream>
 # include <iterator>
 # include <exception>
 # include <stdexcept>
-
 
 namespace ft {
 
@@ -84,9 +82,7 @@ namespace ft {
                     TreeNode(const TreeNode& other) {
                         *this = other;
                     }
-                    ~TreeNode() {
-                        // DOUT() << "destroying: " << this << std::endl;
-                    }
+                    ~TreeNode() {}
 
                     tree_node& operator=(const tree_node& rhs) {
                         if (this == &rhs) { return *this; }
@@ -315,6 +311,7 @@ namespace ft {
                                 = this;
                     }
 
+                /*
                 // [[デバッグメソッド]]
                 public:
 
@@ -374,6 +371,7 @@ namespace ft {
                             right() ? right()->debug_longest_black_height() : 0
                         );
                     }
+                */
             };
 
             // 要素のタイプ
@@ -439,8 +437,8 @@ namespace ft {
                         destroy_();
                     }
 
-                    // TODO: これでよい？
-                    // コピーと代入は禁止した方がよくない？
+                    // このクラスが保持するオブジェクトは増殖して欲しくないので,
+                    // 特殊な処理になっている
                     TreeNodeHolder&  operator=(const self_type &rhs) {
                         if (this != &rhs) {
                             swap(rhs);
@@ -494,7 +492,6 @@ namespace ft {
                     node_pointer    release() {
                         if (node_constructed_ && value_constructed_) {
                             node_pointer    rv = node_ptr_;
-                            // DOUT() << *rv << std::endl;
                             node_ptr_ = NULL;
                             value_ptr_ = NULL;
                             node_constructed_ = false;
@@ -789,7 +786,6 @@ namespace ft {
                 pair<pointer, pointer*> place = find_equal_(key);
                 if (place.first == *(place.second)) {
                     // 挿入できない場合
-                    // DOUT() << "failed to insert " << key << std::endl;
                     return make_pair(iterator(place.first), false);
                 }
                 // 挿入できる場合
@@ -805,7 +801,6 @@ namespace ft {
                 pair<pointer, pointer*> place = find_equal_(&*hint, key);
                 if (place.second == NULL) {
                     // 挿入不可
-                    // DOUT() << "failed to insert" << std::endl;
                     return iterator(place.first);
                 }
                 // 挿入できる場合
@@ -1095,7 +1090,6 @@ namespace ft {
                     if (&*prev != begin_node() && value_compare()(*((--prev)->value()), key)) {
                         // このとき、hintとprevの関係性は以下のいずれかとなり、
                         // hintとprevのうち少なくとも一方が空き子を持つ。
-                        // DOUT() << "found: prev < " << key << " < hint" << std::endl;
                         if (prev->right() == NULL) {
                             // 1. hintの左子がprev
                             //   -> prevは右子を持たない。(持つならそれがhintとprevの間に入る)
@@ -1128,7 +1122,6 @@ namespace ft {
                     return find_equal_(key);
                 }
                 // (3) *hint == key
-                DOUT() << "target is null -> returns end: " << end_node() << std::endl;
                 return pair<pointer, pointer*>(end_node(), &(end_node()->left()));
             }
 
@@ -1263,7 +1256,6 @@ namespace ft {
 
             // 挿入後リバランス
             void    rebalance_after_insertion_(pointer node) {
-                // DOUT() << "rebalance from: " << *node << std::endl;
                 // 0. Nが通常ノードでないか、黒ノードの場合
                 // -> なにもしない
                 if (node == NULL) {
@@ -1397,7 +1389,6 @@ namespace ft {
 
             void    release_node_from_parent_(pointer node) {
                 pointer parent = node->parent();
-                // DOUT() << "releasing: " << *node << " from parent: " << *parent << std::endl;
                 // targetをツリーから切り離す
                 (node->is_left_child() ? parent->left() : parent->right()) = NULL;
                 --size_;
@@ -1463,6 +1454,7 @@ namespace ft {
                 rotate_(parent, node);
             }
 
+        /*
         // [[デバッグメソッド]]
         public:
 
@@ -1483,6 +1475,7 @@ namespace ft {
             size_type   debug_longest_black_height() const {
                 return root() ? root()->debug_longest_black_height() : 0;
             }
+        */
     };
 }
 

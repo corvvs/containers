@@ -1,5 +1,5 @@
-#ifndef TEST_VECTOR_HPP
-# define TEST_VECTOR_HPP
+#ifndef TEST_COMMON_HPP
+# define TEST_COMMON_HPP
 
 # include <iostream>
 # include <string>

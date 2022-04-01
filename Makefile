@@ -75,10 +75,10 @@ SRCS_META		:=	src/main_meta.cpp $(SRCS_COMMON)
 OBJS_META		:=	$(SRCS_META:.cpp=.o)
 
 NAMES			:=	$(NAMES_VECTOR) $(NAMES_STACK) $(NAMES_PAIR) \
-					$(NAMES_TREE) $(NAMES_MAP) $(NAMES_SET) $(NAMES_MAIN)
+					$(NAMES_MAP) $(NAMES_SET) $(NAMES_MAIN)
 
 OBJS			:=	$(OBJS_VECTOR) $(OBJS_STACK) $(OBJS_PAIR) \
-					$(OBJS_TREE) $(OBJS_MAP) $(OBJS_SET) $(OBJS_MAIN)
+					$(OBJS_MAP) $(OBJS_SET) $(OBJS_MAIN)
 
 .PHONY			:	all run
 all				:	$(NAMES)

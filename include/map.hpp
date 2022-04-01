@@ -239,7 +239,8 @@ namespace ft {
         // (KeyCompareから作られる)
         class value_compare {
             // map::value_compare() が value_compare コンストラクタを呼ぶが,
-            // これは protected なのでそのままでは map から呼べない。
+            // これは protected なのでそのままでは map から呼べない.
+            // (protected なのは規格の要請)
             friend class map;
 
             protected:

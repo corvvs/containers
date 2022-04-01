@@ -46,7 +46,8 @@ namespace fill {
         DSOUT();
         it = m.begin();
         for (int i = 0; i < n / 10; ++i) {
-            std::cout << *(it++) << " ";
+            std::cout << *it << " ";
+            ++it;
         }
         std::cout << std::endl;
     }
@@ -162,6 +163,9 @@ namespace fill {
         DSOUT() << (m.begin() == m.end());
         DSOUT() << *(m.begin()) << std::endl;
         DSOUT() << *it << std::endl;
+        it++;
+        DSOUT() << *it << std::endl;
+        it--;
         DSOUT() << *(m.begin()) << std::endl;
         ++it;
         DSOUT() << (m.begin() == m.end()) << std::endl;
@@ -467,7 +471,37 @@ namespace fill {
         }
     }
 
-    void    fill_test() {
+    void    iterator_comparation() {
+        SPRINT("iterator_comparation");
+        typedef SetClass<int>   st;
+        st                      s;
+        s.insert(1);
+        s.insert(2);
+        st::iterator        vit1 = s.begin();
+        st::iterator        vit2 = s.begin();
+        ++vit2;
+        st::const_iterator  cit1 = s.begin();
+        st::const_iterator  cit2 = s.begin();
+        ++cit2;
+        DSOUT() << (vit1 == vit1) << " " << (vit1 != vit1) << std::endl;
+        DSOUT() << (vit1 == vit2) << " " << (vit1 != vit2) << std::endl;
+        DSOUT() << (vit1 == cit1) << " " << (vit1 != cit1) << std::endl;
+        DSOUT() << (vit1 == cit2) << " " << (vit1 != cit2) << std::endl;
+        DSOUT() << (vit2 == vit1) << " " << (vit2 != vit1) << std::endl;
+        DSOUT() << (vit2 == vit2) << " " << (vit2 != vit2) << std::endl;
+        DSOUT() << (vit2 == cit1) << " " << (vit2 != cit1) << std::endl;
+        DSOUT() << (vit2 == cit2) << " " << (vit2 != cit2) << std::endl;
+        DSOUT() << (cit1 == vit1) << " " << (cit1 != vit1) << std::endl;
+        DSOUT() << (cit1 == vit2) << " " << (cit1 != vit2) << std::endl;
+        DSOUT() << (cit1 == cit1) << " " << (cit1 != cit1) << std::endl;
+        DSOUT() << (cit1 == cit2) << " " << (cit1 != cit2) << std::endl;
+        DSOUT() << (cit2 == vit1) << " " << (cit2 != vit1) << std::endl;
+        DSOUT() << (cit2 == vit2) << " " << (cit2 != vit2) << std::endl;
+        DSOUT() << (cit2 == cit1) << " " << (cit2 != cit1) << std::endl;
+        DSOUT() << (cit2 == cit2) << " " << (cit2 != cit2) << std::endl;
+    }
+
+    void    test() {
         constructor_default(100);
         constructor_comparator(100);
         constructor_comparator_allocator(100);
@@ -492,6 +526,7 @@ namespace fill {
         lower_bound(100);
         upper_bound(100);
         comparation();
+        iterator_comparation();
     }
 }
 
@@ -781,7 +816,7 @@ namespace performance {
 
 int main()
 {
-    fill::fill_test();
+    fill::test();
     logic::test();
     performance::test();
     ft::sprint::list();

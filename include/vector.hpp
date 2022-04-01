@@ -58,11 +58,13 @@ namespace ft {
             }
 
             // レンジイテレータ, (アロケータ)
-            template< class InputIt >
-            vector(InputIt first, InputIt last,
+            template <class InputIt>
+            vector(
+                InputIt first, InputIt last,
                 const allocator_type& alloc = allocator_type(),
                 typename ft::disable_if< ft::is_integral<InputIt>::value >::type* = NULL
             ): capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {
+                // InputIt のイテレータタグの識別はinsertがやる
                 // 第４引数はdisable_ifのためのものなので、ノータッチ
                 insert(end(), first, last);
             }
@@ -78,7 +80,6 @@ namespace ft {
             }
 
             // [代入]
-            // ?? signifierは無効化される？
             vector<T, Allocator>& operator=(const vector<T, Allocator> &rhs) {
                 if (this == &rhs) { return *this; }
                 this->assign(rhs.begin(), rhs.end());
@@ -339,7 +340,8 @@ namespace ft {
             }
 
             // pos の前に範囲 [first, last) から要素を挿入します。 
-            template< class InputIt >
+            template <class InputIt>
+            // 範囲挿入(入力イテレータ)
             void insert(
                 iterator pos, InputIt first, InputIt last,
                 typename ft::enable_if<
@@ -355,19 +357,21 @@ namespace ft {
                 for (; first != last; ++first) {
                     receiver.push_back(*first);
                 }
-                // vectorのiteratorは
+                // 受けたvectorを使って前方向バージョンに移譲
+                // -> vectorのiteratorは
                 // - 前方向イテレータなので, 自己呼び出しにはならない.
                 // - ランダムアクセスイテレータなので, std::distanceが定数時間で終わる.
                 insert(pos, receiver.begin(), receiver.end());
             }
 
-            template< class InputIt >
+            template <class ForwardIt>
+            // 範囲挿入(前方向イテレータ)
             void insert(
-                iterator pos, InputIt first, InputIt last,
+                iterator pos, ForwardIt first, ForwardIt last,
                 typename ft::enable_if<
-                    !ft::is_integral<InputIt>::value
+                    !ft::is_integral<ForwardIt>::value
                     &&
-                    ft::is_forward_iterator<InputIt>::value
+                    ft::is_forward_iterator<ForwardIt>::value
                 >::type* = NULL
             ) {
                 size_type   count = std::distance(first, last);
@@ -764,17 +768,17 @@ namespace ft {
         return !(x == y);
     }
 
-    template <class Iter, class Iter2>
+    template <class Iter1, class Iter2>
     bool operator==(
-        const ft::iterator_wrapper<Iter>& x,
-        const ft::iterator_wrapper<Iter>& y
+        const ft::iterator_wrapper<Iter1>& x,
+        const ft::iterator_wrapper<Iter2>& y
     ) {
         return x.base() == y.base();
     }
-    template <class Iter, class Iter2>
+    template <class Iter1, class Iter2>
     bool operator!=(
-        const ft::iterator_wrapper<Iter>& x,
-        const ft::iterator_wrapper<Iter>& y
+        const ft::iterator_wrapper<Iter1>& x,
+        const ft::iterator_wrapper<Iter2>& y
     ) {
         return !(x == y);
     }
@@ -863,4 +867,5 @@ template< class T, class Alloc >
 void swap( ft::vector<T,Alloc>& lhs, ft::vector<T,Alloc>& rhs ) {
     lhs.swap(rhs);
 }
+
 #endif
