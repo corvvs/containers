@@ -25,7 +25,7 @@ namespace ft {
             }
             template <class _Up>
             iterator_wrapper(const iterator_wrapper<_Up>& __u,
-                typename std::enable_if<std::is_convertible<_Up, iterator_type>::value>::type* = NULL)
+                typename ft::enable_if<ft::is_convertible<_Up, iterator_type>::value>::type* = NULL)
                 : base_(__u.operator->()) {}
             virtual ~iterator_wrapper() {}
             iterator_wrapper&   operator=(const iterator_wrapper& other) {
@@ -33,55 +33,55 @@ namespace ft {
                 return *this;
             }
 
-            iterator_type   base() const { return base_; }
+            inline iterator_type   base() const { return base_; }
 
-            reference   operator*() const {
+            inline reference   operator*() const {
                 return *base_;
             }
-            pointer     operator->() const {
+            inline pointer     operator->() const {
                 return base_;
             }
 
-            iterator_wrapper&   operator++() {
+            inline iterator_wrapper&   operator++() {
                 ++base_;
                 return *this;
             }
 
-            iterator_wrapper    operator++(int) {
+            inline iterator_wrapper    operator++(int) {
                 iterator_wrapper    it = *this;
                 ++*this;
                 return it;
             }
 
-            iterator_wrapper&   operator--() {
+            inline iterator_wrapper&   operator--() {
                 --base_;
                 return *this;
             }
 
-            iterator_wrapper    operator--(int) {
+            inline iterator_wrapper    operator--(int) {
                 iterator_wrapper    it = *this;
                 --*this;
                 return it;
             }
 
-            iterator_wrapper  operator+ (difference_type __n) const {
-                iterator_wrapper __w(*this);
-                __w += __n;
-                return __w;
+            inline iterator_wrapper  operator+ (difference_type n) const {
+                iterator_wrapper it(*this);
+                it += n;
+                return it;
             }
-            iterator_wrapper& operator+=(difference_type __n) {
-                base_ += __n;
+            inline iterator_wrapper& operator+=(difference_type n) {
+                base_ += n;
                 return *this;
             }
-            iterator_wrapper  operator- (difference_type __n) const {
-                return *this + (-__n);
+            inline iterator_wrapper  operator- (difference_type n) const {
+                return *this + (-n);
             }
-            iterator_wrapper& operator-=(difference_type __n) {
-                *this += -__n;
+            inline iterator_wrapper& operator-=(difference_type n) {
+                *this += -n;
                 return *this;
             }
-            reference    operator[](difference_type __n) const {
-                return base_[__n];
+            inline reference    operator[](difference_type n) const {
+                return base_[n];
             }
 
             inline bool operator==(const iterator_wrapper& rhs) const {

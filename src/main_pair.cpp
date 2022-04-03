@@ -53,7 +53,7 @@ namespace fill {
         pair_type   p2(s2, m2);
         DSOUT() << p1 << std::endl;
         DSOUT() << p2 << std::endl;
-        std::swap(p1, p2);
+        ft::swap(p1, p2);
         DSOUT() << p1 << std::endl;
         DSOUT() << p2 << std::endl;
         p1.swap(p2);

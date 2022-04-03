@@ -6,11 +6,6 @@
 # include "ft_algorithm.hpp"
 # include "ft_iterator.hpp"
 # include "iterator_wrapper.hpp"
-# include <memory>
-# include <iostream>
-# include <iterator>
-# include <exception>
-# include <stdexcept>
 
 namespace ft {
 
@@ -300,7 +295,7 @@ namespace ft {
             // returns: 挿入された value を指すイテレータ。
             iterator insert(iterator pos, const value_type& value) {
                 size_type    n = distance_(begin(), pos);
-                insert(pos, static_cast<size_type>(1), value);
+                insert(pos, 1, value);
                 return begin() + n;
             }
             // os の前に value のコピーを count 個挿入します。
@@ -417,9 +412,9 @@ namespace ft {
             // 削除された最後の要素の次を指すイテレータ。
             // pos が最後の要素を参照する場合は、 end() イテレータが返されます。
             inline iterator erase(iterator pos) {
-                if (pos == end()) {
-                    // pos を逆参照できない
-                }
+                // if (pos == end()) {
+                //     // pos を逆参照できない
+                // }
                 return erase(pos, pos + 1);
             }
 
@@ -470,7 +465,7 @@ namespace ft {
             // コンテナの最後の要素を削除します。
             // 空のコンテナに対する pop_back の呼び出しは未定義です。
             // 最後の要素を指すイテレータと参照および end() が無効化されます。 
-            void pop_back() {
+            inline void pop_back() {
                 if (empty()) {
                     // 空
                     return;
@@ -484,13 +479,13 @@ namespace ft {
             // 現在のサイズが count より大きい場合、最初の count 個の要素にコンテナが縮小されます。
             // 現在のサイズが count より小さい場合、 value のコピーで初期化された要素が追加されます。
             // より小さなサイズに変更しても vector の容量は縮小されません。 これは、 pop_back() を複数回呼び出すことで同等の効果を得た場合に無効化されるイテレータは削除されたもののみであるのに対し、容量の変更はすべてのイテレータを無効化するためです。 
-            void resize(size_type count) {
+            inline void resize(size_type count) {
                 const size_type   current_size = size();
                 if (current_size > count) {
                     // 現在のサイズが count より大きい場合、最初の count 個の要素にコンテナが縮小されます。
                     // If n is less than or equal to the size of the container,
                     // the function never throws exceptions (no-throw guarantee).
-                    destroy_from_(begin() + count, end());
+                    destroy_from_(iterator(storage_ + count), end());
                     size_ = count;
                 } else if (current_size < count) {
                     // -> value ありに移譲
@@ -504,7 +499,7 @@ namespace ft {
                     // 現在のサイズが count より大きい場合、最初の count 個の要素にコンテナが縮小されます。
                     // If n is less than or equal to the size of the container,
                     // the function never throws exceptions (no-throw guarantee).
-                    destroy_from_(begin() + count, end());
+                    destroy_from_(iterator(storage_ + count), end());
                     size_ = count;
                 } else if (current_size < count) {
                     // 現在のサイズが count より小さい場合、 value のコピーで初期化された要素が追加されます。
@@ -532,7 +527,7 @@ namespace ft {
             // [swap]
             // コンテナの内容を other の内容と交換します。 個々の要素に対するいかなるムーブ、コピー、swap 操作も発生しません。
             // すべてのイテレータおよび参照は有効なまま残されます。 終端イテレータは無効化されます。
-            void swap( vector& other ) {
+            inline void swap( vector& other ) {
                 // allocator_ 以外はプリミティブ型なので、最初にallocator_をスワップする。
                 // -> 少なくともSTRONG, 多分no-throw
                 ft::swap(allocator_, other.allocator_);
@@ -593,7 +588,7 @@ namespace ft {
 
             // [from, to) の要素を末尾に追加する。
             // capacityは十分にあるものとする。
-            void    append_within_capacity_(const_iterator from, const_iterator to) {
+            inline void    append_within_capacity_(const_iterator from, const_iterator to) {
                 // size_type   n = to - from;
                 // ASSERTION: size() + n <= capacity
                 size_type i = size();
@@ -604,7 +599,7 @@ namespace ft {
             }
 
             // 再確保不要な前提でpush_backを行う。
-            void    push_back_within_capacity_(const_reference value) {
+            inline void    push_back_within_capacity_(const_reference value) {
                 // ASSERTION: capacity() >= size() + 1
                 allocator_.construct(&storage_[size_], value);
                 size_ += 1;
@@ -686,7 +681,7 @@ namespace ft {
             }
 
             // 初期状態(storage_なし, capacity == size == 0)に戻す
-            void    obliterate_() {
+            inline void    obliterate_() {
                 clear();
                 if (storage_) {
                     allocator_.deallocate(storage_, capacity());
@@ -843,7 +838,7 @@ namespace ft {
 
     template <class Iter1, class Iter2>
     typename ft::iterator_wrapper<Iter1>::difference_type
-    operator-(
+    inline operator-(
         const ft::iterator_wrapper<Iter1>& x,
         const ft::iterator_wrapper<Iter2>& y
     ) {
@@ -851,21 +846,18 @@ namespace ft {
     }
 
     template <class It>
-    ft::iterator_wrapper<It>    operator+(
+    inline ft::iterator_wrapper<It>    operator+(
         typename ft::iterator_wrapper<It>::difference_type n,
         const ft::iterator_wrapper<It>& x
     ) {
         x += n;
         return x;
     }
-}
 
-// [swap]
-// ft::vector に対する std::swap アルゴリズムの特殊化。
-// lhs と rhs の内容を入れ替えます。 lhs.swap(rhs) を呼びます。 
-template< class T, class Alloc >
-void swap( ft::vector<T,Alloc>& lhs, ft::vector<T,Alloc>& rhs ) {
-    lhs.swap(rhs);
+    template< class T, class Alloc >
+    inline void swap( ft::vector<T,Alloc>& lhs, ft::vector<T,Alloc>& rhs ) {
+        lhs.swap(rhs);
+    }
 }
 
 #endif

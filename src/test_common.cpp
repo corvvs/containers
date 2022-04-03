@@ -38,3 +38,17 @@ ft::vector<int>  random_value_generator() {
     }
     return v;
 }
+
+std::ostream&   debug_out(
+    const char *filename,
+    const int linenumber
+) {
+    return (std::cout << "[" << filename << ":" << linenumber  << "] ");
+}
+
+std::ostream&   debug_err(
+    const char *filename,
+    const int linenumber
+) {
+    return (std::cerr << "[" << filename << ":" << linenumber << "] ");
+}

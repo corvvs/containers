@@ -8,7 +8,7 @@ ifdef FT_DEBUG
 endif
 
 
-SRCS_COMMON		:=	sprint.cpp ft_common.cpp test_common.cpp IntWrapper.cpp
+SRCS_COMMON		:=	sprint.cpp test_common.cpp IntWrapper.cpp
 SRCS_COMMON		:=	$(addprefix src/, $(SRCS_COMMON))
 
 # vector
@@ -83,7 +83,7 @@ OBJS			:=	$(OBJS_VECTOR) $(OBJS_STACK) $(OBJS_PAIR) \
 .PHONY			:	all run
 all				:	$(NAMES)
 
-run				:	fclean meta_diff stack_diff vector_diff map_diff set_diff main_diff
+run				:	fclean meta_diff vector_diff stack_diff map_diff set_diff main_diff
 
 .PHONY			:	clean fclean re
 clean			:
@@ -107,7 +107,7 @@ vector_stl		:
 vector			:
 	$(MAKE) vector_clean
 	$(MAKE) $(NAME_VECTOR_FT)
-
+vd				:	vector_diff
 vector_diff		:	vector vector_stl
 	time ./$(NAME_VECTOR_STL) > out_vector_1
 	time ./$(NAME_VECTOR_FT) 2> err2 > out_vector_2
@@ -135,6 +135,7 @@ stack			:
 	$(MAKE) stack_clean
 	$(MAKE) $(NAME_STACK_FT)
 
+sd				:	stack_diff
 stack_diff		:	stack stack_stl
 	time ./$(NAME_STACK_STL) > out_stack_1
 	time ./$(NAME_STACK_FT) 2> err2 > out_stack_2
@@ -163,6 +164,7 @@ pair			:
 	$(MAKE) pair_clean
 	$(MAKE) $(NAME_PAIR_FT)
 
+pair_diff		:	pair_diff
 pair_diff		:	pair pair_stl
 	time ./$(NAME_PAIR_STL) > out_pair_1
 	time ./$(NAME_PAIR_FT) 2> err2 > out_pair_2
@@ -215,6 +217,7 @@ map				:
 	$(MAKE) map_clean
 	$(MAKE) $(NAME_MAP_FT)
 
+md				:	map_diff
 map_diff		:	map map_stl
 	time ./$(NAME_MAP_STL) 2> err2 > out_map_1
 	time ./$(NAME_MAP_FT) 2> err2 > out_map_2
@@ -243,6 +246,7 @@ set				:
 	$(MAKE) set_clean
 	$(MAKE) $(NAME_SET_FT)
 
+sed				:	set_diff
 set_diff		:	set set_stl
 	time ./$(NAME_SET_STL) 2> err2 > out_set_1
 	time ./$(NAME_SET_FT) 2> err2 > out_set_2

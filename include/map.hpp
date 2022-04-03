@@ -299,7 +299,7 @@ namespace ft {
                 // 破壊処理はtreeのデストラクタがやる
             }
 
-            self_type&      operator=(const self_type& rhs) {
+            inline self_type&      operator=(const self_type& rhs) {
                 if (this == &rhs) { return *this; }
                 tree_ = rhs.tree_;
                 return *this;
@@ -469,14 +469,14 @@ namespace ft {
     ) {
         return !(lhs < rhs);
     }
-}
 
-template <class Key, class Value, class KeyComparator, class PairAllocator>
-void swap(
-    ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
-    ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
-) {
-    lhs.swap(rhs);
+    template <class Key, class Value, class KeyComparator, class PairAllocator>
+    inline void swap(
+        ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
+        ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
+    ) {
+        lhs.swap(rhs);
+    }
 }
 
 #endif

@@ -7,6 +7,15 @@
 
 namespace ft {
 
+    // [[swap]]
+
+    template<class T>
+    void        swap(T& a, T& b) {
+        T temp(a);
+        a = b;
+        b = temp;
+    }
+
     // [[equal, 内部関数]]
 
     template <class Iterator1, class Iterator2, class Compare>

@@ -14,6 +14,15 @@ void    print_stats(VectorClass<T> &v, bool with_stats = true) {
 
 // 構築とreserve
 template <class T>
+void    mass_construct(int n) {
+    SPRINT("mass_construct");
+    for (int i = 0; i < n; ++i) {
+        VC(T)   v;
+    }
+}
+
+// 構築とreserve
+template <class T>
 void    construct_and_reserve() {
     SPRINT("construct_and_reserve");
     VC(T)  vi;
@@ -24,9 +33,12 @@ void    construct_and_reserve() {
     std::cout << "-- reserve(1)" << std::endl;
     vi.reserve(1);
     print_stats(vi);
-    std::cout << "-- reserve(100000000)" << std::endl;
-    vi.reserve(100000000);
-    print_stats(vi);
+    {
+        // SPRINT("reserve(100000000)");
+        std::cout << "-- reserve(100000000)" << std::endl;
+        vi.reserve(100000000);
+        print_stats(vi);
+    }
     std::cout << "-- reserve(1)" << std::endl;
     vi.reserve(1);
     print_stats(vi);
@@ -280,6 +292,19 @@ void    mass_insertion_range_inputiter(VC(T)::size_type n) {
 }
 
 template <class T>
+void    mass_push_back(VC(T)::size_type n) {
+    SPRINT("mass_push_back") << "(" << n << ")";
+    srand(n);
+    {
+        VC(T) vi;
+        for (VC(T)::size_type i = 0; i < n; ++i) {
+            vi.push_back(random_value_generator<T>());
+        }
+        DSOUT() << vi.back() << std::endl;
+    }
+}
+
+template <class T>
 void    mass_pop_back(VC(T)::size_type n) {
     srand(n);
     VC(T) vi;
@@ -311,16 +336,62 @@ void    mass_pop_back(VC(T)::size_type n) {
 
 template <class T>
 void    mass_resize(VC(T)::size_type n) {
-    SPRINT("mass_resize") << "(" << n << ")";
-    srand(n);
-    VC(T)  vi;
-    for (VC(T)::size_type i = 0; i < 5; ++i) {
-        VC(T)::size_type cap = vi.capacity();
-        vi.resize((VC(T)::size_type)((double)(rand()) / RAND_MAX * n) + 1, random_value_generator<T>());
-        std::cout << "cap: " << cap << " -> " << vi.capacity() << std::endl;
-        print_vector_elements(vi.begin(), vi.end());
-        print_vector_elements(vi.rbegin(), vi.rend());
-        print_stats(vi);
+    {
+        srand(n);
+        {
+            SPRINT("mass_resize default") << "(" << n << ")";
+            for (VC(T)::size_type i = 0; i < 100; ++i) {
+                VC(T)  vi;
+                vi.resize(n);
+                print_stats(vi);
+            }
+        }
+        {
+            SPRINT("mass_resize default explicit") << "(" << n << ")";
+            for (VC(T)::size_type i = 0; i < 100; ++i) {
+                VC(T)  vi;
+                vi.resize(n, T());
+                print_stats(vi);
+            }
+        }
+        {
+            SPRINT("mass_resize value specified") << "(" << n << ")";
+            for (VC(T)::size_type i = 0; i < 100; ++i) {
+                VC(T)  vi;
+                vi.resize(n, random_value_generator<T>());
+                // print_vector_elements(vi.begin(), vi.end());
+                // print_vector_elements(vi.rbegin(), vi.rend());
+                print_stats(vi);
+            }
+        }
+    }
+}
+
+template <class T>
+void    mass_print(VC(T)::size_type n) {
+    typedef VectorClass<T>      vt;
+    typedef VectorClass< vt >   vtvt;
+    vtvt                        vv;
+    for (typename vtvt::size_type i = 0; i < 100; ++i) {
+        vt  v;
+        for (typename vt::size_type i = 0; i < n; ++i) {
+            v.push_back(random_value_generator<T>());
+        }
+        vv.push_back(v);
+    }
+    {
+        SPRINT("mass_print normal") << "(" << n << ")";
+        for (typename vtvt::iterator it = vv.begin(); it != vv.end(); ++it) {
+            vt  vi = *it;
+            print_vector_elements(vi.begin(), vi.end());
+        }
+    }
+    {
+        SPRINT("mass_print reverse") << "(" << n << ")";
+        for (typename vtvt::iterator it = vv.begin(); it != vv.end(); ++it) {
+            vt  vi = *it;
+            print_vector_elements(vi.rbegin(), vi.rend());
+        }
     }
 }
 
@@ -334,7 +405,7 @@ void    mass_erase_1(VC(T)::size_type n) {
     print_vector_elements(vi.begin(), vi.end());
     print_stats(vi);
     {
-        SPRINT("mass_resize") << "(" << n << ")";
+        SPRINT("mass_erase_1") << "(" << n << ")";
         for (VC(T)::size_type i = 0; i < n; ++i) {
             VC(T)::size_type  at = VC(T)::size_type(double(rand()) / RAND_MAX * vi.size());
             VC(T)::iterator eit = vi.erase(vi.begin() + at);
@@ -403,7 +474,9 @@ void    mass_compare(VC(T)::size_type n) {
 
 template <class T>
 void    performance(const std::string& sub_title, std::size_t n) {
+    ft::sprint::push_bread("vector<" + sub_title + ">");
     ft::sprint::insert_comment(sub_title);
+    mass_construct<T>(100000 * n);
     construct_and_reserve<T>();
     mass_assign<T>(100 * n);
     mass_assign_range<T>(30 * n);
@@ -414,11 +487,14 @@ void    performance(const std::string& sub_title, std::size_t n) {
     mass_insertion_1<T>(100 * n);
     mass_insertion_n<T>(n);
     mass_insertion_range<T>(n, n);
+    mass_push_back<T>(100 * n);
     mass_pop_back<T>(100 * n);
     mass_resize<T>(100 * n);
+    mass_print<T>(100 * n);
     mass_erase_1<T>(100 * n);
     mass_erase_range<T>(10 * n);
     swap<T>();
+    ft::sprint::pop_bread();
 }
 
 namespace fill {
@@ -791,11 +867,14 @@ int main() {
 
     fill::test();
     logic::test();
-    performance<int>("[int]", 100);
-    performance<ft::IntWrapper>("[ft::IntWrapper]", 100);
-    performance<std::string>("[std::string]", 100);
-    performance<std::vector<int> >("[std::vector<int>]", 20);
-    performance<ft::vector<int> >("[ft::vector<int>]", 20);
+    ft::sprint::push_bread("performance");
+    int n = 60;
+    performance<int>("int", n);
+    performance<ft::IntWrapper>("ft::IntWrapper", n);
+    performance<std::string>("std::string", n);
+    performance<std::vector<int> >("std::vector<int>", n);
+    performance<ft::vector<int> >("ft::vector<int>", n);
+    ft::sprint::pop_bread();
 
     // 別枠で
     mass_insertion_range_inputiter<int>(10);

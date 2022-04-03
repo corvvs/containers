@@ -3,8 +3,9 @@
 
 # include "ft_common.hpp"
 # include "ft_meta_functions.hpp"
-# include "pair.hpp"
 # include "ft_iterator.hpp"
+# include "ft_algorithm.hpp"
+# include "pair.hpp"
 # include <memory>
 # include <iostream>
 # include <iterator>
@@ -125,14 +126,9 @@ namespace ft {
                     inline bool is_root_() const { return has_parent_() && parent()->is_end_(); }
                     inline bool has_parent_() const { return parent() != NULL; }
 
-                public:
-
-                    // 色を反転する
-                    inline void flip_color() { is_black_ = !is_black_; }
-
                     // 自身を根とする部分木の最小ノードを返す
                     // O(log2 |V|)
-                    tree_node_pointer   min_node() {
+                    tree_node_pointer   min_node_() {
                         tree_node_pointer    next_ptr = this;
                         // 左子があるなら左子をたどり続ける
                         while (next_ptr->has_left_child()) {
@@ -143,7 +139,7 @@ namespace ft {
 
                     // 自身を根とする部分木の最大ノードを返す
                     // O(log2 |V|)
-                    tree_node_pointer   max_node() {
+                    tree_node_pointer   max_node_() {
                         tree_node_pointer    next_ptr = this;
                         // 右子があるなら右子をたどり続ける
                         while (next_ptr->has_right_child()) {
@@ -151,6 +147,8 @@ namespace ft {
                         }
                         return next_ptr;
                     }
+
+                public:
 
                     // 後隣接するノードを返す
                     // O(log2 |V|)
@@ -160,7 +158,7 @@ namespace ft {
                         if (has_right_child()) {
                             // 右子がある場合
                             // -> 右子のminを返す
-                            return right()->min_node();
+                            return right()->min_node_();
                         }
                         // 右子がない場合
                         // -> 自身が左子になるまで(=右子である間は)親に遡る
@@ -174,7 +172,7 @@ namespace ft {
                     }
                     tree_node_const_pointer forward_neighbor() const {
                         if (has_right_child()) {
-                            return right()->min_node();
+                            return right()->min_node_();
                         }
                         tree_node_const_pointer    ptr = this;
                         while (ptr->is_right_child()) {
@@ -189,7 +187,7 @@ namespace ft {
                         if (has_left_child()) {
                             // 左子がある場合
                             // -> 左子のminを返す
-                            return left()->max_node();
+                            return left()->max_node_();
                         }
                         // 左子がない場合
                         // -> 自身が右子になるまで(=左子である間は)親に遡る
@@ -202,7 +200,7 @@ namespace ft {
                     }
                     tree_node_const_pointer    backward_neighbor() const {
                         if (has_left_child()) {
-                            return left()->max_node();
+                            return left()->max_node_();
                         }
                         tree_node_const_pointer    ptr = this;
                         while (ptr->is_left_child()) {
@@ -254,8 +252,12 @@ namespace ft {
                         ft::swap(is_black_, other.is_black_);
                     }
 
-                    // 2つのノードの位置関係、つまり接続されているエッジを入れ替える。
-                    // 入れ替え対象はどちらも通常のノード。
+                    // 色を反転する
+                    inline void flip_color() { is_black_ = !is_black_; }
+
+                    // 2つのノードの位置関係、つまり接続されているエッジを入れ替える.
+                    // 入れ替え対象はどちらも通常のノード.
+                    // (なぜこんな面倒なことをするかというと, ポインタと実体の対応関係を保つため.)
                     void    swap_position(tree_node& other) {
                         bool    this_was_left_child = is_root_() || is_left_child();
                         bool    other_was_left_child = other.is_root_() || other.is_left_child();
@@ -271,7 +273,7 @@ namespace ft {
                     }
 
                     // child を自身の左子として配置する
-                    inline void    place_into_left_(tree_node_pointer child) {
+                    inline void    place_into_left(tree_node_pointer child) {
                         this->left() = child;
                         if (child != NULL) {
                             child->parent() = this;
@@ -279,7 +281,7 @@ namespace ft {
                     }
 
                     // child を自身の右子として配置する
-                    inline void    place_into_right_(tree_node_pointer child) {
+                    inline void    place_into_right(tree_node_pointer child) {
                         this->right() = child;
                         if (child != NULL) {
                             child->parent() = this;
@@ -561,21 +563,21 @@ namespace ft {
                     inline reference    operator*() const { return *ptr_; }
                     inline pointer      operator->() const { return ptr_; }
 
-                    iterator_type&      operator++() {
+                    inline iterator_type&      operator++() {
                         ptr_ = next();
                         return *this;
                     }
-                    iterator_type       operator++(int) {
+                    inline iterator_type       operator++(int) {
                         iterator_type   it = *this;
                         ++*this;
                         return it;
                     }
 
-                    iterator_type&      operator--() {
+                    inline iterator_type&      operator--() {
                         ptr_ = prev();
                         return *this;
                     }
-                    iterator_type       operator--(int) {
+                    inline iterator_type       operator--(int) {
                         iterator_type   it = *this;
                         --*this;
                         return it;
@@ -624,30 +626,30 @@ namespace ft {
                     inline reference        operator*() const { return *ptr_; }
                     inline pointer          operator->() const { return ptr_; }
 
-                    iterator_type&          operator++() {
+                    inline iterator_type&          operator++() {
                         ptr_ = next();
                         return *this;
                     }
-                    iterator_type           operator++(int) {
+                    inline iterator_type           operator++(int) {
                         iterator_type   it = *this;
                         ++*this;
                         return it;
                     }
 
-                    iterator_type&          operator--() {
+                    inline iterator_type&          operator--() {
                         ptr_ = prev();
                         return *this;
                     }
-                    iterator_type           operator--(int) {
+                    inline iterator_type           operator--(int) {
                         iterator_type   it = *this;
                         --*this;
                         return it;
                     }
 
-                    bool                    operator==(const iterator_type& rhs) const {
+                    inline bool                    operator==(const iterator_type& rhs) const {
                         return ptr_ == rhs.ptr_;
                     }
-                    bool                    operator!=(const iterator_type& rhs) const {
+                    inline bool                    operator!=(const iterator_type& rhs) const {
                         return !(*this == rhs);
                     }
 
@@ -810,10 +812,9 @@ namespace ft {
             }
 
             // 範囲挿入
-            // TODO:
-            // > InputIt は LegacyInputIterator の要件を満たさなければなりません。 
             template <class InputIterator>
-            void    insert(InputIterator first, InputIterator last) {
+            // (使ってない)
+            inline void    insert(InputIterator first, InputIterator last) {
                 for (; first != last; ++first) {
                     // 常にendをヒントにしながら挿入するので,
                     //   - 挿入元ツリーが空
@@ -957,13 +958,16 @@ namespace ft {
             template <class Key>
             const_pointer   find_ptr_(const Key& key) const {
                 const_pointer ptr = lower_bound_ptr_(key);
-                if (ptr != end_node()) {
-                    // key <= ptr
-                    if (value_compare()(key, *ptr->value())) {
-                        // key < ptr -> ダメ
-                        return end_node();
-                    }
+                if (ptr == end_node()) {
+                    return ptr;
                 }
+                // key <= ptr
+                if (value_compare()(key, *ptr->value())) {
+                    // key < ptr -> ダメ
+                    return end_node();
+                }
+                // key <= ptr かつ !(key < prt)
+                // -> key == ptr であるはず
                 return ptr;
             }
 
@@ -1073,7 +1077,9 @@ namespace ft {
                 }
                 // keyと同じものが見つかった。
                 pointer     target_parent = target->parent();
-                pointer*    target_ptr = &(target->is_left_child() ? target_parent->left() : target_parent->right());
+                pointer*    target_ptr = &(
+                    target->is_left_child() ? target_parent->left() : target_parent->right()
+                );
                 return pair<pointer, pointer*>(target, target_ptr);
             }
 
@@ -1084,39 +1090,41 @@ namespace ft {
                 //    かつその直前または直後がvalueの入るべき位置であるようなノード
                 if (hint == end_node() || value_compare()(key, *(hint->value()))) {
                     // (1) hint == end or key < *hint
-                    // -> prev = hint - 1 として、 prev == begin or *prev < key なら、
-                    //    prevとhintの間にkeyがあるべき。
+                    // -> prev = hint - 1 として, prev == begin or *prev < key なら,
+                    //    prevとhintの間にkeyがあるべき.
+                    //    (prev < key < hint)
                     iterator    prev(hint);
                     if (&*prev != begin_node() && value_compare()(*((--prev)->value()), key)) {
-                        // このとき、hintとprevの関係性は以下のいずれかとなり、
-                        // hintとprevのうち少なくとも一方が空き子を持つ。
+                        // このとき、hintとprevの関係性は以下のいずれかとなり,
+                        // hintとprevのうち少なくとも一方が空き子を持つ.
                         if (prev->right() == NULL) {
                             // 1. hintの左子がprev
-                            //   -> prevは右子を持たない。(持つならそれがhintとprevの間に入る)
-                            return pair<pointer, pointer*>(&*prev, &((*prev).right()));
+                            //   -> prevは右子を持たない.(持つならそれがhintとprevの間に入る)
+                            return pair<pointer, pointer*>(&*prev, &(prev->right()));
                         } else {
                             // 2. prevの右部分木の最小値がhint
-                            //   -> hintは左子を持たない。(持つならそれがhintとprevの間に入る)
-                            return pair<pointer, pointer*>(&*hint, &((*hint).left()));
+                            //   -> hintは左子を持たない.(持つならそれがhintとprevの間に入る)
+                            return pair<pointer, pointer*>(&*hint, &(hint->left()));
                         }
                     }
                     return find_equal_(key);
                 } else if (value_compare()(*(hint->value()), key)) {
                     // (2) *hint < key
-                    // -> next = hint + 1 として、 next == end or key < *next なら、
-                    //    hintとnextの間にkeyがあるべき。
+                    // -> next = hint + 1 として、 next == end or key < *next なら,
+                    //    hintとnextの間にkeyがあるべき.
+                    //    (hint < key < next)
                     iterator    next(hint);
                     if (&*++next != end_node() && value_compare()(key, *((next->value())))) {
-                        // この時、hintとnextの関係性は以下のいずれかとなり、
-                        // hintとnextのうち少なくとも一方が空き子を持つ。
+                        // この時、hintとnextの関係性は以下のいずれかとなり,
+                        // hintとnextのうち少なくとも一方が空き子を持つ.
                         if (next->left() == NULL) {
                             // 1. hintの右部分木の最小値がnext
-                            //   -> nextは左子を持たない。(持つならそれがhintとnextの間に入る)
-                            return pair<pointer, pointer*>(&*next, &((*next).left()));
+                            //   -> nextは左子を持たない.(持つならそれがhintとnextの間に入る)
+                            return pair<pointer, pointer*>(&*next, &(next->left()));
                         } else {
                             // 2. nextの左子がhint
-                            //   -> hintは右子を持たない。(持つならそれがhintとnextの間に入る)
-                            return pair<pointer, pointer*>(&*hint, &((*hint).right()));
+                            //   -> hintは右子を持たない.(持つならそれがhintとnextの間に入る)
+                            return pair<pointer, pointer*>(&*hint, &(hint->right()));
                         }
                     }
                     return find_equal_(key);
@@ -1134,8 +1142,8 @@ namespace ft {
                 // 1. beginより小さい要素が挿入された時
                 // 2. beginが削除された時
                 // -> 挿入されたノードがbeginのleftである場合, 1.に該当するのでキャッシュを更新する。
-                if (begin_node()->left() == *place.second) {
-                    begin_node_ = *place.second;
+                if (begin_node()->left() == *(place.second)) {
+                    begin_node_ = *(place.second);
                 }
                 rebalance_after_insertion_(*(place.second));
                 return inserted;
@@ -1238,10 +1246,10 @@ namespace ft {
                     iterator    dummy = position;
                     if (position->has_right_child()) {
                         ++position;
-                        (*position).swap_position(*dummy);
+                        position->swap_position(*dummy);
                     } else if (position->has_left_child()) {
                         --position;
-                        (*position).swap_position(*dummy);
+                        position->swap_position(*dummy);
                     } else {
                         break;
                     }
@@ -1387,16 +1395,17 @@ namespace ft {
                 ny->flip_color();
             }
 
+            // node をツリーから切り離す
             void    release_node_from_parent_(pointer node) {
                 pointer parent = node->parent();
-                // targetをツリーから切り離す
                 (node->is_left_child() ? parent->left() : parent->right()) = NULL;
                 --size_;
             }
 
             // [[リバランス関連staticメンバ関数]]
 
-            // ノードとその親について、可能な回転を行う。
+            // ノードとその親について, 可能な回転を行う.
+            // (可能な回転は, parent と node の関係性から自動的に定まる)
             static void rotate_(pointer parent, pointer node) {
                 if (node == parent->left()) {
                     rotate_right_(node, parent);
@@ -1407,37 +1416,53 @@ namespace ft {
                 }
             }
 
-            // 自身とその親について左回転する
+            // ノードa, cについて左回転する.
+            //    pa
+            //    |
+            //    a
+            //   / \
+            //  /   \
+            // b     c
+            //      / \
+            //     d   e
             static void rotate_left_(pointer c, pointer a) {
                 bool    a_was_left_child = a->is_left_child();
                 pointer pa = a->parent();
                 pointer d = c->left();
                 // 1. Aの右をDに向ける
-                a->place_into_right_(d);
+                a->place_into_right(d);
                 // 2. Cの左をAに向ける
-                c->place_into_left_(a);
+                c->place_into_left(a);
                 // 3. Aに入っていたエッジをCに向ける
                 if (a_was_left_child) {
-                    pa->place_into_left_(c);
+                    pa->place_into_left(c);
                 } else {
-                    pa->place_into_right_(c);
+                    pa->place_into_right(c);
                 }
             }
 
-            // 自身とその親について右回転する
+            // ノードa, cについて右回転する.
+            //      pc
+            //      |
+            //      c
+            //     / \
+            //    /   \
+            //   a     e
+            //  / \
+            // b   d
             static void rotate_right_(pointer a, pointer c) {
                 bool      c_was_left_child = c->is_left_child();
                 pointer   pc = c->parent();
                 pointer   d = a->right();
                 // 1. Cの左をDに向ける
-                c->place_into_left_(d);
+                c->place_into_left(d);
                 // 2. Aの右をCに向ける
-                a->place_into_right_(c);
+                a->place_into_right(c);
                 // 3. Cに入っていたエッジをAに向ける
                 if (c_was_left_child) {
-                    pc->place_into_left_(a);
+                    pc->place_into_left(a);
                 } else {
-                    pc->place_into_right_(a);
+                    pc->place_into_right(a);
                 }
             }
 

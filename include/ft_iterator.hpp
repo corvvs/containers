@@ -162,64 +162,64 @@ namespace ft {
             }
             virtual ~reverse_iterator() {}
 
-            iterator_type       base() const { return current; }
+            inline iterator_type       base() const { return current; }
 
-            reverse_iterator&   operator=(const reverse_iterator& rhs) {
+            inline reverse_iterator&   operator=(const reverse_iterator& rhs) {
                 current = rhs.current;
                 return *this;
             }
 
             // 通常イテレータと異なり, mutableバージョンはない。
-            reference           operator*() const {
+            inline reference           operator*() const {
                 NormalIter  rv = current;
                 return *(--rv);
             }
 
-            pointer             operator->() const {
+            inline pointer             operator->() const {
                 return &*(*this);
             }
 
-            reverse_iterator&   operator++() {
+            inline reverse_iterator&   operator++() {
                 --current;
                 return *this;
             }
 
-            reverse_iterator    operator++(int) {
+            inline reverse_iterator    operator++(int) {
                 reverse_iterator    rv(*this);
                 --*this;
                 return rv;
             }
 
-            reverse_iterator&   operator--() {
+            inline reverse_iterator&   operator--() {
                 ++current;
                 return *this;
             }
 
-            reverse_iterator    operator--(int) {
+            inline reverse_iterator    operator--(int) {
                 reverse_iterator    rv(*this);
                 ++*this;
                 return rv;
             }
 
-            reverse_iterator&  operator+=(difference_type n) {
+            inline reverse_iterator&  operator+=(difference_type n) {
                 current -= n;
                 return *this;
             }
 
-            reverse_iterator&    operator-=(difference_type n) {
+            inline reverse_iterator&    operator-=(difference_type n) {
                 current += n;
                 return *this;
             }
 
-            reverse_iterator    operator+(difference_type n) const {
+            inline reverse_iterator    operator+(difference_type n) const {
                 return reverse_iterator(current - n);
             }
 
-            reverse_iterator    operator-(difference_type n) const {
+            inline reverse_iterator    operator-(difference_type n) const {
                 return reverse_iterator(current + n);
             }
 
-            reference           operator[](difference_type n) const {
+            inline reference           operator[](difference_type n) const {
                 return *(*this - n);
             }
     };
@@ -262,7 +262,7 @@ inline bool operator>=(const ft::reverse_iterator<It1>& x, const ft::reverse_ite
 }
 
 template <class It1, class It2>
-typename ft::reverse_iterator<It1>::difference_type operator-(
+inline typename ft::reverse_iterator<It1>::difference_type operator-(
     const ft::reverse_iterator<It1>& x,
     const ft::reverse_iterator<It2>& y
 ) {
@@ -270,7 +270,7 @@ typename ft::reverse_iterator<It1>::difference_type operator-(
 }
 
 template <class It>
-ft::reverse_iterator<It>    operator+(
+inline ft::reverse_iterator<It>    operator+(
     typename ft::reverse_iterator<It>::difference_type n,
     const ft::reverse_iterator<It>& x
 ) {

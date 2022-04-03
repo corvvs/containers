@@ -27,6 +27,8 @@ namespace ft {
             std::stringstream&  get_tail();
 
             static void insert_comment(const std::string& comment);
+            static void push_bread(const std::string& bread);
+            static void pop_bread();
             static void list();
 
         private:
@@ -35,6 +37,9 @@ namespace ft {
             unsigned long                       time_origin_;
             static ft::vector<std::string>      chronicle;
             static ft::vector<duration_type>    durations;
+            static ft::vector<std::string>      breads_;
+
+            static std::string  make_title_(const std::string& title);
     };
 }
 

@@ -18,6 +18,7 @@
 #  include <map>
 #  include <set>
 #  include "tree.hpp"
+#  define StackContainer std::deque
 #  define NS std
 # else
 #  include "vector.hpp"
@@ -26,6 +27,7 @@
 #  include "tree.hpp"
 #  include "map.hpp"
 #  include "set.hpp"
+#  define StackContainer ft::vector
 #  define NS ft
 # endif
 # define TreeClass   ft::tree
@@ -34,6 +36,8 @@
 # define PairClass   NS::pair
 # define MapClass    NS::map
 # define SetClass    NS::set
+# define DSOUT() debug_out(__FILE__, __LINE__)
+# define DOUT()  debug_err(__FILE__, __LINE__)
 
 # include "sprint.hpp"
 # include "IntWrapper.hpp"
@@ -50,6 +54,16 @@ template<>
 std::vector<int>    random_value_generator();
 template<>
 ft::vector<int>     random_value_generator();
+
+std::ostream&   debug_out(
+    const char *filename,
+    const int linenumber
+);
+
+std::ostream&   debug_err(
+    const char *filename,
+    const int linenumber
+);
 
 // [[ << overloads ]]
 // [declarations]
@@ -161,6 +175,8 @@ std::ostream& operator<<(
     stream << "(" << value.first << ", " << value.second << ")";
     return stream;
 }
+
+// [[print funcs]]
 
 template <class Iter>
 void    print_vector_elements(Iter from, Iter to) {

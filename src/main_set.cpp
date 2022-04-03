@@ -131,9 +131,13 @@ namespace fill {
 
     void    get_allocator() {
         SPRINT("get_allocator");
-        set_type    m;
-        std::allocator< set_type::value_type >  alloc;
-        DSOUT() << (m.get_allocator() == alloc) << std::endl;
+        int k = 0;
+        for (int i = 0; i < 1000; ++i) {
+            set_type    m;
+            std::allocator< set_type::value_type >  alloc;
+            k += (m.get_allocator() == alloc);
+        }
+        DSOUT() << k << std::endl;
     }
 
     void    key_comp() {
@@ -210,7 +214,7 @@ namespace fill {
             DSOUT() << mm.size() << std::endl;
             DSOUT() << (mm.begin() == m.end()) << std::endl;
             DSOUT() << *(mm.begin()) << std::endl;
-            std::swap(m, mm);
+            m.swap(mm);
             DSOUT() << mm.empty() << std::endl;
             DSOUT() << mm.size() << std::endl;
             DSOUT() << (mm.begin() == m.end()) << std::endl;
@@ -501,29 +505,29 @@ namespace fill {
     }
 
     void    test() {
-        constructor_default(100);
-        constructor_comparator(100);
-        constructor_comparator_allocator(100);
-        constructor_iterator(100);
-        constructor_copy(100);
-        oprator_assignation(100);
+        constructor_default(1000);
+        constructor_comparator(1000);
+        constructor_comparator_allocator(1000);
+        constructor_iterator(1000);
+        constructor_copy(1000);
+        oprator_assignation(1000);
         get_allocator();
         key_comp();
         value_comp();
         begin_end_variable();
-        clear(100);
-        swap(100);
-        insert_value(100);
-        insert_value_with_hint(100);
-        insert_value_with_range(100);
-        erase_by_position(100);
-        erase_by_key(100);
-        erase_by_range(100);
-        find_variable(100);
-        find_constant(100);
-        equal_range(100);
-        lower_bound(100);
-        upper_bound(100);
+        clear(1000);
+        swap(1000);
+        insert_value(1000);
+        insert_value_with_hint(1000);
+        insert_value_with_range(1000);
+        erase_by_position(1000);
+        erase_by_key(1000);
+        erase_by_range(1000);
+        find_variable(1000);
+        find_constant(1000);
+        equal_range(1000);
+        lower_bound(1000);
+        upper_bound(1000);
         comparation();
         iterator_comparation();
     }
@@ -604,7 +608,7 @@ namespace logic {
         SPRINT("set_on_set");
         typedef SetClass< SetClass< int > > set_type;
         set_type    s;
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 1000; ++i) {
             set_type::key_type  t;
             for (int j = 0; j < 4; ++j) {
                 NS::pair<set_type::key_type::iterator, bool> result = t.insert(rand() % 3);
@@ -624,7 +628,7 @@ namespace logic {
         SPRINT("vector_on_set");
         typedef SetClass< VectorClass< int > > set_type;
         set_type    s;
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 1000; ++i) {
             set_type::key_type  t;
             for (int j = 0; j < 4; ++j) {
                 t.push_back(rand() % 3);
@@ -702,7 +706,7 @@ namespace performance {
             s.insert(rand());
         }
         {
-            SPRINT("performance::insertion") << "(" << n << ")";
+            SPRINT("performance::insertion") << "(" << n << ", " << m << ")";
             for (int i = 0; i < m; ++i) {
                 s.insert(rand());
             }
@@ -715,7 +719,7 @@ namespace performance {
             s.insert(i);
         }
         {
-            SPRINT("performance::hint_aided_insertion") << "(" << n << ")";
+            SPRINT("performance::hint_aided_insertion") << "(" << n << ", " << m << ")";
             for (int i = 0; i < m; ++i) {
                 s.insert(s.end(), s.size());
             }
@@ -785,14 +789,14 @@ namespace performance {
     }
 
     void    test() {
-        insertion(1000, 100);
-        insertion(10000, 100);
-        insertion(100000, 100);
-        insertion(1000000, 100);
-        hint_aided_insertion(1000, 100);
-        hint_aided_insertion(10000, 100);
-        hint_aided_insertion(100000, 100);
-        hint_aided_insertion(1000000, 100);
+        insertion(1000, 1000);
+        insertion(10000, 1000);
+        insertion(100000, 1000);
+        insertion(1000000, 1000);
+        hint_aided_insertion(1000, 1000);
+        hint_aided_insertion(10000, 1000);
+        hint_aided_insertion(100000, 1000);
+        hint_aided_insertion(1000000, 1000);
         copy(1000);
         copy(10000);
         copy(100000);
@@ -809,7 +813,7 @@ namespace performance {
         heavy_key(10000, 100);
         heavy_key(100, 1000);
         heavy_key(1000, 1000);
-        heavy_key(10000, 1000);        
+        heavy_key(10000, 1000);
     }
 }
 

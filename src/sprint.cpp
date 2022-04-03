@@ -2,6 +2,7 @@
 
 ft::vector<std::string>                 ft::sprint::chronicle;
 ft::vector<ft::sprint::duration_type>   ft::sprint::durations;
+ft::vector<std::string>                 ft::sprint::breads_;
 
 unsigned long    get_ut(void)
 {
@@ -12,7 +13,7 @@ unsigned long    get_ut(void)
 }
 
 ft::sprint::sprint(const std::string title)
-    : title_(title) {
+    : title_(make_title_(title)) {
         std::cout << ">> sprint start: " << title_ << std::endl;
         time_origin_ = get_ut();
     }
@@ -43,6 +44,16 @@ void    ft::sprint::insert_comment(const std::string& comment) {
     durations.push_back(-1);
 }
 
+void    ft::sprint::push_bread(const std::string& bread) {
+    breads_.push_back(bread);
+}
+
+void    ft::sprint::pop_bread() {
+    if (!breads_.empty()) {
+        breads_.pop_back();
+    }
+}
+
 void    ft::sprint::list() {
     std::size_t n = chronicle.size();
     std::size_t w = 0;
@@ -63,4 +74,14 @@ void    ft::sprint::list() {
             std::cout << chronicle[i] << std::endl;;
         }
     }
+}
+
+std::string ft::sprint::make_title_(const std::string& title) {
+    std::string actual_title;
+    for (ft::vector<std::string>::iterator it = breads_.begin(); it != breads_.end(); ++it) {
+        actual_title += *it;
+        actual_title += "::";
+    }
+    actual_title += title;
+    return actual_title;
 }

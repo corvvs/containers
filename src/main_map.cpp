@@ -201,7 +201,7 @@ namespace fill {
             DSOUT() << mm.size() << std::endl;
             DSOUT() << (mm.begin() == m.end()) << std::endl;
             DSOUT() << *(mm.begin()) << std::endl;
-            std::swap(m, mm);
+            m.swap(mm);
             DSOUT() << mm.empty() << std::endl;
             DSOUT() << mm.size() << std::endl;
             DSOUT() << (mm.begin() == m.end()) << std::endl;
@@ -597,7 +597,7 @@ namespace logic {
         SPRINT("map_on_map");
         typedef MapClass< MapClass< int, int >, int > map_type;
         map_type    s;
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 1000; ++i) {
             map_type::key_type  t;
             for (int j = 0; j < 3; ++j) {
                 NS::pair<map_type::key_type::iterator, bool> result = t.insert(NS::make_pair(rand() % 3, j));
@@ -617,7 +617,7 @@ namespace logic {
         SPRINT("map_on_set");
         typedef SetClass< MapClass< int, int > > set_type;
         set_type    s;
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 1000; ++i) {
             set_type::key_type  t;
             for (int j = 0; j < 3; ++j) {
                 NS::pair<set_type::key_type::iterator, bool> result = t.insert(NS::make_pair(rand() % 3, j));
@@ -636,7 +636,7 @@ namespace logic {
         SPRINT("set_on_map");
         typedef MapClass< SetClass< int >, int > map_type;
         map_type    s;
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 1000; ++i) {
             map_type::key_type  t;
             for (int j = 0; j < 3; ++j) {
                 NS::pair<map_type::key_type::iterator, bool> result = t.insert(rand() % 3);
@@ -760,9 +760,128 @@ namespace logic {
     }
 }
 
+namespace performance {
+    void    insertion(int n, int m) {
+        MapClass<int, int>   s;
+        for (int i = 0; i < n; ++i) {
+            s.insert(NS::make_pair(rand(), rand()));
+        }
+        {
+            SPRINT("performance::insertion") << "(" << n << ", " << m << ")";
+            for (int i = 0; i < m; ++i) {
+                s.insert(NS::make_pair(rand(), rand()));
+            }
+        }
+    }
+
+    void    hint_aided_insertion(int n, int m) {
+        MapClass<int, int>   s;
+        for (int i = 0; i < n; ++i) {
+            s.insert(NS::make_pair(i, rand()));
+        }
+        {
+            SPRINT("performance::hint_aided_insertion") << "(" << n << ", " << m << ")";
+            for (int i = 0; i < m; ++i) {
+                s.insert(s.end(), NS::make_pair(s.size(), rand()));
+            }
+        }
+    }
+
+    void    copy(int n) {
+        MapClass<int, int>   s;
+        for (int i = 0; i < n; ++i) {
+            s.insert(NS::make_pair(rand(), rand()));
+        }
+        {
+            SPRINT("performance::copy") << "(" << n << ")";
+            MapClass<int, int>   ss((s));
+        }
+    }
+
+    void    ranged_insertion(int n) {
+        MapClass<int, int>   s;
+        for (int i = 0; i < n; ++i) {
+            s.insert(NS::make_pair(rand(), rand()));
+        }
+        {
+            SPRINT("performance::ranged_insertion") << "(" << n << ")";
+            MapClass<int, int>   ss;
+            ss.insert(s.begin(), s.end());
+        }
+    }
+
+    // でかい(=compareに時間がかかる)キーを使った処理
+    void    heavy_key(int n, int m) {
+        typedef MapClass< VectorClass< int >, int > map_type;
+        map_type::const_iterator    it;
+        map_type    s;
+        {
+            SPRINT("performance::heavy_key initialize") << "(" << n << ", " << m << ")";
+            for (int i = 0; i < n; ++i) {
+                map_type::key_type  t;
+                for (int j = 0; j < m; ++j) {
+                    t.push_back(rand());
+                }
+                s.insert(NS::make_pair(t, rand()));
+            }
+            DSOUT() << *(s.begin()->first.begin()) << std::endl;
+            it = s.begin();
+            for (int i = 0; i < n / 2; ++i, ++it);
+        }
+        {
+            SPRINT("performance::heavy_key find") << "(" << n << ", " << m << ")";
+            for (int i = 0; i < n; ++i) {
+                map_type::const_iterator result = s.find(it->first);
+                DSOUT() << result->first.back() << ", " << result->second << std::endl;
+            }
+        }
+        {
+            SPRINT("performance::heavy_key erasure") << "(" << n << ", " << m << ")";
+            while (s.size() > 0) {
+                if (rand() % 2 == 0) {
+                    s.erase(s.begin());
+                } else {
+                    map_type::const_iterator    it = s.end();
+                    --it;
+                    s.erase(it);
+                }
+            }
+        }
+    }
+
+    void    test() {
+        insertion(1000, 1000);
+        insertion(10000, 1000);
+        insertion(100000, 1000);
+        insertion(1000000, 1000);
+        hint_aided_insertion(1000, 1000);
+        hint_aided_insertion(10000, 1000);
+        hint_aided_insertion(100000, 1000);
+        hint_aided_insertion(1000000, 1000);
+        copy(1000);
+        copy(10000);
+        copy(100000);
+        copy(1000000);
+        ranged_insertion(1000);
+        ranged_insertion(10000);
+        ranged_insertion(100000);
+        ranged_insertion(1000000);
+        heavy_key(100, 10);
+        heavy_key(1000, 10);
+        heavy_key(10000, 10);
+        heavy_key(100, 100);
+        heavy_key(1000, 100);
+        heavy_key(10000, 100);
+        heavy_key(100, 1000);
+        heavy_key(1000, 1000);
+        heavy_key(10000, 1000);
+    }
+}
+
 int main()
 {
     fill::test();
     logic::test();
+    performance::test();
     ft::sprint::list();
 }

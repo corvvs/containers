@@ -24,32 +24,32 @@ namespace ft {
 
             ~stack() {}
 
-            stack& operator=(const stack& other) {
+            inline stack& operator=(const stack& other) {
                 if (this != &other) { c = other.c; }
                 return *this;
             }
 
-            reference top() {
+            inline reference top() {
                 return c.back();
             }
 
-            const_reference top() const {
+            inline const_reference top() const {
                 return top();
             }
 
-            bool empty() const {
+            inline bool empty() const {
                 return c.empty();
             }
 
-            size_type size() const {
+            inline size_type size() const {
                 return c.size();
             }
 
-            void push(const value_type& value) {
+            inline void push(const value_type& value) {
                 c.push_back(value);
             }
 
-            void pop() {
+            inline void pop() {
                 c.pop_back();
             }
 
@@ -105,14 +105,14 @@ namespace ft {
     ) {
         return lhs.c >= rhs.c;
     }
-}
 
-template< class T, class Container >
-void swap(
-    ft::stack<T, Container>& lhs,
-    ft::stack<T, Container>& rhs
-) {
-    lhs.swap(rhs);
+    template< class T, class Container >
+    inline void swap(
+        ft::stack<T, Container>& lhs,
+        ft::stack<T, Container>& rhs
+    ) {
+        lhs.swap(rhs);
+    }
 }
 
 #endif

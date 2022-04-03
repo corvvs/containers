@@ -3,11 +3,6 @@
 
 # include "ft_common.hpp"
 # include "ft_meta_functions.hpp"
-# include <memory>
-# include <iostream>
-# include <iterator>
-# include <exception>
-# include <stdexcept>
 
 namespace ft {
     template <class First, class Second>
@@ -31,13 +26,13 @@ namespace ft {
                 : first(other.first), second(other.second) {}
             ~pair() {}
 
-            pair<First, Second>& operator=(const pair<First, Second> &rhs) {
+            inline pair<First, Second>& operator=(const pair<First, Second> &rhs) {
                 first = rhs.first;
                 second = rhs.second;
                 return *this;
             }
 
-            void    swap(pair<First, Second>& other) {
+            inline void    swap(pair<First, Second>& other) {
                 ft::swap(first, other.first);
                 ft::swap(second, other.second);
             }
@@ -98,11 +93,11 @@ namespace ft {
     ) {
         return !(lhs < rhs);
     }
-}
 
-template <class First, class Second>
-void    swap(ft::pair<First, Second>& x, ft::pair<First, Second>& y) {
-    x.swap(y);
+    template <class First, class Second>
+    inline void    swap(ft::pair<First, Second>& x, ft::pair<First, Second>& y) {
+        x.swap(y);
+    }
 }
 
 #endif

@@ -138,7 +138,7 @@ namespace ft {
                 // 破壊処理はtreeのデストラクタがやる
             }
 
-            self_type&      operator=(const self_type& rhs) {
+            inline self_type&      operator=(const self_type& rhs) {
                 if (this == &rhs) { return *this; }
                 tree_ = rhs.tree_;
                 return *this;
@@ -187,7 +187,7 @@ namespace ft {
                 return iterator(result);
             }
             template <class InputIterator>
-            void                    insert(InputIterator first, InputIterator last)
+            inline void                    insert(InputIterator first, InputIterator last)
             {
                 typename base::const_iterator  e = tree_.end();
                 for (; first != last; ++first) {
@@ -297,14 +297,13 @@ namespace ft {
         return !(lhs < rhs);
     }
 
-}
-
-template <class Key, class KeyComparator, class KeyAllocator>
-void swap(
-    ft::set<Key, KeyComparator, KeyAllocator>& lhs,
-    ft::set<Key, KeyComparator, KeyAllocator>& rhs
-) {
-    lhs.swap(rhs);
+    template <class Key, class KeyComparator, class KeyAllocator>
+    inline void swap(
+        ft::set<Key, KeyComparator, KeyAllocator>& lhs,
+        ft::set<Key, KeyComparator, KeyAllocator>& rhs
+    ) {
+        lhs.swap(rhs);
+    }
 }
 
 #endif

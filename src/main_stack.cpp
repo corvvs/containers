@@ -70,28 +70,41 @@ void    mass_assign(unsigned long n) {
     }
 }
 
+template <class T>
+void    performance(const std::string& t) {
+    ft::sprint::insert_comment("default container");
+    ft::sprint::push_bread("stack<" + t + ">");
+    mass_push_and_pop<T, StackContainer<T> >(300000);
+    mass_copy<T, StackContainer<T> >(300000);
+    mass_assign<T, StackContainer<T> >(300000);
+    ft::sprint::pop_bread();
+}
+
 template <class T, class Container>
-void    performance(const std::string& sub_title) {
-    ft::sprint::insert_comment(sub_title);
-    mass_push_and_pop<T, Container>(100000);
-    mass_copy<T, Container>(100000);
-    mass_assign<T, Container>(100000);
+void    performance(const std::string& t, const std::string& container) {
+    ft::sprint::insert_comment(container);
+    ft::sprint::push_bread("stack<" + t + ", " + container + ">");
+    mass_push_and_pop<T, Container>(300000);
+    mass_copy<T, Container>(300000);
+    mass_assign<T, Container>(300000);
+    ft::sprint::pop_bread();
 }
 
 #define TP(T, C) T, C<T>
 
 template <class T>
 void    run_mass_test(const std::string& main_title) {
-    ft::sprint::insert_comment(main_title);
-    performance<TP(T, ft::vector)>(">> ft::vector");
-    performance<TP(T, std::vector)>(">> std::vector");
-    performance<TP(T, std::deque)>(">> std::deque");
-    performance<TP(T, std::list)>(">> std::list");
+    ft::sprint::insert_comment(">> " + main_title);
+    performance<T>(main_title);
+    performance<TP(T, ft::vector)>(main_title, "ft::vector");
+    performance<TP(T, std::vector)>(main_title, "std::vector");
+    performance<TP(T, std::deque)>(main_title, "std::deque");
+    performance<TP(T, std::list)>(main_title, "std::list");
 }
 
 int main() {
-    run_mass_test<int>("[int]");
-    run_mass_test<ft::IntWrapper>("[IntWrapper]");
-    run_mass_test<std::string>("[std::string]");
+    run_mass_test<int>("int");
+    run_mass_test<ft::IntWrapper>("ft::IntWrapper");
+    run_mass_test<std::string>("std::string");
     ft::sprint::list();
 }
