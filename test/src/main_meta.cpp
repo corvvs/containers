@@ -79,6 +79,16 @@ namespace is_convertible {
         // 検出限界
         VICE_VERSA(int[], int*);
         VICE_VERSA(long[], std::size_t[]);
+        VICE_VERSA(NS::vector<int>::iterator, NS::vector<int>::const_iterator);
+        VICE_VERSA(NS::vector<int>::iterator, NS::vector<int>::reverse_iterator);
+        VICE_VERSA(NS::vector<int>::reverse_iterator, NS::vector<int>::const_reverse_iterator);
+        VICE_VERSA(NS::set<int>::iterator, NS::set<int>::const_iterator);
+        VICE_VERSA(NS::set<int>::iterator, NS::set<int>::reverse_iterator);
+        VICE_VERSA(NS::set<int>::reverse_iterator, NS::set<int>::const_reverse_iterator);
+        typedef NS::map<int, int>   map_type;
+        VICE_VERSA(map_type::iterator, map_type::const_iterator);
+        VICE_VERSA(map_type::iterator, map_type::reverse_iterator);
+        VICE_VERSA(map_type::reverse_iterator, map_type::const_reverse_iterator);
     }
 #undef VICE_VERSA
 }

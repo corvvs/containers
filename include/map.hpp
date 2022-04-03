@@ -65,8 +65,8 @@ namespace ft {
                         *this = other;
                     }
                     // これは explicit つけない
-                    iterator(const_iterator_type variable)
-                        : tree_it_(variable.tree_iter()) {}
+                    // iterator(const_iterator_type variable)
+                    //     : tree_it_(variable.tree_iter()) {}
                     virtual ~iterator() {}
                     iterator&   operator=(const iterator& rhs) {
                         tree_it_ = rhs.tree_it_;
@@ -109,7 +109,13 @@ namespace ft {
                     inline bool operator==(const iterator& rhs) const {
                         return operator->() == rhs.operator->();
                     }
+                    inline bool operator==(const const_iterator& rhs) const {
+                        return operator->() == rhs.operator->();
+                    }
                     inline bool operator!=(const iterator& rhs) const {
+                        return !(*this == rhs);
+                    }
+                    inline bool operator!=(const const_iterator& rhs) const {
                         return !(*this == rhs);
                     }
             };
@@ -184,6 +190,12 @@ namespace ft {
 
                     inline bool             operator==(const const_iterator& rhs) const {
                         return operator->() == rhs.operator->();
+                    }
+                    inline bool             operator==(const iterator& rhs) const {
+                        return operator->() == rhs.operator->();
+                    }
+                    inline bool             operator!=(const iterator& rhs) const {
+                        return !(*this == rhs);
                     }
                     inline bool             operator!=(const const_iterator& rhs) const {
                         return !(*this == rhs);
