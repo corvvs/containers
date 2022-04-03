@@ -31,22 +31,24 @@ namespace ft {
                                                                 base;
             class const_iterator {
                 FT_PRIVATE:
-                    typedef typename base::node_type    node_type;
-                    typedef typename base::iterator     tree_iterator;
+                    typedef typename base::node_type            node_type;
+                    typedef typename base::iterator             tree_iterator;
                     typedef typename base::const_iterator
-                                                        tree_const_iterator;
-                    typedef const_iterator              const_iterator_type;
+                                                                tree_const_iterator;
+                    typedef const_iterator                      const_iterator_type;
 
-                    tree_const_iterator                 tree_it_;
+                    tree_const_iterator tree_it_;
 
                 public:
                     typedef std::bidirectional_iterator_tag
-                                                        iterator_category;
-                    typedef set::value_type             value_type;
+                                                                iterator_category;
+                    typedef set::value_type                     value_type;
                     typedef typename base::iterator::difference_type
-                                                        difference_type;
-                    typedef const value_type&           reference;
-                    typedef const value_type*           pointer;
+                                                                difference_type;
+                    typedef const value_type&                   reference;
+                    typedef const value_type*                   pointer;
+
+                    // [[constructors]]
 
                     const_iterator() {}
                     explicit const_iterator(tree_const_iterator tit)
@@ -60,30 +62,30 @@ namespace ft {
                         return tree_it_;
                     }
 
-                    inline reference   operator*() const {
+                    inline reference        operator*() const {
                         return *(tree_it_->value());
                     }
-                    inline pointer     operator->() const {
+                    inline pointer          operator->() const {
                         return tree_it_->value();
                     }
 
-                    inline const_iterator&   operator++() {
+                    inline const_iterator&  operator++() {
                         ++tree_it_;
                         return *this;
                     }
 
-                    inline const_iterator    operator++(int) {
+                    inline const_iterator   operator++(int) {
                         iterator    it = *this;
                         ++*this;
                         return it;
                     }
 
-                    inline const_iterator&   operator--() {
+                    inline const_iterator&  operator--() {
                         --tree_it_;
                         return *this;
                     }
 
-                    inline const_iterator    operator--(int) {
+                    inline const_iterator   operator--(int) {
                         const_iterator    it = *this;
                         --*this;
                         return it;
@@ -144,45 +146,27 @@ namespace ft {
                 return *this;
             }
 
-            // [[getter群]]
-
             inline allocator_type      get_allocator() const {
                 return allocator_type(tree_.get_allocator());
             }
 
-            // Key同士を取って比較するコンパレータを返す
-            inline key_compare         key_comp() const {
-                return tree_.value_compare();
-            }
+            inline iterator         begin() { return iterator(tree_.begin()); }
+            inline const_iterator   begin() const { return const_iterator(tree_.begin()); }
+            inline iterator         end() { return iterator(tree_.end()); }
+            inline const_iterator   end() const { return const_iterator(tree_.end()); }
 
-            // setではkey_compと同じ.
-            inline value_compare       value_comp() const {
-                return key_comp();
-            }
+            inline bool             empty() const { return tree_.empty(); }
+            inline size_type        size() const {return tree_.size();}
+            inline size_type        max_size() const {return tree_.max_size();}
 
-            inline bool         empty() const { return tree_.empty(); }
-            inline size_type    size() const {return tree_.size();}
-            inline size_type    max_size() const {return tree_.max_size();}
-
-            inline iterator            begin() { return iterator(tree_.begin()); }
-            inline const_iterator      begin() const { return const_iterator(tree_.begin()); }
-            inline iterator            end() { return iterator(tree_.end()); }
-            inline const_iterator      end() const { return const_iterator(tree_.end()); }
-
-            // [[ライフサイクル]]
-
-            inline void         clear() { tree_.clear(); }
-            inline void                swap(self_type& other) {
-                tree_.swap(other.tree_);
-            }
+            inline void             clear() { tree_.clear(); }
 
             // [[挿入系関数群]]
-
             inline pair<iterator, bool>    insert(const value_type& v) {
                 ft::pair<typename base::iterator, bool>   result = tree_.insert(v);
                 return ft::make_pair(iterator(result.first), result.second);
             }
-            inline iterator                insert(const_iterator hint, const value_type& v) {
+            inline iterator                insert(iterator hint, const value_type& v) {
                 typename base::iterator  result = tree_.insert(hint.tree_iter(), v);
                 return iterator(result);
             }
@@ -196,48 +180,64 @@ namespace ft {
             }
 
             // [[削除]]
-
-            inline void        erase(const_iterator position) {
+            inline void         erase(const_iterator position) {
                 tree_.erase(position.tree_iter());
             }
-            inline size_type   erase(const key_type& x) {
+            inline size_type    erase(const key_type& x) {
                 return tree_.erase_by_key(x);
             }
-            inline void        erase(iterator first, iterator last) {
+            inline void         erase(iterator first, iterator last) {
                 return tree_.erase(first.tree_iter(), last.tree_iter());
+            }
+
+            inline void         swap(self_type& other) {
+                tree_.swap(other.tree_);
             }
 
             // [[検索系関数]]
 
-            inline iterator             find(const key_type& x) {
-                return iterator(tree_.find(x));
-            }
-            inline const_iterator       find(const key_type& x) const {
-                return const_iterator(tree_.find(x));
-            }
-
-            inline size_type            count(const key_type& x) const {
+            inline size_type                count(const key_type& x) const {
                 return tree_.count(x);
             }
 
-            inline pair<iterator, iterator>    equal_range(const key_type& x) {
+            inline iterator                 find(const key_type& x) {
+                return iterator(tree_.find(x));
+            }
+            inline const_iterator           find(const key_type& x) const {
+                return const_iterator(tree_.find(x));
+            }
+
+            inline pair<iterator, iterator>             equal_range(const key_type& x) {
                 return tree_.equal_range(x);
             }
 
-            inline iterator                    lower_bound(const key_type& x) {
+            inline pair<const_iterator, const_iterator> equal_range(const key_type& x) const {
+                return tree_.equal_range(x);
+            }
+
+            inline iterator                 lower_bound(const key_type& x) {
                 return iterator(tree_.lower_bound(x));
             }
-            inline const_iterator              lower_bound(const key_type& x) const {
+            inline const_iterator           lower_bound(const key_type& x) const {
                 return const_iterator(tree_.lower_bound(x));
             }
 
-            inline iterator                    upper_bound(const key_type& x) {
+            inline iterator                 upper_bound(const key_type& x) {
                 return iterator(tree_.upper_bound(x));
             }
-            inline const_iterator              upper_bound(const key_type& x) const {
+            inline const_iterator           upper_bound(const key_type& x) const {
                 return const_iterator(tree_.upper_bound(x));
             }
 
+            // Key同士を取って比較するコンパレータを返す
+            inline key_compare              key_comp() const {
+                return tree_.value_compare();
+            }
+
+            // setではkey_compと同じ.
+            inline value_compare            value_comp() const {
+                return key_comp();
+            }
     };
 
     // [比較演算子]

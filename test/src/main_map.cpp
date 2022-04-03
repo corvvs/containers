@@ -366,6 +366,7 @@ namespace fill {
         DSOUT() << (m.begin() == m.end()) << std::endl;
         for (int i = 0; i < n * 5; ++i) {
             NS::pair<map_type::iterator, map_type::iterator>    range = m.equal_range(rand() % n);
+            NS::pair<map_type::const_iterator, map_type::const_iterator>    crange = m.equal_range(rand() % n);
             if (range.first == range.second) {
                 // not found
                 if (range.first == m.end()) {
@@ -380,6 +381,7 @@ namespace fill {
                     DSOUT() << "found: " << range.first->first << " - " << range.second->first << std::endl;
                 }
             }
+            DSOUT() << (crange.first == crange.second) << std::endl;
         }
     }
 

@@ -375,6 +375,7 @@ namespace fill {
             int k = rand() % n;
             DSOUT() << "test for: " << k << std::endl;
             NS::pair<set_type::iterator, set_type::iterator>    range = m.equal_range(k);
+            NS::pair<set_type::const_iterator, set_type::const_iterator>    crange = m.equal_range(k);
             if (range.first == range.second) {
                 // not found
                 if (range.first == m.end()) {
@@ -389,6 +390,7 @@ namespace fill {
                     DSOUT() << "found: " << *range.first << " - " << *range.second << std::endl;
                 }
             }
+            DSOUT() << (crange.first == crange.second) << std::endl;
         }
     }
 

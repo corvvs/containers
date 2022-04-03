@@ -13,8 +13,12 @@ namespace ft {
             typedef Container                           container_type;
             typedef typename Container::value_type      value_type;
             typedef typename Container::size_type       size_type;
+
+        FT_PRIVATE:
             typedef typename Container::reference       reference;
             typedef typename Container::const_reference const_reference;
+
+        public:
 
             explicit stack(const Container& cont = Container())
                 : c(cont) {}
@@ -32,7 +36,6 @@ namespace ft {
             inline reference top() {
                 return c.back();
             }
-
             inline const_reference top() const {
                 return top();
             }
@@ -106,6 +109,7 @@ namespace ft {
         return lhs.c >= rhs.c;
     }
 
+    // C++03では不要だけど, 便利だからいいんじゃないのと思うの.
     template< class T, class Container >
     inline void swap(
         ft::stack<T, Container>& lhs,

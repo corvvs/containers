@@ -22,17 +22,23 @@ namespace ft {
             typedef typename allocator_type::pointer                pointer;
             typedef typename allocator_type::const_pointer          const_pointer;
 
-            typedef ft::iterator_wrapper<pointer>              iterator;
-            typedef ft::iterator_wrapper<const_pointer>        const_iterator;
+            typedef ft::iterator_wrapper<pointer>                   iterator;
+            typedef ft::iterator_wrapper<const_pointer>             const_iterator;
 
             typedef typename ft::reverse_iterator<iterator>         reverse_iterator;
             typedef typename ft::reverse_iterator<const_iterator>   const_reverse_iterator;
 
+        FT_PRIVATE:
+            size_type       capacity_;
+            size_type       size_;
+            allocator_type  allocator_;
+            pointer         storage_;
+
+        public:
             // [コンストラクタ]
             // デフォルト
             vector()
                 : capacity_(0), size_(0), allocator_(allocator_type()), storage_(NULL) {}
-
             // アロケータ指定
             explicit vector(const allocator_type& alloc)
                 : capacity_(0), size_(0), allocator_(alloc), storage_(NULL) {}
@@ -81,120 +87,31 @@ namespace ft {
                 return *this;
             }
 
-            // [assign]
-            // !! INVALIDATE all signifiers !!
-            // ※コンテナの要素へのイテレータ、ポインタ、参照はすべて無効化されます。 終端イテレータも無効化されます。 
-            // (1) 内容を「valueのコピーcount個」に置き換える
-            void assign(size_type count, const_reference value) {
-                if (is_reallocation_needed_(count)) {
-                    vector<value_type, allocator_type>  new_one(count, value, allocator_);
-                    swap(new_one);
-                } else {
-                    clear();
-                    insert(begin(), count, value);
-                }
-            }
-            // (2) 内容をレンジイテレータが指すものに置き換える
-            // first and/or lastがthis内を指している場合はundefined
-            template< class InputIt >
-            void assign(
-                InputIt first, InputIt last,
-                typename ft::disable_if< ft::is_integral<InputIt>::value >::type* = NULL
-            ) {
-                vector<value_type, allocator_type>  new_one(first, last, allocator_);
-                if (is_reallocation_needed_(new_one.size())) {
-                    swap(new_one);
-                } else {
-                    clear();
-                    insert(begin(), new_one.begin(), new_one.end());
-                }
-            }
-
-            // [get_allocator]
-            // 関連付けられているアロケータを返します 
-            inline allocator_type get_allocator() const {
-                return allocator_type(allocator_);
-            }
-
-            // [at]
-            // 境界チェック付きで、指定された位置 pos の要素への参照を返します。
-            // pos がコンテナの範囲内でなければ std::out_of_range 型の例外が投げられます。
-            // cf. [] は境界チェックをしない。
-            reference       at(size_type pos) {
-                if (size_ <= pos) {
-                    throw std::out_of_range("vector");
-                }
-                return (*this)[pos];
-            }
-            const_reference at(size_type pos) const {
-                if (size_ <= pos) {
-                    throw std::out_of_range("vector");
-                }
-                return (*this)[pos];
-            }
-
-            // [[]]
-            // 指定された位置 pos の要素を指す参照を返します。 境界チェックは行われません。 
-            inline reference       operator[](size_type pos) {
-                return storage_[pos];
-            }
-            inline const_reference operator[](size_type pos) const {
-                return storage_[pos];
-            }
-
-            // [front]
-            // コンテナ内の最初の要素を指す参照を返します。
-            // 空のコンテナに対する front の呼び出しは未定義です。
-            // cf. コンテナ c に対して、式 c.front() は *c.begin() と同等です。 
-            inline reference front() {
-                return *begin();
-            }
-            inline const_reference front() const {
-                return *begin();
-            }
-
-            // [back]
-            // コンテナの最後の要素への参照を返します。
-            // 空のコンテナに対する back の呼び出しは未定義です。 
-            // cf. コンテナ c に対して、式は return c.back(); は { auto tmp = c.end(); --tmp; return *tmp; } と同等です。 
-            inline reference back() {
-                if (empty()) {
-                    // 空
-                }
-                return (*this)[size_ - 1];
-            }
-            inline const_reference back() const {
-                if (empty()) {
-                    // 空
-                }
-                return (*this)[size_ - 1];
-            }
-
             // [begin]
             // コンテナの最初の要素を指すイテレータを返します。
             // コンテナが空の場合は、返されたイテレータは end() と等しくなります。 
-            inline iterator begin() {
+            inline iterator         begin() {
                 if (size_ > 0) {
                     return iterator(storage_);
                 } else {
                     return end();
                 }
             }
-            inline const_iterator begin() const {
+            inline const_iterator   begin() const {
                 return const_iterator(storage_);
             }
 
             // [end]
             // コンテナの最後の要素の次の要素を指すイテレータを返します。
             // この要素はプレースホルダとしての役割を持ちます。この要素にアクセスを試みると未定義動作になります。
-            inline iterator end() {
+            inline iterator         end() {
                 if (size_ > 0) {
                     return begin() + size_;
                 } else {
                     return iterator(storage_);
                 }
             }
-            inline const_iterator end() const {
+            inline const_iterator   end() const {
                 if (size_ > 0) {
                     return begin() + size_;
                 } else {
@@ -205,10 +122,10 @@ namespace ft {
             // [rbegin]
             // 逆順の vector の最初の要素を指す逆イテレータを返します。 これは非逆順の vector の最後の要素に対応します。
             // vector が空の場合、返されるイテレータは rend() と等しくなります。 
-            inline reverse_iterator rbegin() {
+            inline reverse_iterator         rbegin() {
                 return reverse_iterator(end());
             }
-            inline const_reverse_iterator rbegin() const {
+            inline const_reverse_iterator   rbegin() const {
                 return reverse_iterator(end());
             }
 
@@ -216,19 +133,13 @@ namespace ft {
             // 逆順の vector の最後の要素の次の要素を指す逆イテレータを返します。
             // これは非逆順の vector の最初の要素の前の要素に対応します。
             // この要素はプレースホルダとして振る舞い、アクセスを試みると未定義動作になります。
-            inline reverse_iterator rend() {
+            inline reverse_iterator         rend() {
                 return reverse_iterator(begin());
             }
-            inline const_reverse_iterator rend() const {
+            inline const_reverse_iterator   rend() const {
                 return reverse_iterator(begin());
             }
 
-            // [empty]
-            // コンテナの持っている要素が無い、つまり begin() == end() かどうかを調べます。 
-            inline bool empty() const {
-                return size_ == 0;
-            }
-            
             // [size]
             // コンテナ内の要素の数、すなわち std::distance(begin(), end()) を返します。 
             inline size_type size() const {
@@ -243,6 +154,67 @@ namespace ft {
             inline size_type max_size() const {
                 return difference_type(-1) / sizeof(value_type);
                 // return allocator_.max_size();
+            }
+
+            // [resize]
+            // count 個の要素を格納するようにコンテナのサイズを変更します。
+            // 現在のサイズが count より大きい場合、最初の count 個の要素にコンテナが縮小されます。
+            // 現在のサイズが count より小さい場合、 value のコピーで初期化された要素が追加されます。
+            // より小さなサイズに変更しても vector の容量は縮小されません。 これは、 pop_back() を複数回呼び出すことで同等の効果を得た場合に無効化されるイテレータは削除されたもののみであるのに対し、容量の変更はすべてのイテレータを無効化するためです。 
+            inline void resize(size_type count) {
+                const size_type   current_size = size();
+                if (current_size > count) {
+                    // 現在のサイズが count より大きい場合、最初の count 個の要素にコンテナが縮小されます。
+                    // If n is less than or equal to the size of the container,
+                    // the function never throws exceptions (no-throw guarantee).
+                    destroy_from_(iterator(storage_ + count), end());
+                    size_ = count;
+                } else if (current_size < count) {
+                    // -> value ありに移譲
+                    resize(count, value_type());
+                }
+            }
+            void        resize(size_type count, value_type value) {
+                const size_type   current_size = size();
+                if (current_size > count) {
+                    // 現在のサイズが count より大きい場合、最初の count 個の要素にコンテナが縮小されます。
+                    // If n is less than or equal to the size of the container,
+                    // the function never throws exceptions (no-throw guarantee).
+                    destroy_from_(iterator(storage_ + count), end());
+                    size_ = count;
+                } else if (current_size < count) {
+                    // 現在のサイズが count より小さい場合、 value のコピーで初期化された要素が追加されます。
+                    // If n is greater and a reallocation happens, there are no changes in the container in case of exception (strong guarantee)
+                    // if the type of the elements is either copyable or no-throw moveable.
+                    // Otherwise, if an exception is thrown, the container is left with a valid state (basic guarantee).
+                    const size_type   current_cap = capacity_;
+                    if (count <= current_cap) {
+                        // count が容量未満
+                        // -> 再確保不要。サイズがcountになるまでvalueを追加する。
+                        // -> 基本保証
+                        insert(end(), count - current_size, value);
+                    } else {
+                        // 再確保が必要
+                        // -> Copyableなら強い保証、そうでないなら基本保証
+                        vector<value_type, allocator_type> cloned(allocator_);
+                        cloned.reserve(recommended_capacity_(count));
+                        cloned.insert(cloned.end(), begin(), end());
+                        cloned.insert(cloned.end(), count - cloned.size(), value);
+                        swap(cloned);
+                    }
+                }
+            }
+
+            // [capacity]
+            // コンテナが現在確保している空間に格納できる要素の数を返します。 
+            inline size_type    capacity() const {
+                return capacity_;
+            }
+
+            // [empty]
+            // コンテナの持っている要素が無い、つまり begin() == end() かどうかを調べます。 
+            inline bool         empty() const {
+                return size_ == 0;
             }
 
             // [reserve]
@@ -276,31 +248,140 @@ namespace ft {
                 }
             }
 
-            // [capacity]
-            // コンテナが現在確保している空間に格納できる要素の数を返します。 
-            inline size_type capacity() const {
-                return capacity_;
+            // [[]]
+            // 指定された位置 pos の要素を指す参照を返します。 境界チェックは行われません。 
+            inline reference        operator[](size_type pos) {
+                return storage_[pos];
+            }
+            inline const_reference  operator[](size_type pos) const {
+                return storage_[pos];
             }
 
-            // [clear]
-            // コンテナからすべての要素を削除します。 この呼び出しの後、 size() はゼロを返します。
-            // 格納されている要素を指すあらゆる参照、ポインタ、イテレータは無効化されます。 終端イテレータも無効化されます。  
-            // vector の capacity() は変更されません (ノート: 標準の capacity 変更に対する制約は vector::reserve で規定されています。 [1] を参照してください)。
-            inline void clear() {
-                resize(0);
+            // [at]
+            // 境界チェック付きで、指定された位置 pos の要素への参照を返します。
+            // pos がコンテナの範囲内でなければ std::out_of_range 型の例外が投げられます。
+            // cf. [] は境界チェックをしない。
+            reference       at(size_type pos) {
+                if (size_ <= pos) {
+                    throw std::out_of_range("vector");
+                }
+                return (*this)[pos];
+            }
+            const_reference at(size_type pos) const {
+                if (size_ <= pos) {
+                    throw std::out_of_range("vector");
+                }
+                return (*this)[pos];
+            }
+
+            // [front]
+            // コンテナ内の最初の要素を指す参照を返します。
+            // 空のコンテナに対する front の呼び出しは未定義です。
+            // cf. コンテナ c に対して、式 c.front() は *c.begin() と同等です。 
+            inline reference        front() {
+                return *begin();
+            }
+            inline const_reference  front() const {
+                return *begin();
+            }
+
+            // [back]
+            // コンテナの最後の要素への参照を返します。
+            // 空のコンテナに対する back の呼び出しは未定義です。 
+            // cf. コンテナ c に対して、式は return c.back(); は { auto tmp = c.end(); --tmp; return *tmp; } と同等です。 
+            inline reference        back() {
+                if (empty()) {
+                    // 空
+                }
+                return (*this)[size_ - 1];
+            }
+            inline const_reference  back() const {
+                if (empty()) {
+                    // 空
+                }
+                return (*this)[size_ - 1];
+            }
+
+            // [assign]
+            // !! INVALIDATE all signifiers !!
+            // ※コンテナの要素へのイテレータ、ポインタ、参照はすべて無効化されます。 終端イテレータも無効化されます。 
+            // (1) 内容を「valueのコピーcount個」に置き換える
+            void    assign(size_type count, const_reference value) {
+                if (is_reallocation_needed_(count)) {
+                    vector<value_type, allocator_type>  new_one(count, value, allocator_);
+                    swap(new_one);
+                } else {
+                    clear();
+                    insert(begin(), count, value);
+                }
+            }
+            // (2) 内容をレンジイテレータが指すものに置き換える
+            // first and/or lastがthis内を指している場合はundefined
+            // disable_if は (1) と誤認されないためのもの
+            template< class InputIt >
+            void    assign(
+                InputIt first, InputIt last,
+                typename ft::disable_if< ft::is_integral<InputIt>::value >::type* = NULL
+            ) {
+                vector<value_type, allocator_type>  new_one(first, last, allocator_);
+                if (is_reallocation_needed_(new_one.size())) {
+                    swap(new_one);
+                } else {
+                    clear();
+                    insert(begin(), new_one.begin(), new_one.end());
+                }
+            }
+
+            // [push_back]
+            // 指定された要素 value をコンテナの終端に追加します。
+            // (1) 新しい要素は value のコピーとして初期化されます。
+            // 新しい size() が capacity() より大きい場合は、すべてのイテレータおよび参照 (終端イテレータも含む) が無効化されます。 
+            // そうでなければ、終端イテレータのみが無効化されます。 
+            // <時間計算量: 償却定数>
+            // <例外安全性: STRONG>
+            // 例外が投げられた場合 (Allocator::allocate() または要素のコピー/ムーブのコンストラクタ/代入によって発生する可能性があります)、この関数は効果を持ちません (強い例外保証)。 
+            void push_back(const_reference value) {
+                size_type   rec_cap = recommended_capacity_(size_ + 1);
+                if (rec_cap > capacity()) {
+                    // 再確保発生
+                    // コピーしてpush_backしてswap
+                    // 1回あたりO(size)かかるが、size回pushしてlog2(size)回しか起こらないので、
+                    // 全体としては定数くらいになってくれるはず。
+                    vector<value_type, allocator_type> cloned(allocator_);
+                    cloned.reserve(rec_cap);
+                    cloned.append_within_capacity_(begin(), end());
+                    cloned.push_back_within_capacity_(value);
+                    swap(cloned);
+                } else {
+                    // 再確保不要
+                    push_back_within_capacity_(value);
+                }
+            }
+
+            // [pop_back]
+            // コンテナの最後の要素を削除します。
+            // 空のコンテナに対する pop_back の呼び出しは未定義です。
+            // 最後の要素を指すイテレータと参照および end() が無効化されます。 
+            inline void pop_back() {
+                if (empty()) {
+                    // 空
+                    return;
+                }
+                allocator_.destroy(&storage_[size_ - 1]);
+                size_ -= 1;
             }
 
             // [insert]
             // pos の前に value を挿入します。
             // returns: 挿入された value を指すイテレータ。
-            iterator insert(iterator pos, const value_type& value) {
+            iterator    insert(iterator pos, const value_type& value) {
                 size_type    n = distance_(begin(), pos);
                 insert(pos, 1, value);
                 return begin() + n;
             }
             // os の前に value のコピーを count 個挿入します。
             // returns: 挿入された最初の要素を指すイテレータ、または count==0 の場合は pos。
-            void insert(iterator pos, size_type count, const value_type& value) {
+            void        insert(iterator pos, size_type count, const value_type& value) {
                 size_type   recommended_cap = recommended_capacity_(size() + count);
                 bool        needed_realloc = recommended_cap > capacity();
                 bool        do_append = pos == end();
@@ -333,11 +414,10 @@ namespace ft {
                     swap(new_one);
                 }
             }
-
             // pos の前に範囲 [first, last) から要素を挿入します。 
             template <class InputIt>
             // 範囲挿入(入力イテレータ)
-            void insert(
+            void        insert(
                 iterator pos, InputIt first, InputIt last,
                 typename ft::enable_if<
                     !ft::is_integral<InputIt>::value
@@ -358,10 +438,9 @@ namespace ft {
                 // - ランダムアクセスイテレータなので, std::distanceが定数時間で終わる.
                 insert(pos, receiver.begin(), receiver.end());
             }
-
             template <class ForwardIt>
             // 範囲挿入(前方向イテレータ)
-            void insert(
+            void        insert(
                 iterator pos, ForwardIt first, ForwardIt last,
                 typename ft::enable_if<
                     !ft::is_integral<ForwardIt>::value
@@ -417,7 +496,6 @@ namespace ft {
                 // }
                 return erase(pos, pos + 1);
             }
-
             // 2) 範囲 [first, last) 内の要素を削除します。
             // 削除位置およびその後を指すイテレータおよび参照は無効化されます。 終端イテレータも無効化されます。
             // イテレータ pos は有効かつ逆参照可能でなければなりません。 そのため end() イテレータは (有効であるが逆参照可能でないため) pos の値として使用することはできません。
@@ -425,7 +503,7 @@ namespace ft {
             // 削除された最後の要素の次を指すイテレータ。
             // 削除前に last==end() であった場合は、更新後の end() イテレータが返されます。
             // [first, last) が空範囲の場合は、 last が返されます。 
-            iterator erase(iterator first, iterator last) {
+            iterator        erase(iterator first, iterator last) {
                 if (is_interval_empty_(first, last)) {
                     return last;
                 }
@@ -433,95 +511,6 @@ namespace ft {
                 size_type   count = distance_(first, last);
                 mass_moveleft_within_capacity_(last, count);
                 return begin() + i;
-            }
-
-            // [push_back]
-            // 指定された要素 value をコンテナの終端に追加します。
-            // (1) 新しい要素は value のコピーとして初期化されます。
-            // 新しい size() が capacity() より大きい場合は、すべてのイテレータおよび参照 (終端イテレータも含む) が無効化されます。 
-            // そうでなければ、終端イテレータのみが無効化されます。 
-            // <時間計算量: 償却定数>
-            // <例外安全性: STRONG>
-            // 例外が投げられた場合 (Allocator::allocate() または要素のコピー/ムーブのコンストラクタ/代入によって発生する可能性があります)、この関数は効果を持ちません (強い例外保証)。 
-            void push_back(const_reference value) {
-                size_type   rec_cap = recommended_capacity_(size_ + 1);
-                if (rec_cap > capacity()) {
-                    // 再確保発生
-                    // コピーしてpush_backしてswap
-                    // 1回あたりO(size)かかるが、size回pushしてlog2(size)回しか起こらないので、
-                    // 全体としては定数くらいになってくれるはず。
-                    vector<value_type, allocator_type> cloned(allocator_);
-                    cloned.reserve(rec_cap);
-                    cloned.append_within_capacity_(begin(), end());
-                    cloned.push_back_within_capacity_(value);
-                    swap(cloned);
-                } else {
-                    // 再確保不要
-                    push_back_within_capacity_(value);
-                }
-            }
-
-            // [pop_back]
-            // コンテナの最後の要素を削除します。
-            // 空のコンテナに対する pop_back の呼び出しは未定義です。
-            // 最後の要素を指すイテレータと参照および end() が無効化されます。 
-            inline void pop_back() {
-                if (empty()) {
-                    // 空
-                    return;
-                }
-                allocator_.destroy(&storage_[size_ - 1]);
-                size_ -= 1;
-            }
-
-            // [resize]
-            // count 個の要素を格納するようにコンテナのサイズを変更します。
-            // 現在のサイズが count より大きい場合、最初の count 個の要素にコンテナが縮小されます。
-            // 現在のサイズが count より小さい場合、 value のコピーで初期化された要素が追加されます。
-            // より小さなサイズに変更しても vector の容量は縮小されません。 これは、 pop_back() を複数回呼び出すことで同等の効果を得た場合に無効化されるイテレータは削除されたもののみであるのに対し、容量の変更はすべてのイテレータを無効化するためです。 
-            inline void resize(size_type count) {
-                const size_type   current_size = size();
-                if (current_size > count) {
-                    // 現在のサイズが count より大きい場合、最初の count 個の要素にコンテナが縮小されます。
-                    // If n is less than or equal to the size of the container,
-                    // the function never throws exceptions (no-throw guarantee).
-                    destroy_from_(iterator(storage_ + count), end());
-                    size_ = count;
-                } else if (current_size < count) {
-                    // -> value ありに移譲
-                    resize(count, value_type());
-                }
-            }
-
-            void resize(size_type count, value_type value) {
-                const size_type   current_size = size();
-                if (current_size > count) {
-                    // 現在のサイズが count より大きい場合、最初の count 個の要素にコンテナが縮小されます。
-                    // If n is less than or equal to the size of the container,
-                    // the function never throws exceptions (no-throw guarantee).
-                    destroy_from_(iterator(storage_ + count), end());
-                    size_ = count;
-                } else if (current_size < count) {
-                    // 現在のサイズが count より小さい場合、 value のコピーで初期化された要素が追加されます。
-                    // If n is greater and a reallocation happens, there are no changes in the container in case of exception (strong guarantee)
-                    // if the type of the elements is either copyable or no-throw moveable.
-                    // Otherwise, if an exception is thrown, the container is left with a valid state (basic guarantee).
-                    const size_type   current_cap = capacity_;
-                    if (count <= current_cap) {
-                        // count が容量未満
-                        // -> 再確保不要。サイズがcountになるまでvalueを追加する。
-                        // -> 基本保証
-                        insert(end(), count - current_size, value);
-                    } else {
-                        // 再確保が必要
-                        // -> Copyableなら強い保証、そうでないなら基本保証
-                        vector<value_type, allocator_type> cloned(allocator_);
-                        cloned.reserve(recommended_capacity_(count));
-                        cloned.insert(cloned.end(), begin(), end());
-                        cloned.insert(cloned.end(), count - cloned.size(), value);
-                        swap(cloned);
-                    }
-                }
             }
 
             // [swap]
@@ -536,11 +525,21 @@ namespace ft {
                 ft::swap(capacity_, other.capacity_);
             }
 
+            // [clear]
+            // コンテナからすべての要素を削除します。 この呼び出しの後、 size() はゼロを返します。
+            // 格納されている要素を指すあらゆる参照、ポインタ、イテレータは無効化されます。 終端イテレータも無効化されます。  
+            // vector の capacity() は変更されません (ノート: 標準の capacity 変更に対する制約は vector::reserve で規定されています。 [1] を参照してください)。
+            inline void clear() {
+                resize(0);
+            }
+
+            // [get_allocator]
+            // 関連付けられているアロケータを返します 
+            inline allocator_type get_allocator() const {
+                return allocator_type(allocator_);
+            }
+
         FT_PRIVATE:
-            size_type       capacity_;
-            size_type       size_;
-            allocator_type  allocator_;
-            pointer         storage_;
 
             difference_type distance_(const_iterator from, const_iterator to) const {
                 if (is_interval_empty_(from, to)) { return 0; }
@@ -588,7 +587,7 @@ namespace ft {
 
             // [from, to) の要素を末尾に追加する。
             // capacityは十分にあるものとする。
-            inline void    append_within_capacity_(const_iterator from, const_iterator to) {
+            inline void append_within_capacity_(const_iterator from, const_iterator to) {
                 // size_type   n = to - from;
                 // ASSERTION: size() + n <= capacity
                 size_type i = size();
@@ -690,8 +689,6 @@ namespace ft {
                     capacity_ = 0;
                 }
             }
-
-
     };
 
     // [比較演算子]
