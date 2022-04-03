@@ -91,6 +91,52 @@ namespace fill {
         DSOUT() << (m.begin() == m.end()) << std::endl;
     }
 
+    void    begin_end() {
+        SPRINT("begin_end");
+        map_type    m;
+        for (int i = 0; i < 10; ++i) {
+            m[i] = i * 10;
+        }
+        map_type::iterator                  vib = m.begin();
+        map_type::iterator                  vie = m.end();
+        map_type::const_iterator            cib = m.begin();
+        map_type::const_iterator            cie = m.end();
+        map_type::reverse_iterator          vrb = m.rbegin();
+        map_type::reverse_iterator          vre = m.rend();
+        map_type::const_reverse_iterator    crb = m.rbegin();
+        map_type::const_reverse_iterator    cre = m.rend();
+        DSOUT() << *vib << std::endl;
+        DSOUT() << *cib << std::endl;
+        DSOUT() << *vrb << std::endl;
+        DSOUT() << *crb << std::endl;
+        DSOUT() << (vib == vie) << std::endl;
+        DSOUT() << (vib == cib) << std::endl;
+        DSOUT() << (cib == cie) << std::endl;
+        DSOUT() << (vrb == vre) << std::endl;
+        DSOUT() << (vrb == cre) << std::endl;
+        DSOUT() << (crb == cre) << std::endl;
+        DSOUT() << *--vie << std::endl;
+        DSOUT() << *--cie << std::endl;
+        DSOUT() << *--vre << std::endl;
+        DSOUT() << *--cre << std::endl;
+        for (; vib != vie; ++vib) {
+            std::cout << *vib << ", ";
+        }
+        std::cout << std::endl;
+        for (; cib != cie; ++cib) {
+            std::cout << *cib << ", ";
+        }
+        std::cout << std::endl;
+        for (; vrb != vre; ++vrb) {
+            std::cout << *vrb << ", ";
+        }
+        std::cout << std::endl;
+        for (; crb != cre; ++crb) {
+            std::cout << *crb << ", ";
+        }
+        std::cout << std::endl;
+    }
+
     void    oprator_assignation(int n) {
         SPRINT("oprator_assignation") << "(" << n << ")";
         map_type    m;
@@ -502,6 +548,7 @@ namespace fill {
         constructor_iterator(100);
         constructor_copy(100);
         oprator_assignation(100);
+        begin_end();
         get_allocator();
         key_comp();
         value_comp();
@@ -610,6 +657,9 @@ namespace logic {
             DSOUT() << "outer(" << i << "): " << (result.second ? "ok" : "FAIL") << std::endl;
         }
         for (map_type::const_iterator it = s.begin(); it != s.end(); ++it) {
+            DSOUT() << *it << std::endl;
+        }
+        for (map_type::const_reverse_iterator it = s.rbegin(); it != s.rend(); ++it) {
             DSOUT() << *it << std::endl;
         }
     }

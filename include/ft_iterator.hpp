@@ -157,6 +157,10 @@ namespace ft {
         
             reverse_iterator(): current(NormalIter()) {}
             explicit reverse_iterator(NormalIter iter): current(iter) {}
+            // reverse_iterator -> const_reverse_iterator の変換をやるにはこれが必要
+            template <class U>
+            reverse_iterator(const reverse_iterator<U>& u)
+                : current(u.base()) {}
             reverse_iterator(const reverse_iterator<NormalIter>& other) {
                 *this = other;
             }

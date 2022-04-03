@@ -189,6 +189,9 @@ namespace ft {
                         return !(*this == rhs);
                     }
             };
+        
+            typedef ft::reverse_iterator<iterator>          reverse_iterator;
+            typedef ft::reverse_iterator<const_iterator>    const_reverse_iterator;
 
         // [[インナークラス群]]
 
@@ -317,6 +320,10 @@ namespace ft {
             inline const_iterator   begin() const { return const_iterator(tree_.begin()); }
             inline iterator         end() { return iterator(tree_.end()); }
             inline const_iterator   end() const { return const_iterator(tree_.end()); }
+            inline reverse_iterator         rbegin() { return reverse_iterator(end()); }
+            inline const_reverse_iterator   rbegin() const { return reverse_iterator(end()); }
+            inline reverse_iterator         rend() { return reverse_iterator(begin()); }
+            inline const_reverse_iterator   rend() const { return reverse_iterator(begin()); }
 
             inline bool             empty() const { return tree_.empty(); }
             inline size_type        size() const {return tree_.size();}

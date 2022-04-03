@@ -122,23 +122,15 @@ namespace ft {
             // [rbegin]
             // 逆順の vector の最初の要素を指す逆イテレータを返します。 これは非逆順の vector の最後の要素に対応します。
             // vector が空の場合、返されるイテレータは rend() と等しくなります。 
-            inline reverse_iterator         rbegin() {
-                return reverse_iterator(end());
-            }
-            inline const_reverse_iterator   rbegin() const {
-                return reverse_iterator(end());
-            }
+            inline reverse_iterator         rbegin() { return reverse_iterator(end()); }
+            inline const_reverse_iterator   rbegin() const { return reverse_iterator(end()); }
 
             // [rend]
             // 逆順の vector の最後の要素の次の要素を指す逆イテレータを返します。
             // これは非逆順の vector の最初の要素の前の要素に対応します。
             // この要素はプレースホルダとして振る舞い、アクセスを試みると未定義動作になります。
-            inline reverse_iterator         rend() {
-                return reverse_iterator(begin());
-            }
-            inline const_reverse_iterator   rend() const {
-                return reverse_iterator(begin());
-            }
+            inline reverse_iterator         rend() { return reverse_iterator(begin()); }
+            inline const_reverse_iterator   rend() const { return reverse_iterator(begin()); }
 
             // [size]
             // コンテナ内の要素の数、すなわち std::distance(begin(), end()) を返します。 
