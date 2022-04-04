@@ -56,6 +56,9 @@ namespace fill {
         ft::swap(p1, p2);
         DSOUT() << p1 << std::endl;
         DSOUT() << p2 << std::endl;
+        std::swap(p1, p2);
+        DSOUT() << p1 << std::endl;
+        DSOUT() << p2 << std::endl;
         p1.swap(p2);
         DSOUT() << p1 << std::endl;
         DSOUT() << p2 << std::endl;

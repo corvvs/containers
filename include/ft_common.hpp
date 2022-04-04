@@ -7,5 +7,6 @@
 # include <exception>
 # include <stdexcept>
 # define FT_PRIVATE private
+# define FT_NOEXCEPT throw()
 
 #endif

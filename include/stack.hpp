@@ -109,7 +109,16 @@ namespace ft {
         return lhs.c >= rhs.c;
     }
 
-    // C++03では不要だけど, 便利だからいいんじゃないのと思うの.
+    template< class T, class Container >
+    inline void swap(
+        ft::stack<T, Container>& lhs,
+        ft::stack<T, Container>& rhs
+    ) {
+        lhs.swap(rhs);
+    }
+}
+
+namespace std {
     template< class T, class Container >
     inline void swap(
         ft::stack<T, Container>& lhs,

@@ -18,77 +18,79 @@ namespace ft {
             iterator_type    base_;
 
         public:
-            iterator_wrapper(): base_(NULL) {}
-            iterator_wrapper(iterator_type ptr_): base_(ptr_) {}
-            iterator_wrapper(const iterator_wrapper& other) {
+            iterator_wrapper() FT_NOEXCEPT : base_(NULL) {}
+            iterator_wrapper(iterator_type ptr_) FT_NOEXCEPT : base_(ptr_) {}
+            iterator_wrapper(const iterator_wrapper& other) FT_NOEXCEPT {
                 *this = other;
             }
-            template <class _Up>
-            iterator_wrapper(const iterator_wrapper<_Up>& __u,
-                typename ft::enable_if<ft::is_convertible<_Up, iterator_type>::value>::type* = NULL)
-                : base_(__u.operator->()) {}
+            template <class U>
+            iterator_wrapper(const iterator_wrapper<U>& u,
+                typename ft::enable_if<
+                    ft::is_convertible<U, iterator_type>::value
+                >::type* = NULL) FT_NOEXCEPT
+                : base_(u.operator->()) {}
             virtual ~iterator_wrapper() {}
-            iterator_wrapper&   operator=(const iterator_wrapper& other) {
+            inline iterator_wrapper&   operator=(const iterator_wrapper& other) FT_NOEXCEPT {
                 base_ = other.base_;
                 return *this;
             }
 
-            inline iterator_type   base() const { return base_; }
+            inline iterator_type   base() const FT_NOEXCEPT { return base_; }
 
-            inline reference   operator*() const {
+            inline reference   operator*() const FT_NOEXCEPT {
                 return *base_;
             }
-            inline pointer     operator->() const {
+            inline pointer     operator->() const FT_NOEXCEPT {
                 return base_;
             }
 
-            inline iterator_wrapper&   operator++() {
+            inline iterator_wrapper&   operator++() FT_NOEXCEPT {
                 ++base_;
                 return *this;
             }
 
-            inline iterator_wrapper    operator++(int) {
+            inline iterator_wrapper    operator++(int) FT_NOEXCEPT {
                 iterator_wrapper    it = *this;
                 ++*this;
                 return it;
             }
 
-            inline iterator_wrapper&   operator--() {
+            inline iterator_wrapper&   operator--() FT_NOEXCEPT {
                 --base_;
                 return *this;
             }
 
-            inline iterator_wrapper    operator--(int) {
+            inline iterator_wrapper    operator--(int) FT_NOEXCEPT {
                 iterator_wrapper    it = *this;
                 --*this;
                 return it;
             }
 
-            inline iterator_wrapper  operator+ (difference_type n) const {
+            inline iterator_wrapper  operator+ (difference_type n) const FT_NOEXCEPT {
                 iterator_wrapper it(*this);
                 it += n;
                 return it;
             }
-            inline iterator_wrapper& operator+=(difference_type n) {
+            inline iterator_wrapper& operator+=(difference_type n) FT_NOEXCEPT {
                 base_ += n;
                 return *this;
             }
-            inline iterator_wrapper  operator- (difference_type n) const {
+            inline iterator_wrapper  operator- (difference_type n) const FT_NOEXCEPT {
                 return *this + (-n);
             }
-            inline iterator_wrapper& operator-=(difference_type n) {
+            inline iterator_wrapper& operator-=(difference_type n) FT_NOEXCEPT {
                 *this += -n;
                 return *this;
             }
-            inline reference    operator[](difference_type n) const {
+            inline reference    operator[](difference_type n) const FT_NOEXCEPT {
                 return base_[n];
             }
 
-            inline bool operator==(const iterator_wrapper& rhs) const {
+            inline bool operator==(const iterator_wrapper& rhs) const FT_NOEXCEPT {
                 return base_ == rhs.base_;
             }
-            inline bool operator!=(const iterator_wrapper& rhs) const {
-                return !(*this == rhs);
+            inline bool operator!=(const iterator_wrapper& rhs) const FT_NOEXCEPT {
+                return base_ != rhs.base_;
             }
     };
 }

@@ -66,7 +66,7 @@ void    swap() {
     std::cout << *ii << " - " << *ij << std::endl;
     {
         SPRINT("swap");
-        vi.swap(vj);
+        std::swap(vi, vj);
     }
     print_vector_elements(vi.begin(), vi.end());
     print_vector_elements(vj.begin(), vj.end());
@@ -159,7 +159,7 @@ void    mass_swap(VC(T)::size_type n) {
         }
         {
             SPRINT("mass_swap") << "(" << n << ")";
-            vj.swap(vi);
+            std::swap(vj, vi);
         }
         print_vector_elements(vi.begin(), vi.end());
         print_vector_elements(vj.begin(), vj.end());
@@ -194,14 +194,43 @@ void    mass_range_allocation(VC(T)::size_type n) {
 template <class T>
 void    mass_insertion_1(int n) {
     srand(n);
+    VC(T) vv;
+    for (int i = 1; i <= n; ++i) {
+        vv.push_back(random_value_generator<T>());
+    }
+
     VC(T) vi;
     vi.push_back(random_value_generator<T>());
     {
         SPRINT("mass_insertion_1") << "(" << n << ")";
-        for (int i = 1; i <= n; ++i) {
+        int s = 0;
+        for (typename VectorClass<T>::const_iterator vit = vv.begin(); vit != vv.end(); ++vit) {
             VC(T)::size_type  at = VC(T)::size_type(double(rand()) / RAND_MAX * (vi.size() - 1)) + 1;
-            VC(T)::iterator itd = vi.insert(vi.begin() + at, random_value_generator<T>());
-            std::cout << "inserted at " << itd - vi.begin() << std::endl;
+            VC(T)::iterator itd = vi.insert(vi.begin() + at, *vit);
+            // std::cout << "inserted at " << (itd == vi.begin()) << std::endl;
+            s += (itd - vi.begin());
+        }
+        DSOUT() << s << std::endl;
+    }
+    print_vector_elements(vi.begin(), vi.end());
+    print_stats(vi);
+}
+
+template <class T>
+void    mass_insertion_1_discarding(int n) {
+    srand(n);
+    VC(T) vv;
+    for (int i = 1; i <= n; ++i) {
+        vv.push_back(random_value_generator<T>());
+    }
+
+    VC(T) vi;
+    vi.push_back(random_value_generator<T>());
+    {
+        SPRINT("mass_insertion_1_discarding") << "(" << n << ")";
+        for (typename VectorClass<T>::const_iterator vit = vv.begin(); vit != vv.end(); ++vit) {
+            VC(T)::size_type  at = VC(T)::size_type(double(rand()) / RAND_MAX * (vi.size() - 1)) + 1;
+            vi.insert(vi.begin() + at, *vit);
         }
     }
     print_vector_elements(vi.begin(), vi.end());
@@ -406,10 +435,33 @@ void    mass_erase_1(VC(T)::size_type n) {
     print_stats(vi);
     {
         SPRINT("mass_erase_1") << "(" << n << ")";
+        int s = 0;
         for (VC(T)::size_type i = 0; i < n; ++i) {
             VC(T)::size_type  at = VC(T)::size_type(double(rand()) / RAND_MAX * vi.size());
             VC(T)::iterator eit = vi.erase(vi.begin() + at);
-            std::cout << (eit - vi.begin()) << " / " << (eit == vi.end()) << std::endl;
+            s += (eit - vi.end());
+        }
+        DSOUT() << s << std::endl;
+    }
+    print_vector_elements(vi.begin(), vi.end());
+    print_stats(vi);
+}
+
+template <class T>
+void    mass_erase_1_discarding(VC(T)::size_type n) {
+    srand(n);
+    VC(T) vi;
+    for (VC(T)::size_type i = 0; i < n; ++i) {
+        vi.push_back(random_value_generator<T>());
+    }
+    print_vector_elements(vi.begin(), vi.end());
+    print_stats(vi);
+    {
+        SPRINT("mass_erase_1_discarding") << "(" << n << ")";
+        for (VC(T)::size_type i = 0; i < n; ++i) {
+            VC(T)::size_type  at = VC(T)::size_type(double(rand()) / RAND_MAX * vi.size());
+            vi.erase(vi.begin() + at);
+            // std::cout << (eit - vi.begin()) << " / " << (eit == vi.end()) << std::endl;
         }
     }
     print_vector_elements(vi.begin(), vi.end());
@@ -432,6 +484,23 @@ void    mass_erase_range(VC(T)::size_type n) {
         std::cout << (eit - vi.begin()) << " / " << (eit == vi.end()) << std::endl;
         print_vector_elements(vi.begin(), vi.end());
         print_stats(vi);
+    }
+}
+
+template <class T>
+void    mass_iterator_copy(VC(T)::size_type n) {
+    srand(n);
+    VectorClass<T> v;
+    v.push_back(random_value_generator<T>());
+    typename VectorClass<T>::iterator it = v.begin();
+    {
+        SPRINT("mass_iterator_copy") << "(" << n << ")";
+        typename VectorClass<T>::difference_type d = 0;
+        for (typename VectorClass<T>::size_type i = 0; i < n; ++i) {
+            typename VectorClass<T>::iterator iit(it);
+            d += !!(iit.operator->());
+        }
+        DSOUT() << d << std::endl;
     }
 }
 
@@ -485,6 +554,7 @@ void    performance(const std::string& sub_title, std::size_t n) {
     mass_range_allocation<T>(50 * n);
     mass_repeated_allocation<T>(10000 * n);
     mass_insertion_1<T>(100 * n);
+    mass_insertion_1_discarding<T>(100 * n);
     mass_insertion_n<T>(n);
     mass_insertion_range<T>(n, n);
     mass_push_back<T>(100 * n);
@@ -492,8 +562,10 @@ void    performance(const std::string& sub_title, std::size_t n) {
     mass_resize<T>(100 * n);
     mass_print<T>(100 * n);
     mass_erase_1<T>(100 * n);
+    mass_erase_1_discarding<T>(100 * n);
     mass_erase_range<T>(10 * n);
     swap<T>();
+    mass_iterator_copy<T>(10000 * n);
     ft::sprint::pop_bread();
 }
 

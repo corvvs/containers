@@ -312,4 +312,14 @@ namespace ft {
     }
 }
 
+namespace std {
+    template <class Key, class KeyComparator, class KeyAllocator>
+    inline void swap(
+        ft::set<Key, KeyComparator, KeyAllocator>& lhs,
+        ft::set<Key, KeyComparator, KeyAllocator>& rhs
+    ) {
+        lhs.swap(rhs);
+    }
+}
+
 #endif

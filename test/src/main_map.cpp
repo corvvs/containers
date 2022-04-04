@@ -247,7 +247,7 @@ namespace fill {
             DSOUT() << mm.size() << std::endl;
             DSOUT() << (mm.begin() == m.end()) << std::endl;
             DSOUT() << *(mm.begin()) << std::endl;
-            m.swap(mm);
+            std::swap(m, mm);
             DSOUT() << mm.empty() << std::endl;
             DSOUT() << mm.size() << std::endl;
             DSOUT() << (mm.begin() == m.end()) << std::endl;

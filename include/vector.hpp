@@ -90,28 +90,24 @@ namespace ft {
             // [begin]
             // コンテナの最初の要素を指すイテレータを返します。
             // コンテナが空の場合は、返されたイテレータは end() と等しくなります。 
-            inline iterator         begin() {
-                if (size_ > 0) {
-                    return iterator(storage_);
-                } else {
-                    return end();
-                }
+            inline iterator         begin() FT_NOEXCEPT {
+                return iterator(storage_);
             }
-            inline const_iterator   begin() const {
+            inline const_iterator   begin() const FT_NOEXCEPT {
                 return const_iterator(storage_);
             }
 
             // [end]
             // コンテナの最後の要素の次の要素を指すイテレータを返します。
             // この要素はプレースホルダとしての役割を持ちます。この要素にアクセスを試みると未定義動作になります。
-            inline iterator         end() {
+            inline iterator         end() FT_NOEXCEPT {
                 if (size_ > 0) {
                     return begin() + size_;
                 } else {
                     return iterator(storage_);
                 }
             }
-            inline const_iterator   end() const {
+            inline const_iterator   end() const FT_NOEXCEPT {
                 if (size_ > 0) {
                     return begin() + size_;
                 } else {
@@ -122,19 +118,19 @@ namespace ft {
             // [rbegin]
             // 逆順の vector の最初の要素を指す逆イテレータを返します。 これは非逆順の vector の最後の要素に対応します。
             // vector が空の場合、返されるイテレータは rend() と等しくなります。 
-            inline reverse_iterator         rbegin() { return reverse_iterator(end()); }
-            inline const_reverse_iterator   rbegin() const { return reverse_iterator(end()); }
+            inline reverse_iterator         rbegin() FT_NOEXCEPT { return reverse_iterator(end()); }
+            inline const_reverse_iterator   rbegin() const FT_NOEXCEPT { return reverse_iterator(end()); }
 
             // [rend]
             // 逆順の vector の最後の要素の次の要素を指す逆イテレータを返します。
             // これは非逆順の vector の最初の要素の前の要素に対応します。
             // この要素はプレースホルダとして振る舞い、アクセスを試みると未定義動作になります。
-            inline reverse_iterator         rend() { return reverse_iterator(begin()); }
-            inline const_reverse_iterator   rend() const { return reverse_iterator(begin()); }
+            inline reverse_iterator         rend() FT_NOEXCEPT { return reverse_iterator(begin()); }
+            inline const_reverse_iterator   rend() const FT_NOEXCEPT { return reverse_iterator(begin()); }
 
             // [size]
             // コンテナ内の要素の数、すなわち std::distance(begin(), end()) を返します。 
-            inline size_type size() const {
+            inline size_type size() const FT_NOEXCEPT {
                 return size_;
             }
 
@@ -143,7 +139,7 @@ namespace ft {
             // この値は一般的にはコンテナのサイズの理論上の制限を反映します
             // (多くとも std::numeric_limits<difference_type>::max())。
             // 実行時の利用可能な RAM の量により、コンテナのサイズは max_size() より小さな値に制限される場合があります。 
-            inline size_type max_size() const {
+            inline size_type max_size() const FT_NOEXCEPT {
                 return difference_type(-1) / sizeof(value_type);
                 // return allocator_.max_size();
             }
@@ -199,13 +195,13 @@ namespace ft {
 
             // [capacity]
             // コンテナが現在確保している空間に格納できる要素の数を返します。 
-            inline size_type    capacity() const {
+            inline size_type    capacity() const FT_NOEXCEPT {
                 return capacity_;
             }
 
             // [empty]
             // コンテナの持っている要素が無い、つまり begin() == end() かどうかを調べます。 
-            inline bool         empty() const {
+            inline bool         empty() const FT_NOEXCEPT {
                 return size_ == 0;
             }
 
@@ -372,7 +368,6 @@ namespace ft {
                 return begin() + n;
             }
             // os の前に value のコピーを count 個挿入します。
-            // returns: 挿入された最初の要素を指すイテレータ、または count==0 の場合は pos。
             void        insert(iterator pos, size_type count, const value_type& value) {
                 size_type   recommended_cap = recommended_capacity_(size() + count);
                 bool        needed_realloc = recommended_cap > capacity();
@@ -521,23 +516,23 @@ namespace ft {
             // コンテナからすべての要素を削除します。 この呼び出しの後、 size() はゼロを返します。
             // 格納されている要素を指すあらゆる参照、ポインタ、イテレータは無効化されます。 終端イテレータも無効化されます。  
             // vector の capacity() は変更されません (ノート: 標準の capacity 変更に対する制約は vector::reserve で規定されています。 [1] を参照してください)。
-            inline void clear() {
+            inline void clear() FT_NOEXCEPT {
                 resize(0);
             }
 
             // [get_allocator]
             // 関連付けられているアロケータを返します 
-            inline allocator_type get_allocator() const {
+            inline allocator_type get_allocator() const FT_NOEXCEPT {
                 return allocator_type(allocator_);
             }
 
         FT_PRIVATE:
 
-            difference_type distance_(const_iterator from, const_iterator to) const {
-                if (is_interval_empty_(from, to)) { return 0; }
-                if (to == end()) {
-                    return size() - (from - begin());
-                }
+            inline difference_type distance_(const_iterator from, const_iterator to) const {
+                // if (is_interval_empty_(from, to)) { return 0; }
+                // if (to == end()) {
+                //     return size() - (from - begin());
+                // }
                 return to - from;
             }
 
@@ -596,6 +591,29 @@ namespace ft {
                 size_ += 1;
             }
 
+            // 区間 [pos, end) の部分を d だけ左にずらし、
+            // サイズを d だけ減らす。
+            // 移動先の範囲にあるものは destroy されている前提、
+            // また移動先は利用可能範囲を外れない前提。つまり、
+            // ASSERTION: begin() + d <= pos
+            // (pos == end() の状況でこの関数を使うことは想定されていないが、対応しておく)
+            void    mass_moveleft_within_capacity_(iterator pos, size_type d) {
+                if (d == 0) { return; }
+                if (!is_interval_empty_(pos, end())) {
+                    // 区間が空でない場合
+                    // std::copy(pos, end(), pos - d);
+                    // -> 洒落にならないレベルで遅いので手作業でコピー
+                    for (size_type i = distance_(begin(), pos); i < size(); ++i) {
+                        storage_[i - d] = storage_[i];
+                    }
+                }
+                reverse_iterator to = rbegin() + d;
+                for (reverse_iterator it = rbegin(); it != to; ++it) {
+                    allocator_.destroy(&*it);
+                }
+                size_ -= d;
+            }
+
             // 区間 [pos, end) の部分を d だけ右にずらし、
             // サイズを d だけ増やす。
             // 再確保が起きない前提。つまり、
@@ -607,40 +625,27 @@ namespace ft {
                     // 区間が空でない場合
                     size_type   p = distance_(begin(), pos);
                     size_type   old_size = size();
+                    // [pos, border) は使用済み領域にコピーされる
+                    // [border, end) は未使用領域にコピーされる
                     size_type   border = p;
                     if (p + d <= old_size) {
                         border = old_size - d;
                     }
+                    // 未使用領域へのコピー -> コピー構築を行う
                     for (size_type i = border; i < old_size; ++i) {
                         allocator_.construct(&storage_[i + d], storage_[i]);
                     }
-                    std::copy_backward(
-                        pos, begin() + border,
-                        begin() + border + d);
+                    // 使用済み領域へのコピー -> 代入
+                    // std::copy_backward(pos, begin() + border, begin() + border + d);
+                    // -> ゲロ遅いようなので手作業にする
+                    for (size_type i = border; p < i--;) {
+                        storage_[i + d] = storage_[i];
+                    }
                 }
                 size_ += d;
             }
 
-            // 区間 [pos, end) の部分を d だけ左にずらし、
-            // サイズを d だけ減らす。
-            // 移動先の範囲にあるものは destroy されている前提、
-            // また移動先は利用可能範囲を外れない前提。つまり、
-            // ASSERTION: begin() + d <= pos
-            // (pos == end() の状況でこの関数を使うことは想定されていないが、対応しておく)
-            void    mass_moveleft_within_capacity_(iterator pos, size_type d) {
-                if (d == 0) { return; }
-                if (!is_interval_empty_(pos, end())) {
-                    // 区間が空でない場合
-                    std::copy(pos, end(), pos - d);
-                }
-                reverse_iterator to = rbegin() + d;
-                for (reverse_iterator it = rbegin(); it != to; ++it) {
-                    allocator_.destroy(&*it);
-                }
-                size_ -= d;
-            }
-
-            // インデックス pos に value を入れる。
+            // インデックス pos に value を入れる.
             // ただし、入れ方が異なる:
             // - pos < border:
             //   - 代入
@@ -648,10 +653,10 @@ namespace ft {
             //   - コピー構築
             inline void substitute_to_(size_type pos, const value_type& value, size_type border) {
                 if (pos < border) {
-                    // end() より前に来るものは代入
+                    // border より前に来るものは代入
                     storage_[pos] = value;
                 } else {
-                    // end()以降に来るものはコピー構築
+                    // border 以降に来るものはコピー構築
                     allocator_.construct(&storage_[pos], value);
                 }
             }
@@ -687,16 +692,16 @@ namespace ft {
     // lhs と rhs の内容が等しいかどうか調べます。 つまり、それらが同じ個数の要素を持ち、 lhs 内のそれぞれの要素が rhs 内の同じ位置の要素と等しいかどうか比較します。
     template< class T, class Alloc >
     inline bool operator==(
-        const ft::vector<T,Alloc>& lhs,
-        const ft::vector<T,Alloc>& rhs
+        const ft::vector<T, Alloc>& lhs,
+        const ft::vector<T, Alloc>& rhs
     ) {
         return equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 
     template< class T, class Alloc >
     inline bool operator!=(
-        const ft::vector<T,Alloc>& lhs,
-        const ft::vector<T,Alloc>& rhs
+        const ft::vector<T, Alloc>& lhs,
+        const ft::vector<T, Alloc>& rhs
     ) {
         return !(lhs == rhs);
     }
@@ -705,8 +710,8 @@ namespace ft {
     // lhs の内容が rhs の内容より辞書的に小さい場合は true、そうでなければ false。
     template< class T, class Alloc >
     inline bool operator<(
-        const ft::vector<T,Alloc>& lhs,
-        const ft::vector<T,Alloc>& rhs
+        const ft::vector<T, Alloc>& lhs,
+        const ft::vector<T, Alloc>& rhs
     ) {
         // lhs の内容が rhs の内容より辞書的に小さいまたは等しい場合は true、そうでなければ false。
         return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
@@ -714,16 +719,16 @@ namespace ft {
 
     template< class T, class Alloc >
     inline bool operator<=(
-        const ft::vector<T,Alloc>& lhs,
-        const ft::vector<T,Alloc>& rhs
+        const ft::vector<T, Alloc>& lhs,
+        const ft::vector<T, Alloc>& rhs
     ) {
         return !(lhs > rhs);
     }
 
     template< class T, class Alloc >
     inline bool operator>(
-        const ft::vector<T,Alloc>& lhs,
-        const ft::vector<T,Alloc>& rhs
+        const ft::vector<T, Alloc>& lhs,
+        const ft::vector<T, Alloc>& rhs
     ) {
         // lhs の内容が rhs の内容より辞書的に大きいまたは等しい場合は true、そうでなければ false。
         return rhs < lhs;
@@ -731,8 +736,8 @@ namespace ft {
 
     template< class T, class Alloc >
     inline bool operator>=(
-        const ft::vector<T,Alloc>& lhs,
-        const ft::vector<T,Alloc>& rhs
+        const ft::vector<T, Alloc>& lhs,
+        const ft::vector<T, Alloc>& rhs
     ) {
         return !(lhs < rhs);
     }
@@ -843,8 +848,15 @@ namespace ft {
         return x;
     }
 
-    template< class T, class Alloc >
-    inline void swap( ft::vector<T,Alloc>& lhs, ft::vector<T,Alloc>& rhs ) {
+    template <class T, class Alloc>
+    inline void swap( ft::vector<T, Alloc>& lhs, ft::vector<T, Alloc>& rhs ) {
+        lhs.swap(rhs);
+    }
+}
+
+namespace std {
+    template <class T, class Alloc>
+    inline void swap( ft::vector<T, Alloc>& lhs, ft::vector<T, Alloc>& rhs ) {
         lhs.swap(rhs);
     }
 }

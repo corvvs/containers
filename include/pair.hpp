@@ -100,4 +100,11 @@ namespace ft {
     }
 }
 
+namespace std {
+    template <class First, class Second>
+    inline void    swap(ft::pair<First, Second>& x, ft::pair<First, Second>& y) {
+        x.swap(y);
+    }
+}
+
 #endif
