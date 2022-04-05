@@ -43,7 +43,7 @@ namespace ft {
 
     // [is_arithmetic]
     // 算術的な型であることを判定するpredicate
-    template <class T>  struct is_aritmetic: public integral_constant<bool,
+    template <class T>  struct is_arithmetic: public integral_constant<bool,
         is_integral<T>::value || is_floating_point<T>::value
     > {};
     

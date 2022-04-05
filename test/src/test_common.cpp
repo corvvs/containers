@@ -6,6 +6,26 @@ int             random_value_generator() {
 }
 
 template<>
+char            random_value_generator() {
+    return ' ' + rand() % 95;
+}
+
+template<>
+long            random_value_generator() {
+    return rand();
+}
+
+template<>
+double          random_value_generator() {
+    return (double)rand() /  RAND_MAX;
+}
+
+template<>
+simple_holder<char> random_value_generator() {
+    return simple_holder<char>(random_value_generator<char>());
+}
+
+template<>
 std::string     random_value_generator() {
     std::string s(1 + rand() % 10, 'a');
     for (std::string::iterator it = s.begin(); it != s.end(); ++it) {

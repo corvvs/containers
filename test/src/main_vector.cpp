@@ -205,7 +205,7 @@ void    mass_insertion_1(int n) {
         SPRINT("mass_insertion_1") << "(" << n << ")";
         int s = 0;
         for (typename VectorClass<T>::const_iterator vit = vv.begin(); vit != vv.end(); ++vit) {
-            VC(T)::size_type  at = VC(T)::size_type(double(rand()) / RAND_MAX * (vi.size() - 1)) + 1;
+            VC(T)::size_type  at = VC(T)::size_type(double(rand()) / RAND_MAX * (vi.size() - 1));
             VC(T)::iterator itd = vi.insert(vi.begin() + at, *vit);
             // std::cout << "inserted at " << (itd == vi.begin()) << std::endl;
             s += (itd - vi.begin());
@@ -941,11 +941,15 @@ int main() {
     logic::test();
     ft::sprint::push_bread("performance");
     int n = 60;
+    performance<char>("char", n);
     performance<int>("int", n);
+    performance<long>("long", n);
+    performance<double>("double", n);
+    performance< simple_holder<char> >("simple_holder<char>", n);
     performance<ft::IntWrapper>("ft::IntWrapper", n);
     performance<std::string>("std::string", n);
-    performance<std::vector<int> >("std::vector<int>", n);
-    performance<ft::vector<int> >("ft::vector<int>", n);
+    performance<std::vector<int> >("std::vector<int>", n / 5);
+    performance<ft::vector<int> >("ft::vector<int>", n / 5);
     ft::sprint::pop_bread();
 
     // 別枠で

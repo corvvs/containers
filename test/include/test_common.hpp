@@ -42,10 +42,33 @@
 # include "sprint.hpp"
 # include "IntWrapper.hpp"
 
+template <class T>
+struct simple_holder {
+    T   val_;
+
+    simple_holder(T val = T()) FT_NOEXCEPT: val_(val) {}
+    simple_holder(const simple_holder& other) FT_NOEXCEPT {
+        *this = other;
+    }
+    ~simple_holder() {}
+    inline simple_holder&   operator=(const simple_holder& rhs) FT_NOEXCEPT {
+        val_ = rhs.val_;
+        return *this;
+    }
+};
+
 template<class T>
 T                   random_value_generator();
 template<>
+char                random_value_generator();
+template<>
 int                 random_value_generator();
+template<>
+long                random_value_generator();
+template<>
+double              random_value_generator();
+template<>
+simple_holder<char> random_value_generator();
 template<>
 std::string         random_value_generator();
 template<>
@@ -173,6 +196,15 @@ std::ostream& operator<<(
     const NS::pair<First, Second>& value
 ) {
     stream << "(" << value.first << ", " << value.second << ")";
+    return stream;
+}
+
+template <class T>
+std::ostream& operator<<(
+    std::ostream& stream,
+    const simple_holder<T>& value
+) {
+    stream << "[" << value.val_ << "]";
     return stream;
 }
 

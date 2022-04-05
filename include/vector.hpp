@@ -140,8 +140,11 @@ namespace ft {
             // (多くとも std::numeric_limits<difference_type>::max())。
             // 実行時の利用可能な RAM の量により、コンテナのサイズは max_size() より小さな値に制限される場合があります。 
             inline size_type max_size() const FT_NOEXCEPT {
-                return difference_type(-1) / sizeof(value_type);
-                // return allocator_.max_size();
+                // return difference_type(-1) / sizeof(value_type);
+                return std::min<size_type>(
+                    allocator_.max_size(),
+                    std::numeric_limits<difference_type >::max()
+                );
             }
 
             // [resize]
@@ -597,21 +600,22 @@ namespace ft {
             // また移動先は利用可能範囲を外れない前提。つまり、
             // ASSERTION: begin() + d <= pos
             // (pos == end() の状況でこの関数を使うことは想定されていないが、対応しておく)
-            void    mass_moveleft_within_capacity_(iterator pos, size_type d) {
-                if (d == 0) { return; }
+            void    mass_moveleft_within_capacity_(iterator pos, size_type move_distance) {
+                if (move_distance == 0) { return; }
                 if (!is_interval_empty_(pos, end())) {
                     // 区間が空でない場合
-                    // std::copy(pos, end(), pos - d);
+                    // std::copy(pos, end(), pos - move_distance);
                     // -> 洒落にならないレベルで遅いので手作業でコピー
-                    for (size_type i = distance_(begin(), pos); i < size(); ++i) {
-                        storage_[i - d] = storage_[i];
-                    }
+                    pointer     src = pos.operator->();
+                    pointer     dest = src - move_distance;
+                    size_type   n = end() - pos;
+                    copy_forward__<ft::is_arithmetic<value_type>::value>(dest, src, n);
                 }
-                reverse_iterator to = rbegin() + d;
+                reverse_iterator to = rbegin() + move_distance;
                 for (reverse_iterator it = rbegin(); it != to; ++it) {
                     allocator_.destroy(&*it);
                 }
-                size_ -= d;
+                size_ -= move_distance;
             }
 
             // 区間 [pos, end) の部分を d だけ右にずらし、
@@ -619,30 +623,84 @@ namespace ft {
             // 再確保が起きない前提。つまり、
             // ASSERTION: size_ + d <= capacity()
             // (pos == end() の状況でこの関数を使うことは想定されていないが、対応しておく)
-            void    mass_moveright_within_capacity_(iterator pos, size_type d) {
-                if (d == 0) { return; }
+            void    mass_moveright_within_capacity_(
+                iterator pos,
+                size_type move_distance
+            ) {
+                if (move_distance == 0) { return; }
                 if (!is_interval_empty_(pos, end())) {
                     // 区間が空でない場合
-                    size_type   p = distance_(begin(), pos);
+                    size_type   pos_from_head = distance_(begin(), pos);
                     size_type   old_size = size();
-                    // [pos, border) は使用済み領域にコピーされる
-                    // [border, end) は未使用領域にコピーされる
-                    size_type   border = p;
-                    if (p + d <= old_size) {
-                        border = old_size - d;
+                    // [pos, border_used) は使用済み領域にコピーされる
+                    // [border_used, end) は未使用領域にコピーされる
+                    size_type   border_used = pos_from_head;
+                    if (pos_from_head + move_distance <= old_size) {
+                        border_used = old_size - move_distance;
                     }
                     // 未使用領域へのコピー -> コピー構築を行う
-                    for (size_type i = border; i < old_size; ++i) {
-                        allocator_.construct(&storage_[i + d], storage_[i]);
+                    for (size_type i = border_used; i < old_size; ++i) {
+                        allocator_.construct(&storage_[i + move_distance], storage_[i]);
                     }
                     // 使用済み領域へのコピー -> 代入
-                    // std::copy_backward(pos, begin() + border, begin() + border + d);
+                    // std::copy_backward(pos, begin() + border_used, begin() + border_used + d);
                     // -> ゲロ遅いようなので手作業にする
-                    for (size_type i = border; p < i--;) {
-                        storage_[i + d] = storage_[i];
-                    }
+                    pointer     src = pos.operator->();
+                    pointer     dest = src + move_distance;
+                    size_type   n = border_used - pos_from_head;
+                    copy_backward__<ft::is_arithmetic<value_type>::value>(dest, src, n);
                 }
-                size_ += d;
+                size_ += move_distance;
+            }
+
+            template <bool B>
+            void    copy_forward__(
+                value_type* dest,
+                value_type* src,
+                size_type n
+            );
+            template <>
+            void    copy_forward__<true>(
+                value_type* dest,
+                value_type* src,
+                size_type n
+            ) {
+                std::memmove(dest, src, n * sizeof(value_type));
+            }
+            template <>
+            void    copy_forward__<false>(
+                value_type* dest,
+                value_type* src,
+                size_type n
+            ) {
+                for (size_type i = 0; i < n; ++i) {
+                    *(dest + i) = *(src + i);
+                }
+            }
+
+            template <bool B>
+            void    copy_backward__(
+                value_type* dest,
+                value_type* src,
+                size_type n
+            );
+            template <>
+            void    copy_backward__<true>(
+                value_type* dest,
+                value_type* src,
+                size_type n
+            ) {
+                std::memmove(dest, src, n * sizeof(value_type));
+            }
+            template <>
+            void    copy_backward__<false>(
+                value_type* dest,
+                value_type* src,
+                size_type n
+            ) {
+                for (size_type i = n; 0 < i--;) {
+                    *(dest + i) = *(src + i);
+                }
             }
 
             // インデックス pos に value を入れる.
