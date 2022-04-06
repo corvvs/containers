@@ -51,6 +51,7 @@ struct simple_holder {
         *this = other;
     }
     ~simple_holder() {}
+    // ↓これをコメントアウトすると std::is_trivially_copy_assignable となる.
     inline simple_holder&   operator=(const simple_holder& rhs) FT_NOEXCEPT {
         val_ = rhs.val_;
         return *this;

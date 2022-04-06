@@ -24,22 +24,21 @@ namespace ft {
             template <class U, class V>
             pair(const pair<U, V>& other)
                 : first(other.first), second(other.second) {}
-            ~pair() {}
 
-            inline pair<First, Second>& operator=(const pair<First, Second> &rhs) {
+            pair<First, Second>& operator=(const pair<First, Second> &rhs) {
                 first = rhs.first;
                 second = rhs.second;
                 return *this;
             }
 
-            inline void    swap(pair<First, Second>& other) {
+            void    swap(pair<First, Second>& other) {
                 ft::swap(first, other.first);
                 ft::swap(second, other.second);
             }
     };
 
     template<class First, class Second>
-    pair<First, Second> make_pair(First x, Second y) {
+    inline pair<First, Second> make_pair(First x, Second y) {
         return pair<First, Second>(x, y);
     }
 

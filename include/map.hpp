@@ -67,55 +67,57 @@ namespace ft {
                     // これは explicit つけない
                     // iterator(const_iterator_type variable)
                     //     : tree_it_(variable.tree_iter()) {}
-                    virtual ~iterator() {}
-                    iterator&   operator=(const iterator& rhs) {
-                        tree_it_ = rhs.tree_it_;
-                        return *this;
-                    }
+                    // ~iterator() {}
+                    // iterator&   operator=(const iterator& rhs) {
+                    //     if (*this != &rhs) {
+                    //         tree_it_ = rhs.tree_it_;
+                    //     }
+                    //     return *this;
+                    // }
 
-                    inline tree_const_iterator  tree_iter() const {
+                    tree_const_iterator  tree_iter() const {
                         return tree_it_;
                     }
 
-                    inline reference    operator*() const {
+                    reference    operator*() const {
                         return *(tree_it_->value());
                     }
-                    inline pointer      operator->() const {
+                    pointer      operator->() const {
                         return tree_it_->value();
                     }
 
-                    inline iterator&    operator++() {
+                    iterator&    operator++() {
                         ++tree_it_;
                         return *this;
                     }
 
-                    inline iterator     operator++(int) {
+                    iterator     operator++(int) {
                         iterator    it = *this;
                         ++*this;
                         return it;
                     }
 
-                    inline iterator&    operator--() {
+                    iterator&    operator--() {
                         --tree_it_;
                         return *this;
                     }
 
-                    inline iterator     operator--(int) {
+                    iterator     operator--(int) {
                         iterator    it = *this;
                         --*this;
                         return it;
                     }
 
-                    inline bool operator==(const iterator& rhs) const {
+                    bool operator==(const iterator& rhs) const {
                         return operator->() == rhs.operator->();
                     }
-                    inline bool operator==(const const_iterator& rhs) const {
+                    bool operator==(const const_iterator& rhs) const {
                         return operator->() == rhs.operator->();
                     }
-                    inline bool operator!=(const iterator& rhs) const {
+                    bool operator!=(const iterator& rhs) const {
                         return !(*this == rhs);
                     }
-                    inline bool operator!=(const const_iterator& rhs) const {
+                    bool operator!=(const const_iterator& rhs) const {
                         return !(*this == rhs);
                     }
             };
@@ -149,55 +151,57 @@ namespace ft {
                     // これは explicit つけない
                     const_iterator(iterator_type variable)
                         : tree_it_(variable.tree_iter()) {}
-                    virtual ~const_iterator() {}
-                    const_iterator&   operator=(const const_iterator& rhs) {
-                        tree_it_ = rhs.tree_it_;
-                        return *this;
-                    }
+                    // ~const_iterator() {}
+                    // const_iterator&   operator=(const const_iterator& rhs) {
+                    //     if (*this != &rhs) {
+                    //         tree_it_ = rhs.tree_it_;
+                    //     }
+                    //     return *this;
+                    // }
 
-                    inline tree_const_iterator tree_iter() const {
+                    tree_const_iterator tree_iter() const {
                         return tree_it_;
                     }
 
-                    inline reference        operator*() const {
+                    reference        operator*() const {
                         return *(tree_it_->value());
                     }
-                    inline pointer          operator->() const {
+                    pointer          operator->() const {
                         return tree_it_->value();
                     }
 
-                    inline const_iterator&  operator++() {
+                    const_iterator&  operator++() {
                         ++tree_it_;
                         return *this;
                     }
 
-                    inline const_iterator   operator++(int) {
+                    const_iterator   operator++(int) {
                         iterator    it = *this;
                         ++*this;
                         return it;
                     }
 
-                    inline const_iterator&  operator--() {
+                    const_iterator&  operator--() {
                         --tree_it_;
                         return *this;
                     }
 
-                    inline const_iterator   operator--(int) {
+                    const_iterator   operator--(int) {
                         const_iterator    it = *this;
                         --*this;
                         return it;
                     }
 
-                    inline bool             operator==(const const_iterator& rhs) const {
+                    bool             operator==(const const_iterator& rhs) const {
                         return operator->() == rhs.operator->();
                     }
-                    inline bool             operator==(const iterator& rhs) const {
+                    bool             operator==(const iterator& rhs) const {
                         return operator->() == rhs.operator->();
                     }
-                    inline bool             operator!=(const iterator& rhs) const {
+                    bool             operator!=(const iterator& rhs) const {
                         return !(*this == rhs);
                     }
-                    inline bool             operator!=(const const_iterator& rhs) const {
+                    bool             operator!=(const const_iterator& rhs) const {
                         return !(*this == rhs);
                     }
             };
@@ -232,22 +236,22 @@ namespace ft {
                     : key_compare_(c) {}
 
                 // Keyのコンパレータを返す
-                inline const MVCKeyCompare& key_comp() const { return key_compare_; }
+                const MVCKeyCompare& key_comp() const { return key_compare_; }
 
                 // Keyはそのまま、ノードはKeyを引っ張ってきてコンパレータに渡す
-                inline bool operator()(const MVCNodeValue& x, const MVCNodeValue& y) const {
+                bool operator()(const MVCNodeValue& x, const MVCNodeValue& y) const {
                     return key_compare_(x.first, y.first);
                 }
 
-                inline bool operator()(const MVCNodeValue& x, const MVCKey& y) const {
+                bool operator()(const MVCNodeValue& x, const MVCKey& y) const {
                     return key_compare_(x.first, y);
                 }
 
-                inline bool operator()(const MVCKey& x, const MVCNodeValue& y) const {
+                bool operator()(const MVCKey& x, const MVCNodeValue& y) const {
                     return key_compare_(x, y.first);
                 }
 
-                inline void swap(map_value_compare& y) {
+                void swap(map_value_compare& y) {
                     swap(key_compare_, y.key_compare_);
                 }
         };
@@ -273,7 +277,7 @@ namespace ft {
                 typedef value_type  first_argument_type;
                 typedef value_type  second_argument_type;
 
-                inline bool operator()(const value_type& x, const value_type& y) const {
+                bool operator()(const value_type& x, const value_type& y) const {
                     return comp(x.first, y.first);
                 }
         };
@@ -316,7 +320,7 @@ namespace ft {
                 // 破壊処理はtreeのデストラクタがやる
             }
 
-            inline self_type&       operator=(const self_type& rhs) {
+            self_type&       operator=(const self_type& rhs) {
                 if (this == &rhs) { return *this; }
                 tree_ = rhs.tree_;
                 return *this;
@@ -324,39 +328,39 @@ namespace ft {
 
             // [[getter群]]
 
-            inline allocator_type   get_allocator() const {
+            allocator_type   get_allocator() const {
                 return allocator_type(tree_.get_allocator());
             }
 
-            inline iterator         begin() { return iterator(tree_.begin()); }
-            inline const_iterator   begin() const { return const_iterator(tree_.begin()); }
-            inline iterator         end() { return iterator(tree_.end()); }
-            inline const_iterator   end() const { return const_iterator(tree_.end()); }
-            inline reverse_iterator         rbegin() { return reverse_iterator(end()); }
-            inline const_reverse_iterator   rbegin() const { return reverse_iterator(end()); }
-            inline reverse_iterator         rend() { return reverse_iterator(begin()); }
-            inline const_reverse_iterator   rend() const { return reverse_iterator(begin()); }
+            iterator                begin() { return iterator(tree_.begin()); }
+            const_iterator          begin() const { return const_iterator(tree_.begin()); }
+            iterator                end() { return iterator(tree_.end()); }
+            const_iterator          end() const { return const_iterator(tree_.end()); }
+            reverse_iterator        rbegin() { return reverse_iterator(end()); }
+            const_reverse_iterator  rbegin() const { return reverse_iterator(end()); }
+            reverse_iterator        rend() { return reverse_iterator(begin()); }
+            const_reverse_iterator  rend() const { return reverse_iterator(begin()); }
 
-            inline bool             empty() const { return tree_.empty(); }
-            inline size_type        size() const {return tree_.size();}
-            inline size_type        max_size() const {return tree_.max_size();}
+            bool            empty() const { return tree_.empty(); }
+            size_type       size() const {return tree_.size();}
+            size_type       max_size() const {return tree_.max_size();}
 
             // [[ライフサイクル]]
 
-            inline void             clear() { tree_.clear(); }
+            void            clear() { tree_.clear(); }
 
             // [[挿入系関数群]]
 
-            inline pair<iterator, bool> insert(const value_type& v) {
+            pair<iterator, bool>    insert(const value_type& v) {
                 ft::pair<typename base::iterator, bool>   result = tree_.insert(v);
                 return ft::make_pair(iterator(result.first), result.second);
             }
-            inline iterator             insert(iterator hint, const value_type& v) {
+            iterator                insert(iterator hint, const value_type& v) {
                 typename base::iterator  result = tree_.insert(hint.tree_iter(), v);
                 return iterator(result);
             }
             template <class InputIterator>
-            inline void                 insert(InputIterator first, InputIterator last) {
+            void                    insert(InputIterator first, InputIterator last) {
                 for (; first != last; ++first) {
                     tree_.insert(tree_.end(), *first);
                 }
@@ -364,74 +368,74 @@ namespace ft {
 
             // [[削除]]
 
-            inline void         erase(iterator position) {
+            void         erase(iterator position) {
                 tree_.erase(position.tree_iter());
             }
             // 厳密にはC++03にはないけど, 便利じゃん？
-            inline void         erase(const_iterator position) {
+            void         erase(const_iterator position) {
                 tree_.erase(position.tree_iter());
             }
-            inline size_type    erase(const key_type& x) {
+            size_type    erase(const key_type& x) {
                 return tree_.erase_by_key(x);
             }
-            inline void         erase(iterator first, iterator last) {
+            void         erase(iterator first, iterator last) {
                 return tree_.erase(first.tree_iter(), last.tree_iter());
             }
 
-            inline void         swap(self_type& other) {
+            void         swap(self_type& other) {
                 tree_.swap(other.tree_);
             }
 
             // [[検索系関数]]
 
-            inline Value&           operator[](const key_type& x) {
+            Value&           operator[](const key_type& x) {
                 ft::pair<iterator, bool> result = insert(ft::make_pair(x, mapped_type()));
                 return (result.first)->second;
             }
             // key_type&& x のオーバーロードはない(C++03にはムーブがないので)
 
-            inline size_type        count(const key_type& x) const {
+            size_type        count(const key_type& x) const {
                 return tree_.count(x);
             }
 
-            inline iterator         find(const key_type& x) {
+            iterator         find(const key_type& x) {
                 return iterator(tree_.find(x));
             }
-            inline const_iterator   find(const key_type& x) const {
+            const_iterator   find(const key_type& x) const {
                 return const_iterator(tree_.find(x));
             }
 
-            inline pair<iterator, iterator>    equal_range(const key_type& x) {
+            pair<iterator, iterator>                equal_range(const key_type& x) {
                 return tree_.equal_range(x);
             }
 
-            inline pair<const_iterator, const_iterator> equal_range(const key_type& x) const {
+            pair<const_iterator, const_iterator>    equal_range(const key_type& x) const {
                 return tree_.equal_range(x);
             }
 
-            inline iterator                    lower_bound(const key_type& x) {
+            iterator                                lower_bound(const key_type& x) {
                 return iterator(tree_.lower_bound(x));
             }
-            inline const_iterator              lower_bound(const key_type& x) const {
+            const_iterator                          lower_bound(const key_type& x) const {
                 return const_iterator(tree_.lower_bound(x));
             }
 
-            inline iterator                    upper_bound(const key_type& x) {
+            iterator                                upper_bound(const key_type& x) {
                 return iterator(tree_.upper_bound(x));
             }
-            inline const_iterator              upper_bound(const key_type& x) const {
+            const_iterator                          upper_bound(const key_type& x) const {
                 return const_iterator(tree_.upper_bound(x));
             }
 
             // Key同士を取って比較するコンパレータを返す
-            inline key_compare         key_comp() const {
+            key_compare         key_comp() const {
                 // tree_.value_compare() は map_value_comp を返す.
                 // map_value_comp.key_comp() は key_compare(KeyComparator) を返す.
                 return tree_.value_compare().key_comp();
             }
 
             // pair<Key, Value>を取り, first同士を比較するコンパレータを返す
-            inline value_compare       value_comp() const {
+            value_compare       value_comp() const {
                 // 一見 tree_.value_compare() でよさそうだが,
                 // 型としては value_compare を返す必要があるので,
                 // 面倒だが以下のようにする:

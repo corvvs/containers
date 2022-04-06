@@ -18,6 +18,9 @@ namespace ft {
             typedef typename Container::reference       reference;
             typedef typename Container::const_reference const_reference;
 
+        protected:
+            Container  c;
+
         public:
 
             explicit stack(const Container& cont = Container())
@@ -26,38 +29,33 @@ namespace ft {
             stack(const stack& other)
                 : c(other.c) {}
 
-            ~stack() {}
-
-            inline stack& operator=(const stack& other) {
+            stack& operator=(const stack& other) {
                 if (this != &other) { c = other.c; }
                 return *this;
             }
 
-            inline reference top() {
+            reference top() {
                 return c.back();
             }
-            inline const_reference top() const {
+            const_reference top() const {
                 return top();
             }
 
-            inline bool empty() const {
+            bool empty() const {
                 return c.empty();
             }
 
-            inline size_type size() const {
+            size_type size() const {
                 return c.size();
             }
 
-            inline void push(const value_type& value) {
+            void push(const value_type& value) {
                 c.push_back(value);
             }
 
-            inline void pop() {
+            void pop() {
                 c.pop_back();
             }
-
-        protected:
-            Container  c;
     };
 
     // [比較演算子]

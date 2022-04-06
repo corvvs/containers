@@ -23,6 +23,21 @@ namespace fill {
         PairClass<const std::string, double> pair7 = pair6;
         DSOUT() << (pair6 == pair7) << std::endl;
         DSOUT() << std::equal_to< PairClass<const std::string, double> >()(pair6, pair7) << std::endl;
+        VectorClass<int>    v;
+
+        PairClass<VectorClass<int>::iterator, VectorClass<int>::iterator> pair8;
+
+        // iterator -> const_iterator は変換可能
+        PairClass<VectorClass<int>::const_iterator, VectorClass<int>::const_iterator> pair9(pair8);
+
+        // iterator -> const_iterator は変換可能
+        pair9 = pair8;
+
+        // const_iterator -> iterator はダメなのでコンパイルエラー
+        // pair8 = pair9;
+
+        // 同じ理由でコンパイルエラー
+        // PairClass<VectorClass<int>::iterator, VectorClass<int>::iterator> pair10(pair9);
     }
 
     void    make_pair() {

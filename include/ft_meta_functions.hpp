@@ -102,6 +102,34 @@ namespace ft {
         typedef typename remove_volatile<typename remove_const<T>::type>::type type;
     };
 
+    // [is_pointer]
+    template< class T > struct is_pointer_helper     : false_type {};
+    template< class T > struct is_pointer_helper<T*> : true_type {};
+    template< class T > struct is_pointer : is_pointer_helper<typename remove_cv<T>::type> {};
+
+    // [is_pseudo_trivially_constructible]
+    template< class T > struct is_pseudo_trivially_constructible : integral_constant<bool,
+        is_arithmetic<T>::value || is_pointer<T>::value
+    > {};
+
+    // [is_pseudo_trivially_assignable]
+    template< class T > struct is_pseudo_trivially_assignable : integral_constant<bool,
+        is_arithmetic<
+            typename remove_volatile<
+                typename remove_reference<T>::type
+            >::type
+        >::value || is_pointer<T>::value
+    > {};
+
+    // [is_pseudo_trivially_destructible]
+    template< class T > struct is_pseudo_trivially_destructible : integral_constant<bool,
+        is_arithmetic<
+            typename remove_cv<
+                typename remove_reference<T>::type
+            >::type
+        >::value || is_pointer<T>::value
+    > {};
+
     // [is_same]
     template<typename S, typename T>
     struct is_same {

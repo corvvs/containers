@@ -166,12 +166,10 @@ pair			:
 	$(MAKE) pair_clean
 	$(MAKE) $(NAME_PAIR_FT)
 
-pair_diff		:	pair_diff
+pd				:	pair_diff
 pair_diff		:	pair pair_stl
 	time ./$(NAME_PAIR_STL) > out_pair_1
 	time ./$(NAME_PAIR_FT) 2> err2 > out_pair_2
-	time ./$(NAME_MAP_STL) 2> err2 > out_map_1
-	time ./$(NAME_MAP_FT) 2> err2 > out_map_2
 	diff out_map_1 out_map_2 || :
 	sed -n -e '1,/= sprints =/p'  out_pair_1 > out1
 	sed -n -e '/= sprints =/,$$p' out_pair_1 > sprint1
@@ -299,6 +297,7 @@ meta			:
 	$(MAKE) meta_clean
 	$(MAKE) $(NAME_META_FT)
 
+med				:	meta_diff
 meta_diff		:	meta meta_stl
 	time ./$(NAME_META_STL) 100 2> err2 > out_meta_1
 	time ./$(NAME_META_FT) 100 2> err2 > out_meta_2

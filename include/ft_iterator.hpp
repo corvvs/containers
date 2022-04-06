@@ -150,80 +150,78 @@ namespace ft {
 
             typedef NormalIter                                                  iterator_type;
             typedef typename ft::iterator_traits<NormalIter>::difference_type   difference_type;
-            typedef typename ft::iterator_traits<NormalIter>::value_type        value_type;
             typedef typename ft::iterator_traits<NormalIter>::pointer           pointer;
-            typedef typename ft::iterator_traits<NormalIter>::reference         reference;
+            typedef typename ft::iterator_traits<NormalIter>::value_type        value_type;
             typedef typename ft::iterator_traits<NormalIter>::iterator_category iterator_category;
-        
+            typedef typename ft::iterator_traits<NormalIter>::reference         reference;
+
             reverse_iterator(): current(NormalIter()) {}
             explicit reverse_iterator(NormalIter iter): current(iter) {}
             // reverse_iterator -> const_reverse_iterator の変換をやるにはこれが必要
             template <class U>
             reverse_iterator(const reverse_iterator<U>& u)
                 : current(u.base()) {}
-            reverse_iterator(const reverse_iterator<NormalIter>& other) {
-                *this = other;
-            }
-            virtual ~reverse_iterator() {}
+            reverse_iterator(const reverse_iterator<NormalIter>& other): current(other.current) {}
+            // ~reverse_iterator() {}
 
-            inline iterator_type       base() const { return current; }
-
-            inline reverse_iterator&   operator=(const reverse_iterator& rhs) {
-                current = rhs.current;
+            reverse_iterator&   operator=(const reverse_iterator& rhs) {
+                current = rhs.base();
                 return *this;
             }
 
+            iterator_type       base() const { return current; }
+
             // 通常イテレータと異なり, mutableバージョンはない。
-            inline reference           operator*() const {
+            reference           operator*() const {
                 NormalIter  rv = current;
                 return *(--rv);
             }
 
-            inline pointer             operator->() const {
+            pointer             operator->() const {
                 return &*(*this);
             }
 
-            inline reverse_iterator&   operator++() {
+            reverse_iterator&   operator++() {
                 --current;
                 return *this;
             }
 
-            inline reverse_iterator    operator++(int) {
+            reverse_iterator    operator++(int) {
                 reverse_iterator    rv(*this);
                 --*this;
                 return rv;
             }
 
-            inline reverse_iterator&   operator--() {
+            reverse_iterator&   operator--() {
                 ++current;
                 return *this;
             }
 
-            inline reverse_iterator    operator--(int) {
+            reverse_iterator    operator--(int) {
                 reverse_iterator    rv(*this);
                 ++*this;
                 return rv;
             }
 
-            inline reverse_iterator&  operator+=(difference_type n) {
+            reverse_iterator    operator+(difference_type n) const {
+                return reverse_iterator(current - n);
+            }
+
+            reverse_iterator&   operator+=(difference_type n) {
                 current -= n;
                 return *this;
             }
 
-            inline reverse_iterator&    operator-=(difference_type n) {
+            reverse_iterator    operator-(difference_type n) const {
+                return reverse_iterator(current + n);
+            }
+
+            reverse_iterator&   operator-=(difference_type n) {
                 current += n;
                 return *this;
             }
 
-            inline reverse_iterator    operator+(difference_type n) const {
-                return reverse_iterator(current - n);
-            }
-
-            inline reverse_iterator    operator-(difference_type n) const {
-                return reverse_iterator(current + n);
-            }
-
-            inline reference           operator[](difference_type n) const {
+            reference           operator[](difference_type n) const {
                 return *(*this - n);
             }
     };

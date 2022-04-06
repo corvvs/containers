@@ -99,32 +99,32 @@ namespace ft {
 
                     // [[getters]]
 
-                    inline tree_value_pointer       value() { return tree_value_; }
-                    inline const tree_value_pointer value() const { return tree_value_; }
-                    inline tree_node_pointer&       left() { return left_child_node_; }
-                    inline tree_node_pointer&       right() { return right_child_node_; }
-                    inline tree_node_pointer&       parent() { return parent_node_; }
-                    inline const tree_node_pointer& left() const { return left_child_node_; }
-                    inline const tree_node_pointer& right() const { return right_child_node_; }
-                    inline const tree_node_pointer& parent() const { return parent_node_; }
+                    tree_value_pointer       value() { return tree_value_; }
+                    const tree_value_pointer value() const { return tree_value_; }
+                    tree_node_pointer&       left() { return left_child_node_; }
+                    tree_node_pointer&       right() { return right_child_node_; }
+                    tree_node_pointer&       parent() { return parent_node_; }
+                    const tree_node_pointer& left() const { return left_child_node_; }
+                    const tree_node_pointer& right() const { return right_child_node_; }
+                    const tree_node_pointer& parent() const { return parent_node_; }
 
                     // [[predicates]]
 
-                    inline bool is_black() const { return is_black_; }
+                    bool is_black() const { return is_black_; }
                     // 自身が左子かどうか
                     // (rootに対してはfalseを返すことに注意！)
-                    inline bool is_left_child() const { return has_parent_() && parent()->left() == this; }
+                    bool is_left_child() const { return has_parent_() && parent()->left() == this; }
                     // 自身が右子かどうか
-                    inline bool is_right_child() const { return has_parent_() && parent()->right() == this; }
-                    inline bool has_left_child() const { return left() != NULL; }
-                    inline bool has_right_child() const { return right() != NULL; }
+                    bool is_right_child() const { return has_parent_() && parent()->right() == this; }
+                    bool has_left_child() const { return left() != NULL; }
+                    bool has_right_child() const { return right() != NULL; }
 
                 FT_PRIVATE:
 
                     // [[private predicates]]
-                    inline bool is_end_() const { return !has_parent_(); }
-                    inline bool is_root_() const { return has_parent_() && parent()->is_end_(); }
-                    inline bool has_parent_() const { return parent() != NULL; }
+                    bool is_end_() const { return !has_parent_(); }
+                    bool is_root_() const { return has_parent_() && parent()->is_end_(); }
+                    bool has_parent_() const { return parent() != NULL; }
 
                     // 自身を根とする部分木の最小ノードを返す
                     // O(log2 |V|)
@@ -211,7 +211,7 @@ namespace ft {
 
                     // 「シス子」、つまり
                     // 自分が左子なら右子、自分が右子なら左子を返す。
-                    inline tree_node_pointer    cis_child() const {
+                    tree_node_pointer    cis_child() const {
                         if (is_left_child()) { return right(); }
                         if (is_right_child()) { return left(); }
                         return NULL;
@@ -219,7 +219,7 @@ namespace ft {
 
                     // 「トランス子」、つまり
                     // 自分が左子なら左子、自分が右子なら右子を返す。
-                    inline tree_node_pointer    trans_child() const {
+                    tree_node_pointer    trans_child() const {
                         if (is_left_child()) { return left(); }
                         if (is_right_child()) { return right(); }
                         return NULL;
@@ -227,33 +227,33 @@ namespace ft {
 
                     // childがthisの子である場合、childと逆の子を返す
                     // そうでない場合 NULL を返す
-                    inline tree_node_pointer   counter_child(const tree_node_pointer& child) const {
+                    tree_node_pointer   counter_child(const tree_node_pointer& child) const {
                         if (left() == child) { return right(); }
                         if (right() == child) { return left(); }
                         return NULL;
                     }
 
                     // 自分がトランス子かどうかを返す。
-                    inline bool                is_trans_child() const {
+                    bool                is_trans_child() const {
                         return !is_end_() && is_left_child() == parent()->is_left_child();
                     }
 
                     // 自分がシス子かどうかを返す。
-                    inline bool                is_cis_child() const {
+                    bool                is_cis_child() const {
                         return !is_end_() && is_left_child() != parent()->is_left_child();
                     }
 
                     // valueだけをswapする。
-                    inline void    swap_value(tree_node& other) {
+                    void    swap_value(tree_node& other) {
                         ft::swap(tree_value_, other.tree_value_);
                     }
 
-                    inline void    swap_color(tree_node& other) {
+                    void    swap_color(tree_node& other) {
                         ft::swap(is_black_, other.is_black_);
                     }
 
                     // 色を反転する
-                    inline void flip_color() { is_black_ = !is_black_; }
+                    void flip_color() { is_black_ = !is_black_; }
 
                     // 2つのノードの位置関係、つまり接続されているエッジを入れ替える.
                     // 入れ替え対象はどちらも通常のノード.
@@ -273,7 +273,7 @@ namespace ft {
                     }
 
                     // child を自身の左子として配置する
-                    inline void    place_into_left(tree_node_pointer child) {
+                    void    place_into_left(tree_node_pointer child) {
                         this->left() = child;
                         if (child != NULL) {
                             child->parent() = this;
@@ -281,7 +281,7 @@ namespace ft {
                     }
 
                     // child を自身の右子として配置する
-                    inline void    place_into_right(tree_node_pointer child) {
+                    void    place_into_right(tree_node_pointer child) {
                         this->right() = child;
                         if (child != NULL) {
                             child->parent() = this;
@@ -481,7 +481,7 @@ namespace ft {
                     }
 
                     // valueの構築が必要ない場合、value構築フラグだけを立てる
-                    inline void    construct_blank_value() {
+                    void    construct_blank_value() {
                         if (node_constructed_) {
                             value_constructed_ = true;
                         }
@@ -549,44 +549,44 @@ namespace ft {
                         : ptr_(other.ptr_) {}
                     iterator(const_iterator_type constant)
                         : ptr_(const_cast<pointer>(constant.operator->())) {}
-                    iterator_type&  operator=(const iterator_type &rhs) {
-                        ptr_ = rhs.ptr_;
-                        return *this;
-                    }
-                    virtual         ~iterator() {}
+                    // iterator_type&  operator=(const iterator_type &rhs) {
+                    //     ptr_ = rhs.ptr_;
+                    //     return *this;
+                    // }
+                    // ~iterator() {}
 
                 FT_PRIVATE:
-                    inline pointer  next() const { return ptr_->forward_neighbor(); }
-                    inline pointer  prev() const { return ptr_->backward_neighbor(); }
+                    pointer  next() const { return ptr_->forward_neighbor(); }
+                    pointer  prev() const { return ptr_->backward_neighbor(); }
 
                 public:
-                    inline reference    operator*() const { return *ptr_; }
-                    inline pointer      operator->() const { return ptr_; }
+                    reference    operator*() const { return *ptr_; }
+                    pointer      operator->() const { return ptr_; }
 
-                    inline iterator_type&      operator++() {
+                    iterator_type&      operator++() {
                         ptr_ = next();
                         return *this;
                     }
-                    inline iterator_type       operator++(int) {
+                    iterator_type       operator++(int) {
                         iterator_type   it = *this;
                         ++*this;
                         return it;
                     }
 
-                    inline iterator_type&      operator--() {
+                    iterator_type&      operator--() {
                         ptr_ = prev();
                         return *this;
                     }
-                    inline iterator_type       operator--(int) {
+                    iterator_type       operator--(int) {
                         iterator_type   it = *this;
                         --*this;
                         return it;
                     }
 
-                    inline bool         operator==(const iterator_type& rhs) const {
+                    bool         operator==(const iterator_type& rhs) const {
                         return ptr_ == rhs.ptr_;
                     }
-                    inline bool         operator!=(const iterator_type& rhs) const {
+                    bool         operator!=(const iterator_type& rhs) const {
                         return !(*this == rhs);
                     }
             };
@@ -616,40 +616,40 @@ namespace ft {
                         ptr_ = rhs.ptr_;
                         return *this;
                     }
-                    virtual         ~const_iterator() {}
+                    ~const_iterator() {}
 
                 FT_PRIVATE:
-                    inline pointer  next() const { return ptr_->forward_neighbor(); }
-                    inline pointer  prev() const { return ptr_->backward_neighbor(); }
+                    pointer  next() const { return ptr_->forward_neighbor(); }
+                    pointer  prev() const { return ptr_->backward_neighbor(); }
 
                 public:
-                    inline reference        operator*() const { return *ptr_; }
-                    inline pointer          operator->() const { return ptr_; }
+                    reference        operator*() const { return *ptr_; }
+                    pointer          operator->() const { return ptr_; }
 
-                    inline iterator_type&          operator++() {
+                    iterator_type&          operator++() {
                         ptr_ = next();
                         return *this;
                     }
-                    inline iterator_type           operator++(int) {
+                    iterator_type           operator++(int) {
                         iterator_type   it = *this;
                         ++*this;
                         return it;
                     }
 
-                    inline iterator_type&          operator--() {
+                    iterator_type&          operator--() {
                         ptr_ = prev();
                         return *this;
                     }
-                    inline iterator_type           operator--(int) {
+                    iterator_type           operator--(int) {
                         iterator_type   it = *this;
                         --*this;
                         return it;
                     }
 
-                    inline bool                    operator==(const iterator_type& rhs) const {
+                    bool                    operator==(const iterator_type& rhs) const {
                         return ptr_ == rhs.ptr_;
                     }
-                    inline bool                    operator!=(const iterator_type& rhs) const {
+                    bool                    operator!=(const iterator_type& rhs) const {
                         return !(*this == rhs);
                     }
 
@@ -734,33 +734,33 @@ namespace ft {
                 return *this;
             }
 
-            inline value_allocator_type&        get_allocator() { return value_allocator_; }
-            inline const value_allocator_type&  get_allocator() const { return value_allocator_; }
-            inline node_allocator_type&         get_node_allocator() { return node_allocator_; }
-            inline const node_allocator_type&   get_node_allocator() const { return node_allocator_; }
-            inline value_comparator_type&       value_compare() { return value_compare_; }
-            inline const value_comparator_type& value_compare() const { return value_compare_; }
+            value_allocator_type&        get_allocator() { return value_allocator_; }
+            const value_allocator_type&  get_allocator() const { return value_allocator_; }
+            node_allocator_type&         get_node_allocator() { return node_allocator_; }
+            const node_allocator_type&   get_node_allocator() const { return node_allocator_; }
+            value_comparator_type&       value_compare() { return value_compare_; }
+            const value_comparator_type& value_compare() const { return value_compare_; }
 
-            inline iterator                 begin()
+            iterator                 begin()
                 { return iterator(begin_node()); }
-            inline const_iterator           begin() const
+            const_iterator           begin() const
                 { return const_iterator(begin_node()); }
-            inline iterator                 end()
+            iterator                 end()
                 { return iterator(end_node()); }
-            inline const_iterator           end() const
+            const_iterator           end() const
                 { return const_iterator(end_node()); }
-            inline reverse_iterator         rbegin()
+            reverse_iterator         rbegin()
                 { return reverse_iterator(end()); }
-            inline const_reverse_iterator   rbegin() const
+            const_reverse_iterator   rbegin() const
                 { return reverse_iterator(end()); }
-            inline reverse_iterator         rend()
+            reverse_iterator         rend()
                 { return reverse_iterator(begin()); }
-            inline const_reverse_iterator   rend() const
+            const_reverse_iterator   rend() const
                 { return reverse_iterator(begin()); }
 
-            inline size_type    size() const { return size_; }
-            inline bool         empty() const { return size() == 0; }
-            inline size_type    max_size() const {
+            size_type    size() const { return size_; }
+            bool         empty() const { return size() == 0; }
+            size_type    max_size() const {
                 return std::min<size_type>(
                     get_node_allocator().max_size(),
                     std::numeric_limits<difference_type >::max()
@@ -814,7 +814,7 @@ namespace ft {
             // 範囲挿入
             template <class InputIterator>
             // (使ってない)
-            inline void    insert(InputIterator first, InputIterator last) {
+            void    insert(InputIterator first, InputIterator last) {
                 for (; first != last; ++first) {
                     // 常にendをヒントにしながら挿入するので,
                     //   - 挿入元ツリーが空
@@ -875,7 +875,7 @@ namespace ft {
             // keyと等しい要素があれば返す。
             // 言い換えると、 key <= element かつ element <= key が成り立つelementを返す。
             template <class Key>
-            inline iterator         find(const Key& key) {
+            iterator         find(const Key& key) {
                 iterator it = lower_bound(key);
                 if (it == end() || value_compare()(key, *(it->value()))) {
                     return end();
@@ -883,7 +883,7 @@ namespace ft {
                 return it;
             }
             template <class Key>
-            inline const_iterator   find(const Key& key) const {
+            const_iterator   find(const Key& key) const {
                 const_iterator it = lower_bound(key);
                 if (it == end() || value_compare()(key, *(it->value()))) {
                     return end();
@@ -895,25 +895,25 @@ namespace ft {
             // 言い換えると   min{ element | key <= element }
             // または        min{ element | !value_comp()(element, key) }
             template <class Key>
-            inline iterator         lower_bound(const Key& key) {
+            iterator         lower_bound(const Key& key) {
                 return iterator(lower_bound_ptr_(key));
             }
             template <class Key>
-            inline const_iterator   lower_bound(const Key& key) const {
+            const_iterator   lower_bound(const Key& key) const {
                 return const_iterator(lower_bound_ptr_(key));
             }
             // 「key より大きい最小の要素」を返す
             template <class Key>
-            inline iterator         upper_bound(const Key& key) {
+            iterator         upper_bound(const Key& key) {
                 return iterator(upper_bound_ptr_(key));
             }
             template <class Key>
-            inline const_iterator   upper_bound(const Key& key) const {
+            const_iterator   upper_bound(const Key& key) const {
                 return const_iterator(upper_bound_ptr_(key));
             }
 
             template <class Key>
-            inline size_type        count(const Key& x) const {
+            size_type        count(const Key& x) const {
                 return find_ptr_(x) == end_node() ? 0 : 1;
             }
 
@@ -945,12 +945,12 @@ namespace ft {
 
         FT_PRIVATE:
 
-            inline pointer          end_node() { return &end_node_; }
-            inline const_pointer    end_node() const { return &end_node_; }
-            inline pointer          root() { return end_node()->left(); }
-            inline const_pointer    root() const { return end_node()->left(); }
-            inline pointer          begin_node() { return begin_node_; }
-            inline const_pointer    begin_node() const { return begin_node_; }
+            pointer          end_node() { return &end_node_; }
+            const_pointer    end_node() const { return &end_node_; }
+            pointer          root() { return end_node()->left(); }
+            const_pointer    root() const { return end_node()->left(); }
+            pointer          begin_node() { return begin_node_; }
+            const_pointer    begin_node() const { return begin_node_; }
 
             // key と一致するノードがあれば、そのポインタを返す。
             // "key と一致"とはつまり、xが key <= x && x <= key を満たすこと。
@@ -1467,14 +1467,14 @@ namespace ft {
             }
 
             // 回転と色反転を同時に行う
-            inline static void    rotate_flip_(pointer parent, pointer node) {
+            static void    rotate_flip_(pointer parent, pointer node) {
                 node->flip_color();
                 parent->flip_color();
                 rotate_(parent, node);
             }
 
             // 回転と色交換を同時に行う
-            inline static void    rotate_swap_(pointer parent, pointer node) {
+            static void    rotate_swap_(pointer parent, pointer node) {
                 parent->swap_color(*node);
                 rotate_(parent, node);
             }

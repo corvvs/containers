@@ -93,6 +93,153 @@ namespace is_convertible {
 #undef VICE_VERSA
 }
 
+namespace is_pseudo_trivially_constructible {
+// 以下, std::is_pseudo_trivially_constructible がC++11なのでコメントアウトしてある.
+// コメントアウトを外すと比較可能になる.
+// #ifdef USE_STL
+// # define IS_TRIVIAL NS::is_trivially_constructible
+// #else
+// # define IS_TRIVIAL NS::is_pseudo_trivially_constructible
+// #endif
+#ifndef IS_TRIVIAL
+# define IS_TRIVIAL ft::is_pseudo_trivially_constructible
+#endif
+#define TEST(type_a) (DSOUT() << "is is_pseudo_trivially_constructible?: " << (IS_TRIVIAL<type_a>::value ? "yes" : "NO") << (": " #type_a) << std::endl)
+    void    is_pseudo_trivially_constructible() {
+        TEST(int);
+        TEST(int*);
+        TEST(int&);
+        TEST(const int);
+        TEST(volatile int);
+        TEST(volatile int*);
+        TEST(volatile int&);
+        TEST(simple_holder<int>);
+        TEST(simple_holder<int*>);
+        TEST(char);
+        TEST(char*);
+        TEST(char&);
+        TEST(const char);
+        TEST(volatile char);
+        TEST(volatile char*);
+        TEST(volatile char&);
+        TEST(simple_holder<char>);
+        TEST(simple_holder<char*>);
+        TEST(std::string);
+        TEST(std::string*);
+        TEST(const std::string);
+        TEST(volatile std::string);
+        TEST(volatile std::string*);
+        TEST(int[]);
+        TEST(std::vector<int>);
+        TEST(ft::vector<int>);
+        TEST(NS::stack<int>);
+        typedef NS::map<int, int> map_type;
+        TEST(map_type);
+        TEST(std::set<int>);
+        TEST(ft::set<int>);
+    }
+#undef TEST
+#undef IS_TRIVIAL
+}
+
+namespace is_pseudo_trivially_assignable {
+// 以下, std::is_trivially_copy_assignable がC++11なのでコメントアウトしてある.
+// コメントアウトを外すと比較可能になる.
+// #ifdef USE_STL
+// # define IS_TRIVIAL NS::is_trivially_copy_assignable
+// #else
+// # define IS_TRIVIAL NS::is_pseudo_trivially_assignable
+// #endif
+#ifndef IS_TRIVIAL
+# define IS_TRIVIAL ft::is_pseudo_trivially_assignable
+#endif
+#define TEST(type_a) (DSOUT() << "is is_pseudo_trivially_assignable?: " << (IS_TRIVIAL<type_a>::value ? "yes" : "NO") << (": " #type_a) << std::endl)
+    void    is_pseudo_trivially_assignable() {
+        TEST(int);
+        TEST(int*);
+        TEST(int&);
+        TEST(const int);
+        TEST(volatile int);
+        TEST(volatile int*);
+        TEST(volatile int&);
+        TEST(simple_holder<int>);
+        TEST(simple_holder<int*>);
+        TEST(char);
+        TEST(char*);
+        TEST(char&);
+        TEST(const char);
+        TEST(volatile char);
+        TEST(volatile char*);
+        TEST(volatile char&);
+        TEST(simple_holder<char>);
+        TEST(simple_holder<char*>);
+        TEST(std::string);
+        TEST(std::string*);
+        TEST(const std::string);
+        TEST(volatile std::string);
+        TEST(volatile std::string*);
+        TEST(int[]);
+        TEST(std::vector<int>);
+        TEST(ft::vector<int>);
+        TEST(NS::stack<int>);
+        typedef NS::map<int, int> map_type;
+        TEST(map_type);
+        TEST(std::set<int>);
+        TEST(ft::set<int>);
+    }
+#undef TEST
+#undef IS_TRIVIAL
+}
+
+namespace is_pseudo_trivially_destructible {
+// 以下, std::is_pseudo_trivially_destructible がC++11なのでコメントアウトしてある.
+// コメントアウトを外すと比較可能になる.
+// #ifdef USE_STL
+// # define IS_TRIVIAL NS::is_trivially_destructible
+// #else
+// # define IS_TRIVIAL NS::is_pseudo_trivially_destructible
+// #endif
+#ifndef IS_TRIVIAL
+# define IS_TRIVIAL ft::is_pseudo_trivially_destructible
+#endif
+#define TEST(type_a) (DSOUT() << "is is_pseudo_trivially_destructible?: " << (IS_TRIVIAL<type_a>::value ? "yes" : "NO") << (": " #type_a) << std::endl)
+    void    is_pseudo_trivially_destructible() {
+        TEST(int);
+        TEST(int*);
+        TEST(int&);
+        TEST(const int);
+        TEST(volatile int);
+        TEST(volatile int*);
+        TEST(volatile int&);
+        TEST(simple_holder<int>);
+        TEST(simple_holder<int*>);
+        TEST(char);
+        TEST(char*);
+        TEST(char&);
+        TEST(const char);
+        TEST(volatile char);
+        TEST(volatile char*);
+        TEST(volatile char&);
+        TEST(simple_holder<char>);
+        TEST(simple_holder<char*>);
+        TEST(std::string);
+        TEST(std::string*);
+        TEST(const std::string);
+        TEST(volatile std::string);
+        TEST(volatile std::string*);
+        TEST(int[]);
+        TEST(std::vector<int>);
+        TEST(ft::vector<int>);
+        TEST(NS::stack<int>);
+        typedef NS::map<int, int> map_type;
+        TEST(map_type);
+        TEST(std::set<int>);
+        TEST(ft::set<int>);
+    }
+#undef TEST
+#undef IS_TRIVIAL
+}
+
 namespace iterator_category {
     template <class Iter>
     void subtest() {
@@ -132,6 +279,9 @@ namespace iterator_category {
 int main() {
     is_same::is_same();
     is_convertible::is_convertible();
+    is_pseudo_trivially_constructible::is_pseudo_trivially_constructible();
+    is_pseudo_trivially_assignable::is_pseudo_trivially_assignable();
+    is_pseudo_trivially_destructible::is_pseudo_trivially_destructible();
     iterator_category::test();
 
     {

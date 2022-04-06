@@ -200,7 +200,7 @@ void    mass_insertion_1(int n) {
     }
 
     VC(T) vi;
-    vi.push_back(random_value_generator<T>());
+    vi.insert(vi.end(), random_value_generator<T>());
     {
         SPRINT("mass_insertion_1") << "(" << n << ")";
         int s = 0;
@@ -225,7 +225,7 @@ void    mass_insertion_1_discarding(int n) {
     }
 
     VC(T) vi;
-    vi.push_back(random_value_generator<T>());
+    vi.insert(vi.begin(), random_value_generator<T>());
     {
         SPRINT("mass_insertion_1_discarding") << "(" << n << ")";
         for (typename VectorClass<T>::const_iterator vit = vv.begin(); vit != vv.end(); ++vit) {
@@ -299,9 +299,11 @@ void    mass_insertion_range_inputiter(VC(T)::size_type n) {
         std::istream_iterator<T> it(ss);
         std::istream_iterator<T> it_end;
         vj.reserve(n * 2);
-        SPRINT("mass_insertion_range_inputiter(2: no realloc and insert)") << "(" << n << ")";
         print_stats(vj, false);
-        vj.insert(vj.begin(), it, it_end);
+        {
+            SPRINT("mass_insertion_range_inputiter(2: no realloc and insert)") << "(" << n << ")";
+            vj.insert(vj.begin(), it, it_end);
+        }
         DSOUT() << vj << std::endl;
         print_stats(vj, false);
     }
@@ -493,15 +495,15 @@ void    mass_iterator_copy(VC(T)::size_type n) {
     VectorClass<T> v;
     v.push_back(random_value_generator<T>());
     typename VectorClass<T>::iterator it = v.begin();
+    typename VectorClass<T>::difference_type d = 0;
     {
         SPRINT("mass_iterator_copy") << "(" << n << ")";
-        typename VectorClass<T>::difference_type d = 0;
         for (typename VectorClass<T>::size_type i = 0; i < n; ++i) {
             typename VectorClass<T>::iterator iit(it);
             d += !!(iit.operator->());
         }
-        DSOUT() << d << std::endl;
     }
+    DSOUT() << d << std::endl;
 }
 
 template <class T>
@@ -555,8 +557,8 @@ void    performance(const std::string& sub_title, std::size_t n) {
     mass_repeated_allocation<T>(10000 * n);
     mass_insertion_1<T>(100 * n);
     mass_insertion_1_discarding<T>(100 * n);
-    mass_insertion_n<T>(n);
-    mass_insertion_range<T>(n, n);
+    mass_insertion_n<T>(10 * n);
+    mass_insertion_range<T>(10 * n, n);
     mass_push_back<T>(100 * n);
     mass_pop_back<T>(100 * n);
     mass_resize<T>(100 * n);
@@ -953,14 +955,14 @@ int main() {
     ft::sprint::pop_bread();
 
     // 別枠で
-    mass_insertion_range_inputiter<int>(10);
-    mass_insertion_range_inputiter<int>(100);
-    mass_insertion_range_inputiter<int>(1000);
-    mass_insertion_range_inputiter<int>(10000);
-    mass_insertion_range_inputiter<std::string>(10);
-    mass_insertion_range_inputiter<std::string>(100);
-    mass_insertion_range_inputiter<std::string>(1000);
-    mass_insertion_range_inputiter<std::string>(10000);
+    mass_insertion_range_inputiter<int>(50);
+    mass_insertion_range_inputiter<int>(500);
+    mass_insertion_range_inputiter<int>(5000);
+    mass_insertion_range_inputiter<int>(50000);
+    mass_insertion_range_inputiter<std::string>(50);
+    mass_insertion_range_inputiter<std::string>(500);
+    mass_insertion_range_inputiter<std::string>(5000);
+    mass_insertion_range_inputiter<std::string>(50000);
 
     {
         VectorClass< ft::blank<int> >   v((0));
