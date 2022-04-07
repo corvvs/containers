@@ -23,28 +23,40 @@ void    mass_construct(int n) {
 
 // 構築とreserve
 template <class T>
-void    construct_and_reserve() {
-    SPRINT("construct_and_reserve");
-    VC(T)  vi;
-    print_stats(vi);
-    std::cout << "-- reserve(0)" << std::endl;
-    vi.reserve(0);
-    print_stats(vi);
-    std::cout << "-- reserve(1)" << std::endl;
-    vi.reserve(1);
-    print_stats(vi);
+void    construct_and_reserve(int n) {
     {
-        // SPRINT("reserve(100000000)");
-        std::cout << "-- reserve(100000000)" << std::endl;
-        vi.reserve(100000000);
+        SPRINT("construct_and_reserve");
+        VC(T)  vi;
+        print_stats(vi);
+        std::cout << "-- reserve(0)" << std::endl;
+        vi.reserve(0);
+        print_stats(vi);
+        std::cout << "-- reserve(1)" << std::endl;
+        vi.reserve(1);
+        print_stats(vi);
+        {
+            // SPRINT("reserve(100000000)");
+            std::cout << "-- reserve(100000000)" << std::endl;
+            vi.reserve(100000000);
+            print_stats(vi);
+        }
+        std::cout << "-- reserve(1)" << std::endl;
+        vi.reserve(1);
+        print_stats(vi);
+        std::cout << "-- reserve(0)" << std::endl;
+        vi.reserve(0);
         print_stats(vi);
     }
-    std::cout << "-- reserve(1)" << std::endl;
-    vi.reserve(1);
-    print_stats(vi);
-    std::cout << "-- reserve(0)" << std::endl;
-    vi.reserve(0);
-    print_stats(vi);
+    {
+        SPRINT("mass_construct_and_reserve");
+
+        for (int i = 0; i < n; ++i) {
+            VC(T)  vi;
+            vi.reserve(100000000);
+            print_stats(vi);
+        }
+
+    }
     // std::cout << "-- reserve(-1)" << std::endl;
     // vi.reserve(-1);
     // print_stats(vi);
@@ -548,7 +560,7 @@ void    performance(const std::string& sub_title, std::size_t n) {
     ft::sprint::push_bread("vector<" + sub_title + ">");
     ft::sprint::insert_comment(sub_title);
     mass_construct<T>(100000 * n);
-    construct_and_reserve<T>();
+    construct_and_reserve<T>(100 * n);
     mass_assign<T>(100 * n);
     mass_assign_range<T>(30 * n);
     mass_assignation_eq<T>(100 * n);
