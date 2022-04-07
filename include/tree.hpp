@@ -801,7 +801,7 @@ namespace ft {
             // > そうでなければ、コンテナのサイズの対数。
             iterator    insert(iterator hint, const value_type& key) {
                 pair<pointer, pointer*> place = find_equal_(&*hint, key);
-                if (place.second == NULL) {
+                if (place.first == *(place.second)) {
                     // 挿入不可
                     return iterator(place.first);
                 }
@@ -930,18 +930,34 @@ namespace ft {
                         // つまり p == key
                         iterator    it2(p);
                         iterator    it1 = it2++;
-                        return ft::pair<iterator, iterator>(it1, it2);
+                        return ft::make_pair(it1, it2);
                     }
                 }
-                return ft::pair<iterator, iterator>(iterator(p), iterator(p));
+                return ft::make_pair(p, p);
             }
-            pair<const_iterator, const_iterator> equal_range(const value_type& key) const {
-                pair<iterator, iterator>    pp = equal_range(key);
-                return pair<const_iterator, const_iterator>(
-                    static_cast<const_iterator>(pp.first),
-                    static_cast<const_iterator>(pp.second)
-                );
+            template <class Key>
+            pair<const_iterator, const_iterator>    equal_range(const Key& key) const {
+                const_pointer p = lower_bound_ptr_(key);
+                if (p != end_node()) {
+                    // p = min{ x | key <= x }, つまり key <= p
+                    if (!value_compare()(key, *p->value())) {
+                        // p <= key
+                        // -> p <= key <= p
+                        // つまり p == key
+                        const_iterator    it2(p);
+                        const_iterator    it1 = it2++;
+                        return ft::make_pair(it1, it2);
+                    }
+                }
+                return ft::make_pair(p, p);
             }
+            // pair<const_iterator, const_iterator> equal_range(const value_type& key) const {
+            //     pair<iterator, iterator>    pp = equal_range(key);
+            //     return pair<const_iterator, const_iterator>(
+            //         static_cast<const_iterator>(pp.first),
+            //         static_cast<const_iterator>(pp.second)
+            //     );
+            // }
 
         FT_PRIVATE:
 
@@ -1477,6 +1493,11 @@ namespace ft {
             static void    rotate_swap_(pointer parent, pointer node) {
                 parent->swap_color(*node);
                 rotate_(parent, node);
+            }
+
+        FT_PRIVATE:
+            static void    node_out_(const std::string& name, pointer node) {
+                std::cerr << name << "(" << node << ").(p, l, r) = (" << node->parent() << ", " << node->left() << ", " << node->right() << ")" << std::endl;
             }
 
         /*

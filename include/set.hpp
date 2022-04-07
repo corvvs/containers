@@ -303,13 +303,13 @@ namespace ft {
         return !(lhs < rhs);
     }
 
-    template <class Key, class KeyComparator, class KeyAllocator>
-    inline void swap(
-        ft::set<Key, KeyComparator, KeyAllocator>& lhs,
-        ft::set<Key, KeyComparator, KeyAllocator>& rhs
-    ) {
-        lhs.swap(rhs);
-    }
+    // template <class Key, class KeyComparator, class KeyAllocator>
+    // inline void swap(
+    //     ft::set<Key, KeyComparator, KeyAllocator>& lhs,
+    //     ft::set<Key, KeyComparator, KeyAllocator>& rhs
+    // ) {
+    //     lhs.swap(rhs);
+    // }
 }
 
 namespace std {

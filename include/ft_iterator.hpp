@@ -178,7 +178,7 @@ namespace ft {
             }
 
             pointer             operator->() const {
-                return &*(*this);
+                return &(operator*());
             }
 
             reverse_iterator&   operator++() {
@@ -188,7 +188,7 @@ namespace ft {
 
             reverse_iterator    operator++(int) {
                 reverse_iterator    rv(*this);
-                --*this;
+                ++*this;
                 return rv;
             }
 
@@ -199,7 +199,7 @@ namespace ft {
 
             reverse_iterator    operator--(int) {
                 reverse_iterator    rv(*this);
-                ++*this;
+                --*this;
                 return rv;
             }
 
@@ -222,7 +222,7 @@ namespace ft {
             }
 
             reference           operator[](difference_type n) const {
-                return *(*this - n);
+                return *(*this + n);
             }
     };
 }
@@ -242,25 +242,25 @@ inline bool operator!=(const ft::reverse_iterator<It1>& x, const ft::reverse_ite
 template <class It1, class It2>
 inline bool operator<(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
 {
-    return x.base() < y.base();
+    return x.base() > y.base();
 }
 
 template <class It1, class It2>
 inline bool operator>(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
 {
-    return x.base() > y.base();
+    return x.base() < y.base();
 }
 
 template <class It1, class It2>
 inline bool operator<=(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
 {
-    return x.base() <= y.base();
+    return x.base() >= y.base();
 }
 
 template <class It1, class It2>
 inline bool operator>=(const ft::reverse_iterator<It1>& x, const ft::reverse_iterator<It2>& y)
 {
-    return x.base() >= y.base();
+    return x.base() <= y.base();
 }
 
 template <class It1, class It2>

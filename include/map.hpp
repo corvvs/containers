@@ -176,7 +176,7 @@ namespace ft {
                     }
 
                     const_iterator   operator++(int) {
-                        iterator    it = *this;
+                        const_iterator  it = *this;
                         ++*this;
                         return it;
                     }
@@ -500,13 +500,13 @@ namespace ft {
         return !(lhs < rhs);
     }
 
-    template <class Key, class Value, class KeyComparator, class PairAllocator>
-    inline void swap(
-        ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
-        ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
-    ) {
-        lhs.swap(rhs);
-    }
+    // template <class Key, class Value, class KeyComparator, class PairAllocator>
+    // inline void swap(
+    //     ft::map<Key, Value, KeyComparator, PairAllocator>& lhs,
+    //     ft::map<Key, Value, KeyComparator, PairAllocator>& rhs
+    // ) {
+    //     lhs.swap(rhs);
+    // }
 }
 
 namespace std {

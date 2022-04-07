@@ -747,9 +747,9 @@ namespace ft {
                 if (storage_) {
                     clear();
                     allocator_.deallocate(storage_, capacity());
-                    storage_ = NULL;
-                    size_ = 0;
-                    capacity_ = 0;
+                    // storage_ = NULL;
+                    // size_ = 0;
+                    // capacity_ = 0;
                 }
             }
             // trivialに破壊できるとき
@@ -757,9 +757,9 @@ namespace ft {
             void    obliterate_<true>() {
                 if (storage_) {
                     allocator_.deallocate(storage_, capacity());
-                    storage_ = NULL;
-                    size_ = 0;
-                    capacity_ = 0;
+                    // storage_ = NULL;
+                    // size_ = 0;
+                    // capacity_ = 0;
                 }
             }
     };
@@ -917,16 +917,15 @@ namespace ft {
     template <class It>
     inline ft::iterator_wrapper<It> operator+(
         typename ft::iterator_wrapper<It>::difference_type n,
-        const ft::iterator_wrapper<It>& x
+        ft::iterator_wrapper<It> x
     ) {
-        x += n;
-        return x;
+        return x + n;
     }
 
-    template <class T, class Alloc>
-    inline void swap( ft::vector<T, Alloc>& lhs, ft::vector<T, Alloc>& rhs ) {
-        lhs.swap(rhs);
-    }
+    // template <class T, class Alloc>
+    // inline void swap( ft::vector<T, Alloc>& lhs, ft::vector<T, Alloc>& rhs ) {
+    //     lhs.swap(rhs);
+    // }
 }
 
 // まあ一応ね
